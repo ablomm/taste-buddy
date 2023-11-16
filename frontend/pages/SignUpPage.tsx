@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, TextInput, StyleSheet} from "react-native";
+import {View, Text, TextInput, StyleSheet, Button, Pressable} from "react-native";
 
 const SignUpPage = () =>{
 
@@ -10,7 +10,6 @@ const [passwordConfirm, onChangePasswordConfirm] = React.useState('');
 
 
     return(<View>
-        <Text>Sign Up</Text>
         <TextInput style={styles.input}
         onChangeText={onChangeUsername}
         value={username}
@@ -31,6 +30,12 @@ const [passwordConfirm, onChangePasswordConfirm] = React.useState('');
         value={passwordConfirm}
         placeholder='Confirm Password'
         />
+        {/* <Button title="Sign Up" color={"black"}></Button> */}
+        <Pressable style={({pressed}) => [
+          {
+            backgroundColor: pressed ? '#F6F6F6' : 'white',
+          },styles.button]}
+          ><Text>Sign Up</Text></Pressable>
     </View>);
 }
 
@@ -38,14 +43,28 @@ const [passwordConfirm, onChangePasswordConfirm] = React.useState('');
 const styles = StyleSheet.create({
     input: {
         height: 50,
-        borderWidth: 1,
         width: 340,
+        borderWidth: 1,
         padding:10,
         margin: 10,
         borderRadius: 10,
         backgroundColor: "#F6F6F6",
         color: "#BDBDBD",
         borderColor: "#E8E8E8"
+    },
+    button:{
+        height: 50,
+        width: 340,
+        borderRadius: 100,
+        borderWidth: 2,
+        margin: 10,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    signupText: {
+        fontSize:16,
+        lineHeight:19,
+        fontWeight: "600"
     }
 })
 export default SignUpPage;
