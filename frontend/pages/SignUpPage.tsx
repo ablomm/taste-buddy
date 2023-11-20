@@ -3,6 +3,7 @@ import {View, Text, TextInput, StyleSheet, Button, Pressable} from "react-native
 import * as yup from 'yup';
 import {useForm, Controller} from 'react-hook-form';
 import {yupResolver} from '@hookform/resolvers/yup';
+import SignUpButton from '../components/loginSignupPageComponents/buttons/SignUpButton';
 
 const SignUpPage = () =>{
 
@@ -75,11 +76,7 @@ const [passwordConfirm, onChangePasswordConfirm] = React.useState('');
         placeholder='Confirm Password'
         />
         {/* <Button title="Sign Up" color={"black"}></Button> */}
-        <Pressable style={({pressed}) => [
-          {
-            backgroundColor: pressed ? '#F6F6F6' : 'white',
-          },styles.button]}
-          ><Text>Sign Up</Text></Pressable>
+        <SignUpButton/>
     </View>);
 }
 

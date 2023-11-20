@@ -21,10 +21,11 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#fff',
         paddingHorizontal: 12,
-    },
-    logoContainer: {
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    logoContainer: {
         flexShrink: 0,
+        paddingVertical: 30,
     },
 });

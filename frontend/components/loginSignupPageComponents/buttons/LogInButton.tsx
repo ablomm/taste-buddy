@@ -1,5 +1,6 @@
 import React from 'react';
 import {View, Text, StyleSheet, TextInput, Button, Pressable} from "react-native";
+import styles from '../../../styles/loginSignupPageComponents/buttons/loginSignupButtonStyles';
 
 const LoginButton = () =>{
     return(
@@ -11,27 +12,3 @@ const LoginButton = () =>{
     );
 }
 export default LoginButton;
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#fff',
-        paddingHorizontal: 12,
-        paddingVertical: 80,
-        alignItems: 'center',
-    },
-    button:{
-        height: 50,
-        width: 340,
-        borderRadius: 100,
-        borderWidth: 2,
-        margin: 10,
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    buttonText: {
-        fontSize:16,
-        lineHeight:19,
-        fontWeight: "600"
-    }
-})
