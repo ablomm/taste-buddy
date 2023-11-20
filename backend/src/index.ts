@@ -1,10 +1,11 @@
-import 'dotenv/config'
-import express from 'express'
-import cors from 'cors' 
-import helmet from 'helmet'
+import 'dotenv/config';
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import'express-async-errors';
 
 //import routes
-import userRoute from "./routes/user"
+import userController from "./controller/user"
 
 const app = express(); 
 
@@ -13,7 +14,14 @@ app.use(cors());
 app.use(express.json());
 
 //routes
-app.use('/user', userRoute);
+app.use('/user', userController);
+
+//error handler; must be last
+app.use((err: Error, req: express.Request, res: express.Response, next: express.RequestHandler) => {
+    console.error(err.stack);
+    res.status(500).json(err)
+});
+
 
 const PORT = process.env.PORT || 8080
 
