@@ -3,6 +3,7 @@ import {View, Text, StyleSheet, TextInput, Button, Pressable} from "react-native
 import * as yup from 'yup';
 import {useForm, Controller} from 'react-hook-form';
 import {yupResolver} from '@hookform/resolvers/yup';
+import LoginButton from './buttons/LogInButton';
 
 
 
@@ -62,11 +63,7 @@ const LoginForm = () =>{
             value={password}
             placeholder='Password'
             />
-            <View style={styles.container}>
-                <Pressable style={({pressed}) => [{backgroundColor: pressed ? '#BDBDBD' : 'white',} ,styles.button]}>
-                    <Text style={styles.buttonText}>Log In</Text>
-                </Pressable>
-            </View>
+            <LoginButton/>
         </View>
     );
 }
@@ -91,7 +88,7 @@ const styles = StyleSheet.create({
         color: "#BDBDBD",
         borderColor: "#E8E8E8"
     },
-    button:{
+   /* button:{
         height: 50,
         width: 340,
         borderRadius: 100,
@@ -104,5 +101,5 @@ const styles = StyleSheet.create({
         fontSize:16,
         lineHeight:19,
         fontWeight: "600"
-    }
+    }*/
 })
