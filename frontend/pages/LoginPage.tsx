@@ -1,27 +1,8 @@
-import {View, Text, StyleSheet, Image} from "react-native";
-import LoginForm from "../components/loginPage/LoginForm";
+import {View, Text} from "react-native";
 
 const LoginPage = () =>{
-    return(
-        <View style={styles.container}>
-            <View style={styles.logoContainer}>
-                <Image source={require("../assets/logo/Logo.png")} height={61} width={193}/>
-            </View>
-            <LoginForm/>
-        </View>
-    );
+    return(<View>
+        <Text>Login</Text>
+    </View>);
 }
 export default LoginPage;
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#fff',
-        paddingHorizontal: 12,
-    },
-    logoContainer: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexShrink: 0,
-    },
-});
