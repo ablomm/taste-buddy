@@ -36,7 +36,7 @@ const LoginForm = () =>{
     })
 
     return(
-        <View>
+        <View style={styles.container}>
             {/*<Controller 
             control={control}
             rules={{required:true,}}
@@ -62,30 +62,24 @@ const LoginForm = () =>{
             value={password}
             placeholder='Password'
             />
-
-            <Pressable style={({pressed}) => [{backgroundColor: pressed ? '#BDBDBD' : 'white',} ,styles.button]}>
-                <Text>Log In</Text>
-            </Pressable>
+            <View style={styles.container}>
+                <Pressable style={({pressed}) => [{backgroundColor: pressed ? '#BDBDBD' : 'white',} ,styles.button]}>
+                    <Text style={styles.buttonText}>Log In</Text>
+                </Pressable>
+            </View>
         </View>
     );
 }
 export default LoginForm;
 
-/*
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
-        paddingTop: 43,
         paddingHorizontal: 12,
-    },
-    logoContainer: {
+        paddingVertical: 80,
         alignItems: 'center',
-        justifyContent: 'center',
-        flexShrink: 0,
     },
-});*/
-const styles = StyleSheet.create({
     input: {
         height: 50,
         width: 340,
@@ -106,7 +100,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center'
     },
-    signupText: {
+    buttonText: {
         fontSize:16,
         lineHeight:19,
         fontWeight: "600"
