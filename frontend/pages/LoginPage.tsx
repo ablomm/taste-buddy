@@ -1,5 +1,5 @@
 import {View, Text, StyleSheet, Image} from "react-native";
-import LoginForm from "../components/loginPage/LoginForm";
+import LoginForm from "../components/loginSignupPageComponents/LoginForm";
 
 const LoginPage = () =>{
     return(
