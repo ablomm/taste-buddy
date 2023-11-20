@@ -53,15 +53,16 @@ const LoginForm = () =>{
             
             {errors.username && <Text>{errors.username.message}</Text>}
             <TextInput style={styles.input}
-            onChangeText={onChangeUsername}
-            value={username}
-            placeholder='Username'
+                onChangeText={onChangeUsername}
+                value={username}
+                placeholder='Username'
             />
             
             <TextInput style={styles.input}
-            onChangeText={onChangePassword}
-            value={password}
-            placeholder='Password'
+                onChangeText={onChangePassword}
+                value={password}
+                placeholder='Password'
+                secureTextEntry = {true}
             />
             <LoginButton/>
         </View>
@@ -87,19 +88,5 @@ const styles = StyleSheet.create({
         backgroundColor: "#F6F6F6",
         color: "#BDBDBD",
         borderColor: "#E8E8E8"
-    },
-   /* button:{
-        height: 50,
-        width: 340,
-        borderRadius: 100,
-        borderWidth: 2,
-        margin: 10,
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    buttonText: {
-        fontSize:16,
-        lineHeight:19,
-        fontWeight: "600"
-    }*/
+    }
 })
