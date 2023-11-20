@@ -3,15 +3,17 @@ import express from 'express'
 import cors from 'cors' 
 import helmet from 'helmet'
 
+//import routes
+import userRoute from "./routes/user"
+
 const app = express(); 
 
 app.use(helmet()); 
 app.use(cors()); 
 app.use(express.json());
 
-app.get("/", (req: any, res:any) => {
-  res.send("hello world");
-});
+//routes
+app.use('/user', userRoute);
 
 const PORT = process.env.PORT || 8080
 
