@@ -1,11 +1,30 @@
-const express = require('express')
-const app = express()
-const port = 8080
+import 'dotenv/config';
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import'express-async-errors';
 
-app.get('/', (req: any, res: any) => {
-  res.send('Hello World!')
-})
+//import routes
+import userController from "./controller/user"
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
+const app = express(); 
+
+app.use(helmet()); 
+app.use(cors()); 
+app.use(express.json());
+
+//routes
+app.use('/user', userController);
+
+//error handler; must be last
+app.use((err: Error, req: express.Request, res: express.Response, next: express.RequestHandler) => {
+    console.error(err.stack);
+    res.status(500).json(err)
+});
+
+
+const PORT = process.env.PORT || 8080
+
+app.listen(PORT, async () => {
+   console.log(`listening on port ${PORT}`)
+});
