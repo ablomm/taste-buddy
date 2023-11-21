@@ -10,12 +10,8 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Stack.Screen
-        options = {{
-          headerStyle: {backgroundColor: '#fff'}
-        }}
-      />
-
+      <Text>Open up App.js to start working on your app!</Text>
+      <LoginPage/>
       <StatusBar style="auto" />
     </SafeAreaView>
   );
