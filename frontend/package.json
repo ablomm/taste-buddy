@@ -14,6 +14,7 @@
     "@hookform/resolvers": "^3.3.2",
     "@types/react": "~18.2.14",
     "axios": "^1.6.2",
+    "cors": "^2.8.5",
     "expo": "~49.0.15",
     "expo-constants": "~14.4.2",
     "expo-font": "^11.6.0",

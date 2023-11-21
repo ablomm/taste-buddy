@@ -4,10 +4,11 @@ import * as yup from 'yup';
 import {useForm, Controller} from 'react-hook-form';
 import {yupResolver} from '@hookform/resolvers/yup';
 import LoginButton from './buttons/LogInButton';
+import axios from 'axios';
 
 
 
-const LoginForm = () =>{
+const LoginForm = () => {
     const [username, onChangeUsername] = React.useState('');
     const [password, onChangePassword] = React.useState('');
 
@@ -32,11 +33,27 @@ const LoginForm = () =>{
     } = useForm({
         resolver: yupResolver(schema),
         defaultValues:{
-            username: ''
+            //username: ''
         }
     })
 
+    let onSubmitHandler = async () => {
+        alert("Login hit")
+        try {
+          let response = await axios.post('http://localhost:8080/login', {
+            username,
+            password
+          });
+          alert("Login failed please try again")
+          console.log('Response:', response.data);
+
+        } catch (error) {
+          console.error('Error:', error);
+        }
+    };
+
     return(
+        
         <View style={styles.container}>
             {/*<Controller 
             control={control}
@@ -52,20 +69,21 @@ const LoginForm = () =>{
             />*/}
             
             {errors.username && <Text>{errors.username.message}</Text>}
-            <TextInput style={styles.input}
-                onChangeText={onChangeUsername}
-                value={username}
-                placeholder='Username'
-            />
+                <TextInput style={styles.input}
+                    onChangeText={onChangeUsername}
+                    value={username}
+                    placeholder='Username'
+                />
             
-            <TextInput style={styles.input}
-                onChangeText={onChangePassword}
-                value={password}
-                placeholder='Password'
-                secureTextEntry = {true}
-            />
-            <LoginButton/>
+                <TextInput style={styles.input}
+                    onChangeText={onChangePassword}
+                    value={password}
+                    placeholder='Password'
+                    secureTextEntry = {true}
+                />
+            <LoginButton onPress={() => onSubmitHandler()}/>
         </View>
+        
     );
 }
 export default LoginForm;
