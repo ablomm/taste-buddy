@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 
-const getUser = async (username: any) => {
-    return { userId: "123", password: "asd", username };
+const getUser = async (username:any, password:any) => {
+    return { userId: "123", password, username };
   };
 
 module.exports = async (req:any , res:any) => {
@@ -9,9 +9,9 @@ module.exports = async (req:any , res:any) => {
     
         const { username, password } = req;
 
-        console.log(username)
+        console.log(username, password)
 
-        const user = await getUser(username);
+        const user = await getUser(username, password);
 
         console.log(user)
 
@@ -24,5 +24,5 @@ module.exports = async (req:any , res:any) => {
         })
 
         console.log("successful!")
-        return res.redirect('/SignUpPage');
+        return res.redirect('/');
 }

@@ -44,10 +44,11 @@ const LoginForm = () => {
             username,
             password
           });
-          alert("Login failed please try again")
-          console.log('Response:', response.data);
+          
+          console.log('Response:', response);
 
         } catch (error) {
+            alert("Login failed please try again")
           console.error('Error:', error);
         }
     };
