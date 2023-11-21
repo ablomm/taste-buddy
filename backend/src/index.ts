@@ -16,6 +16,10 @@ app.get('/', (req: any, res: any) => {
   res.send('Hello World!')
 })
 
+app.get('/SignUpPage', (req: any, res: any) => {
+  res.send('Hello World!')
+})
+
 app.post('/login', loginRoute);
 
 app.listen(port, () => {
