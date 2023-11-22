@@ -1,24 +1,13 @@
-import React, {useState} from 'react';
+import {useState} from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, SafeAreaView, ScrollView } from 'react-native';
-import {Stack, useRouter} from 'expo-router';
-import { NavigationContainer } from "@react-navigation/native";
-import LoginPage from "./pages/LoginPage";
-import LogInOrSignUpOptionPage from "./pages/LoginOrSignUpOptionPage";
+import LogInOrSignUpStack from "./navigation";
 
 export default function App() {
-  const router = useRouter();
 
   return (
     <SafeAreaView style={styles.container}>
-      <NavigationContainer>
-        <Stack.Screen
-          options = {{
-            headerStyle: {backgroundColor: '#fff'}
-          }}
-        />
-      </NavigationContainer>
-      
+      <LogInOrSignUpStack/>
       <StatusBar style="auto" />
     </SafeAreaView>
   );
