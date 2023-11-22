@@ -4,7 +4,7 @@ import { StyleSheet, Text, View, SafeAreaView, ScrollView } from 'react-native';
 import {Stack, useRouter} from 'expo-router';
 import { NavigationContainer } from "@react-navigation/native";
 import LoginPage from "./pages/LoginPage";
-import LogInOrSignUpOptionPage from './pages/LogInOrSignUpOptionPage';
+import LogInOrSignUpOptionPage from "./pages/LoginOrSignUpOptionPage";
 
 export default function App() {
   const router = useRouter();
