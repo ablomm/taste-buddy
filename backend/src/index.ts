@@ -4,10 +4,9 @@ import cors from 'cors';
 import helmet from 'helmet';
 import'express-async-errors';
 import cookieParser from "cookie-parser";
-import loginRoute from "./routes/login"
-
-//import routes
 import userController from "./controller/user"
+import loginController from "./controller/login"
+import authController from "./controller/authorize"
 
 const app = express(); 
 
@@ -22,6 +21,8 @@ app.use(cors({
 
 //routes
 app.use('/user', userController);
+app.use('/login', loginController);
+app.use('/authorize', authController);
 
 //error handler; must be last
 app.use((err: Error, req: express.Request, res: express.Response, next: express.RequestHandler) => {
@@ -29,11 +30,8 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
     res.status(500).json(err)
 });
 
-app.post('/login', loginRoute);
-
-
 const PORT = process.env.PORT || 8080
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
+app.listen(PORT, () => {
+  console.log(`Example app listening on port ${PORT}`)
 })
