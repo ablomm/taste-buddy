@@ -5,24 +5,16 @@ const getUser = async (username:any, password:any) => {
   };
 
 module.exports = async (req:any , res:any) => {
-        
     
-        const { username, password } = req;
-
-        console.log(username, password)
+        const { username, password } = req.body;
 
         const user = await getUser(username, password);
 
-        console.log(user)
-
-        const token = jwt.sign(user, "tastebuddy", { expiresIn:"1h"})
-
-        console.log(token)
+        const token = jwt.sign(user, "tastebuddy", { expiresIn:"1h"});
 
         res.cookie("token", token, {
           httpOnly: true,
         })
 
-        console.log("successful!")
         return res.redirect('/');
 }
