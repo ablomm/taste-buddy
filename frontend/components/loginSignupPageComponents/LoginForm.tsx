@@ -1,12 +1,9 @@
 import React from 'react';
-import {View, Text, StyleSheet, TextInput, Button, Pressable} from "react-native";
+import { View, Text, StyleSheet, TextInput, Button, Pressable, Alert } from "react-native";
 import * as yup from 'yup';
-import {useForm, Controller} from 'react-hook-form';
-import {yupResolver} from '@hookform/resolvers/yup';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
 import LoginButton from './buttons/LogInButton';
-import axios from 'axios';
-
-
 
 const LoginForm = () => {
     const [username, onChangeUsername] = React.useState('');
@@ -15,52 +12,55 @@ const LoginForm = () => {
     // define validation rules for each field
     const schema = yup.object().shape({
         username: yup
-        .string()
-        .required('Username is required')
-        .min(3, 'Username must contain at least 3 characters'),
+            .string()
+            .required('Username is required')
+            .min(3, 'Username must contain at least 3 characters'),
         password: yup
-        .string()
-        .required('Password is required')
-        .min(10, 'Password must contain at least 10 characters')
+            .string()
+            .required('Password is required')
+            .min(10, 'Password must contain at least 10 characters')
 
     });
 
     //set up form with validation schema, pass resolver property with yupResolver(schema) to handle validation logic
-    const{
+    const {
         control,
         handleSubmit,
-        formState: {errors},
+        formState: { errors },
     } = useForm({
         resolver: yupResolver(schema),
-        defaultValues:{
+        defaultValues: {
             //username: ''
         }
     })
 
     let onSubmitHandler = async () => {
         try {
-          let response = await fetch('http://localhost:8080/login', {
-            method: 'POST',
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-            body: JSON.stringify({
-              username: username,
-              password: password,
-            }),
-          });
-          console.log('Response:', response);
-        
+            let response = await fetch('http://localhost:8080/login', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    username: username,
+                    password: password,
+                }),
+            });
+            console.log('Response:', response);
+
+            if (response.status !== 200) {
+                Alert.alert("Login failed please try again")
+            }
         } catch (error) {
-            alert("Login failed please try again")
+            Alert.alert("Login failed please try again")
             console.error('Error:', error);
         }
     };
 
-    return(
-        
+    return (
+
         <View style={styles.container}>
             {/*<Controller 
             control={control}
@@ -74,23 +74,23 @@ const LoginForm = () => {
             )}
             name="username"
             />*/}
-            
+
             {errors.username && <Text>{errors.username.message}</Text>}
-                <TextInput style={styles.input}
-                    onChangeText={onChangeUsername}
-                    value={username}
-                    placeholder='Username'
-                />
-            
-                <TextInput style={styles.input}
-                    onChangeText={onChangePassword}
-                    value={password}
-                    placeholder='Password'
-                    secureTextEntry = {true}
-                />
-            <LoginButton onPress={() => onSubmitHandler()}/>
+            <TextInput style={styles.input}
+                onChangeText={onChangeUsername}
+                value={username}
+                placeholder='Username'
+            />
+
+            <TextInput style={styles.input}
+                onChangeText={onChangePassword}
+                value={password}
+                placeholder='Password'
+                secureTextEntry={true}
+            />
+            <LoginButton onPress={() => onSubmitHandler()} />
         </View>
-        
+
     );
 }
 export default LoginForm;
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
         height: 50,
         width: 340,
         borderWidth: 1,
-        padding:10,
+        padding: 10,
         margin: 10,
         borderRadius: 10,
         backgroundColor: "#F6F6F6",
