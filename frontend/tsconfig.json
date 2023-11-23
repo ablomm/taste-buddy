@@ -6,7 +6,7 @@
     ],
     "jsx": "react",
     "module": "commonjs",
-    //"rootDir": "src",
+    "rootDir": ".",
     "resolveJsonModule": true,
     "allowJs": true,
     "outDir": "build",

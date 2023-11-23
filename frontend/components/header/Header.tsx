@@ -1,10 +1,10 @@
 import React from "react";
 import {View, Text, StyleSheet, Image, Pressable} from "react-native";
 
-const Header = ({handleBackButtonPress}:any) =>{
+const Header = ({navigation}:any) =>{
     return(
         <View style={styles.container}>
-            <Pressable style={({pressed}) => [{backgroundColor: pressed ? '#BDBDBD' : 'white',} ,styles.buttonContainer]} onPress={handleBackButtonPress}>
+            <Pressable style={({pressed}) => [{backgroundColor: pressed ? '#BDBDBD' : 'white',} ,styles.buttonContainer]} onPress={() => navigation.goBack()}>
                 <Text style={styles.buttonText}>{`<<`}</Text>
             </Pressable>
             
