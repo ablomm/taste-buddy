@@ -6,10 +6,14 @@ const loginRoute = require('./routes/login')
 
 const cors = require('cors');
 
+app.use(express.urlencoded({ extended: true }));
+
+app.use(express.json());
+
 app.use(cookieParser());
 
 app.use(cors({
-  origin: 'http://localhost:19006' // Your frontend's URL
+  origin: 'http://localhost:19006' 
 }));
 
 app.get('/', (req: any, res: any) => {

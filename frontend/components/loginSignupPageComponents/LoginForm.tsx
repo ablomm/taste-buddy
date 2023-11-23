@@ -40,16 +40,22 @@ const LoginForm = () => {
     let onSubmitHandler = async () => {
         alert("Login hit")
         try {
-          let response = await axios.post('http://localhost:8080/login', {
-            username,
-            password
+          let response = await fetch('http://localhost:8080/login', {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              username: username,
+              password: password,
+            }),
           });
-          
           console.log('Response:', response);
 
         } catch (error) {
             alert("Login failed please try again")
-          console.error('Error:', error);
+            console.error('Error:', error);
         }
     };
 
