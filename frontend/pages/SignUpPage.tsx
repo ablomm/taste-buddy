@@ -6,37 +6,9 @@ import {yupResolver} from '@hookform/resolvers/yup';
 import SignUpButton from '../components/loginSignupPageComponents/buttons/SignUpButton';
 import Header from '../components/header/Header';
 import SignUpForm from '../components/loginSignupPageComponents/SignUpForm';
+import { Formik, Form, Field } from 'formik';
 
 const SignUpPage = ({navigation}:any) =>{
-
-// define validation rules for each field
-const schema = yup.object().shape({
-    username: yup
-    .string()
-    .required('Username is required')
-    .min(3, 'Username must contain at least 3 characters'),
-    password: yup
-    .string()
-    .required('Password is required')
-    .min(10, 'Password must contain at least 10 characters'),
-    confirmPassword: yup
-    .string()
-    .required('Confirm password is required')
-    .oneOf([yup.ref('password'),''], "Passwords don't match")
-
-});
-
-//set up form with validation schema, pass resolver property with yupResolver(schema) to handle validation logic
-const{
-    control,
-    handleSubmit,
-    formState: {errors},
-} = useForm({
-    resolver: yupResolver(schema),
-    defaultValues:{
-        username: ''
-    }
-})
 
 const [username, onChangeUsername] = React.useState('');
 const [email, onChangeEmail] = React.useState('');
