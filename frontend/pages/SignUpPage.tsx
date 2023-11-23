@@ -7,7 +7,7 @@ import SignUpButton from '../components/loginSignupPageComponents/buttons/SignUp
 import Header from '../components/header/Header';
 import SignUpForm from '../components/loginSignupPageComponents/SignUpForm';
 
-const SignUpPage = () =>{
+const SignUpPage = ({navigation}:any) =>{
 
 // define validation rules for each field
 const schema = yup.object().shape({
@@ -44,7 +44,7 @@ const [password, onChangePassword] = React.useState('');
 const [passwordConfirm, onChangePasswordConfirm] = React.useState('');
 
     return(<View style={styles.container}>
-        <Header/>
+        <Header navigation = {navigation}/>
         <SignUpForm/>
     </View>);
 }
