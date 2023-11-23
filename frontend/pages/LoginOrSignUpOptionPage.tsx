@@ -8,6 +8,7 @@ const LogInOrSignUpOptionPage = ({navigation}:any) =>{
         <View style={styles.container}>
             <View style={styles.logoContainer}>
                 <Image source={require("../assets/logo/Logo.png")} height={61} width={193}/>
+                <Text style={styles.appNameText}>t a s t e    b u d d y</Text>
             </View>
             <SignUpButton handlePress={()=>navigation.push('SignUpPage')}/>
             <LoginButton handlePress={()=>navigation.push('LoginPage')}/>
@@ -27,5 +28,11 @@ const styles = StyleSheet.create({
     logoContainer: {
         flexShrink: 0,
         paddingVertical: 30,
+        alignItems: 'center'
+    },
+    appNameText: {
+        fontSize:16,
+        paddingTop: 10,
+        lineHeight:19,
     },
 });
