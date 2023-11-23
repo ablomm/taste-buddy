@@ -1,12 +1,13 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, SafeAreaView } from 'react-native';
 import LoginPage from "./pages/LoginPage";
+import CreateRecipePage from "./pages/CreateRecipePage"
 
 export default function App() {
   return (
     <SafeAreaView style={styles.container}>
       <Text>Open up App.js to start working on your app!</Text>
-      <LoginPage/>
+      <CreateRecipePage/>
       <StatusBar style="auto" />
     </SafeAreaView>
   );
