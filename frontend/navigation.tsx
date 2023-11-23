@@ -22,3 +22,25 @@ const LogInOrSignUpStack= () => (
 )
 
 export default LogInOrSignUpStack;
+
+/*const SignedInStack = () =>(
+    <NavigationContainer>
+        <Stack.Navigator initialRouteName='' screenOptions={screenOptions}>
+            
+        </Stack.Navigator>
+    </NavigationContainer>
+);
+
+export default SignedInStack;
+
+const NonSignedInUserStack = () =>(
+    <NavigationContainer>
+        <Stack.Navigator initialRouteName='' screenOptions={screenOptions}>
+            
+        </Stack.Navigator>
+    </NavigationContainer>
+);
+
+export default NonSignedInUserStack;
+
+*/
