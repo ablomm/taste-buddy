@@ -1,16 +1,16 @@
+import React from "react";
 import {View, Text, StyleSheet, Image} from "react-native";
-import LoginForm from "../components/loginSignupPageComponents/LoginForm";
 import SignUpButton from "../components/loginSignupPageComponents/buttons/SignUpButton";
 import LoginButton from "../components/loginSignupPageComponents/buttons/LogInButton";
 
-const LogInOrSignUpOptionPage = () =>{
+const LogInOrSignUpOptionPage = ({navigation}:any) =>{
     return(
         <View style={styles.container}>
             <View style={styles.logoContainer}>
                 <Image source={require("../assets/logo/Logo.png")} height={61} width={193}/>
             </View>
-            <SignUpButton/>
-            <LoginButton/>
+            <SignUpButton handlePress={()=>navigation.push('SignUpPage')}/>
+            <LoginButton handlePress={()=>navigation.push('LoginPage')}/>
         </View>
     );
 }
