@@ -1,13 +1,14 @@
 import React from 'react';
-import { View, Text, TextInput, StyleSheet, Button, Pressable } from "react-native";
+import { View, Text, TextInput, StyleSheet, Button, Pressable, Modal } from "react-native";
 import * as yup from 'yup';
 import { Formik, Form, Field } from 'formik';
 import ValidatedInput from '../components/validatedInput';
+import AddIngredientsForm, { Ingredient } from '../components/addIngredientForm';
 
 const SignUpPage = () => {
 
   // define validation rules for each field
-  const schema = yup.object().shape({
+  const recipeSchema = yup.object().shape({
     title: yup
       .string()
       .required("required"),
@@ -28,15 +29,30 @@ const SignUpPage = () => {
       .typeError("Must be a number"),
   });
 
+
+
   const [title, onChangeTitle] = React.useState('');
   const [description, onChangeDescription] = React.useState('');
   const [cookTime, onChangeCookTime] = React.useState('');
   const [calories, onChangeCalories] = React.useState('');
   const [servings, onChangeServings] = React.useState('');
+  const [ingredients, setIngredients]: [Ingredient[], any] = React.useState([]);
+  const [ingredientsModalVisible, setIngredientsModalVisible] = React.useState(false);
+
+  const addIngredients = (ingredient: Ingredient) => {
+    setIngredients(ingredients.push(ingredient))
+  }
 
   console.log(cookTime)
   return (
     <>
+      <AddIngredientsForm
+        visible={ingredientsModalVisible}
+        setVisible={setIngredientsModalVisible}
+        addIngredients={addIngredients}
+      />
+
+
       <Formik
         initialValues={{
           title: '',
@@ -46,7 +62,7 @@ const SignUpPage = () => {
           servings: ''
         }}
 
-        validationSchema={schema}
+        validationSchema={recipeSchema}
         onSubmit={values => {
           // same shape as initial values
           console.log(values);
@@ -54,48 +70,50 @@ const SignUpPage = () => {
 
         {({ errors, handleChange, handleBlur, handleSubmit, values }) => (
           <View>
-            
-              <ValidatedInput
-                placeholder="Title"
-                onChangeText={handleChange('title')}
-                onBlur={handleBlur('title')}
-                value={values.title}
-                error={errors.title}
-              />
 
-              <ValidatedInput
-                placeholder="Description"
-                onChangeText={handleChange('description')}
-                onBlur={handleBlur('description')}
-                value={values.description}
-                error={errors.description}
-              />
+            <ValidatedInput
+              placeholder="Title"
+              onChangeText={handleChange('title')}
+              onBlur={handleBlur('title')}
+              value={values.title}
+              error={errors.title}
+            />
 
-              <ValidatedInput
-                placeholder="Cook Time (min)"
-                onChangeText={handleChange('cookTime')}
-                onBlur={handleBlur('cookTime')}
-                value={values.cookTime}
-                error={errors.cookTime}
-              />
+            <ValidatedInput
+              placeholder="Description"
+              onChangeText={handleChange('description')}
+              onBlur={handleBlur('description')}
+              value={values.description}
+              error={errors.description}
+            />
 
-              <ValidatedInput
-                placeholder="Calories"
-                onChangeText={handleChange('calories')}
-                onBlur={handleBlur('calories')}
-                value={values.calories}
-                error={errors.calories}
-              />
-              <ValidatedInput
-                placeholder="Servings"
-                onChangeText={handleChange('servings')}
-                onBlur={handleBlur('servings')}
-                value={values.servings}
-                error={errors.servings}
-              />
+            <ValidatedInput
+              placeholder="Cook Time (min)"
+              onChangeText={handleChange('cookTime')}
+              onBlur={handleBlur('cookTime')}
+              value={values.cookTime}
+              error={errors.cookTime}
+            />
 
-            <Button onPress={handleSubmit as any} title="Submit" />  
-        </View>
+            <ValidatedInput
+              placeholder="Calories"
+              onChangeText={handleChange('calories')}
+              onBlur={handleBlur('calories')}
+              value={values.calories}
+              error={errors.calories}
+            />
+            <ValidatedInput
+              placeholder="Servings"
+              onChangeText={handleChange('servings')}
+              onBlur={handleBlur('servings')}
+              value={values.servings}
+              error={errors.servings}
+            />
+            <Button onPress={() => setIngredientsModalVisible(true)} title="Add Ingredients" />
+
+
+            <Button onPress={handleSubmit as any} title="Submit" />
+          </View>
         )}
       </Formik>
     </>);
@@ -106,14 +124,6 @@ const onSubmit = () => {
 }
 
 const styles = StyleSheet.create({
-  form: {
-    display: 'flex',
-    flexDirection: 'column'
-  },
-
-  input: {
-    margin: 10
-  },
   button: {
     height: 50,
     width: 340,
@@ -127,20 +137,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 19,
     fontWeight: "600"
-  },
-  error: {
-    color: "red",
-    paddingLeft: 15
-  },
-  textInput: {
-    height: 50,
-    width: 340,
-    borderWidth: 1,
-    padding: 10,
-    borderRadius: 10,
-    backgroundColor: "#F6F6F6",
-    color: "#BDBDBD",
-    borderColor: "#E8E8E8"
   }
 })
 export default SignUpPage;
