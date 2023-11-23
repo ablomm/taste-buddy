@@ -42,12 +42,15 @@ const SignUpForm = () => {
                     password: '',
                     confirmPassword: ''
                 }}
-
+                validateOnChange={false}
+                validateOnBlur={false}
                 validationSchema={schema}
                 onSubmit={values => {
                     console.log(values);
                 }}
-                >
+
+
+            >
 
                 {({ errors, handleChange, handleBlur, handleSubmit, values }) => (
                     <View style={styles.container}>
