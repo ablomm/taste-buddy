@@ -1,84 +1,90 @@
 import React from 'react';
-import {View, Text, StyleSheet, TextInput, Button, Pressable} from "react-native";
+import { View, Text, StyleSheet, TextInput, Button, Pressable } from "react-native";
 import * as yup from 'yup';
-import {useForm, Controller} from 'react-hook-form';
-import {yupResolver} from '@hookform/resolvers/yup';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
 import SignUpButton from './buttons/SignUpButton';
+import { Formik, Form, Field } from 'formik';
+import ValidatedInput from '../validatedInput';
 
-
-
-const SignUpForm = () =>{
+const SignUpForm = () => {
     // define validation rules for each field
-const schema = yup.object().shape({
-    username: yup
-    .string()
-    .required('Username is required')
-    .min(3, 'Username must contain at least 3 characters'),
-    password: yup
-    .string()
-    .required('Password is required')
-    .min(10, 'Password must contain at least 10 characters'),
-    confirmPassword: yup
-    .string()
-    .required('Confirm password is required')
-    .oneOf([yup.ref('password'),''], "Passwords don't match")
+    const schema = yup.object().shape({
+        username: yup
+            .string()
+            .required('Username is required')
+            .min(3, 'Username must contain at least 3 characters'),
+        email: yup
+            .string()
+            .required('Email is required')
+            .email('Invalid Email '),
+        password: yup
+            .string()
+            .required('Password is required')
+            .min(10, 'Password must contain at least 10 characters'),
+        confirmPassword: yup
+            .string()
+            .required('Confirm password is required')
+            .oneOf([yup.ref('password'), ''], "Passwords don't match")
+    });
 
-});
+    const [username, onChangeUsername] = React.useState('');
+    const [email, onChangeEmail] = React.useState('');
+    const [password, onChangePassword] = React.useState('');
+    const [confirmPassword, onChangePasswordConfirm] = React.useState('');
 
-//set up form with validation schema, pass resolver property with yupResolver(schema) to handle validation logic
-const{
-    control,
-    handleSubmit,
-    formState: {errors},
-} = useForm({
-    resolver: yupResolver(schema),
-    defaultValues:{
-        username: ''
-    }
-})
+    return (
+        <>
+            <Formik
+                initialValues={{
+                    username: '',
+                    email: '',
+                    password: '',
+                    confirmPassword: ''
+                }}
 
-const [username, onChangeUsername] = React.useState('');
-const [email, onChangeEmail] = React.useState('');
-const [password, onChangePassword] = React.useState('');
-const [passwordConfirm, onChangePasswordConfirm] = React.useState('');
+                validationSchema={schema}
+                onSubmit={values => {
+                    console.log(values);
+                }}
+                >
 
-    return(<View style={styles.container}>
-        <Controller 
-        control={control}
-        rules={{required:true,}}
-        render={({field:{onChange, value}}) => (
-            <TextInput 
-            style={styles.input}
-            value ={value}
-            onChangeText={onChange}
-            />
-        )}
-        name="username"
-        />
-         {errors.username && <Text>{errors.username.message}</Text>}
-        <TextInput style={styles.input}
-        onChangeText={onChangeUsername}
-        value={username}
-        placeholder='Username'
-        />
-        <TextInput style={styles.input}
-        onChangeText={onChangeEmail}
-        value={email}
-        placeholder='Email'
-        />
-        <TextInput style={styles.input}
-        onChangeText={onChangePassword}
-        value={password}
-        placeholder='Password'
-        />
-        <TextInput style={styles.input}
-        onChangeText={onChangePasswordConfirm}
-        value={passwordConfirm}
-        placeholder='Confirm Password'
-        />
-        {/* <Button title="Sign Up" color={"black"}></Button> */}
-        <SignUpButton/>
-    </View>);
+                {({ errors, handleChange, handleBlur, handleSubmit, values }) => (
+                    <View style={styles.container}>
+                        <ValidatedInput
+                            placeholder="Username"
+                            onChangeText={handleChange('username')}
+                            onBlur={handleBlur('username')}
+                            value={values.username}
+                            error={errors.username}
+                        />
+                        <ValidatedInput
+                            placeholder="Email"
+                            onChangeText={handleChange('email')}
+                            onBlur={handleBlur('email')}
+                            value={values.email}
+                            error={errors.email}
+                        />
+                        <ValidatedInput
+                            placeholder="Password"
+                            onChangeText={handleChange('password')}
+                            onBlur={handleBlur('password')}
+                            value={values.password}
+                            error={errors.password}
+                        />
+                        <ValidatedInput
+                            placeholder="Confirm Password"
+                            onChangeText={handleChange('confirmPassword')}
+                            onBlur={handleBlur('passwordConfirm')}
+                            value={values.confirmPassword}
+                            error={errors.confirmPassword}
+                        />
+
+                        {/* <Button title="Sign Up" color={"black"}></Button> */}
+                        <SignUpButton handlePress={handleSubmit as any} />
+                    </View>)}
+            </Formik>
+        </>);
 }
 export default SignUpForm;
 
@@ -94,7 +100,7 @@ const styles = StyleSheet.create({
         height: 50,
         width: 340,
         borderWidth: 1,
-        padding:10,
+        padding: 10,
         margin: 10,
         borderRadius: 10,
         backgroundColor: "#F6F6F6",
