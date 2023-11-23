@@ -8,7 +8,7 @@ import Header from '../components/header/Header';
 import SignUpForm from '../components/loginSignupPageComponents/SignUpForm';
 import { Formik, Form, Field } from 'formik';
 
-const SignUpPage = () =>{
+const SignUpPage = ({navigation}:any) =>{
 
 const [username, onChangeUsername] = React.useState('');
 const [email, onChangeEmail] = React.useState('');
@@ -16,7 +16,7 @@ const [password, onChangePassword] = React.useState('');
 const [passwordConfirm, onChangePasswordConfirm] = React.useState('');
 
     return(<View style={styles.container}>
-        <Header/>
+        <Header navigation = {navigation}/>
         <SignUpForm/>
     </View>);
 }
