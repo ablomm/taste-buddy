@@ -1,52 +1,39 @@
-const express = require('express')
-const app = express()
-const port = 8080
-const cookieParser = require("cookie-parser")
-const loginRoute = require('./routes/login')
+import 'dotenv/config';
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import'express-async-errors';
+import cookieParser from "cookie-parser";
+import loginRoute from "./routes/login"
 
-const cors = require('cors');
+//import routes
+import userController from "./controller/user"
 
-app.use(express.urlencoded({ extended: true }));
+const app = express(); 
 
+app.use(helmet()); 
 app.use(express.json());
-
 app.use(cookieParser());
-
+app.use(express.urlencoded({ extended: true }));
 app.use(cors({
   origin: 'http://localhost:19006',
   credentials: true, 
 }));
 
-app.get('/', (req: any, res: any) => {
-  res.send('Hello World!')
-})
+//routes
+app.use('/user', userController);
 
-app.get('/SignUpPage', (req: any, res: any) => {
-  res.send('Hello World!')
-})
+//error handler; must be last
+app.use((err: Error, req: express.Request, res: express.Response, next: express.RequestHandler) => {
+    console.error(err.stack);
+    res.status(500).json(err)
+});
 
 app.post('/login', loginRoute);
 
+
+const PORT = process.env.PORT || 8080
+
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
-})
-
-app.get('/authorize', async (req: any, res: any) => {
-  let result;
-  const config = {
-    issuer: 'localhost:19006',
-    clientId: '<YOUR_CLIENT_ID>',
-    redirectUrl: '<YOUR_REDIRECT_URL>',
-    scopes: ['<YOUR_SCOPES_ARRAY>'],
-  };
-
-  try {
-    //result = await authorize(config);
-    // result includes accessToken, accessTokenExpirationDate and refreshToken
-  } catch (error) {
-    console.log(error);
-    result = error;
-  }
-
-  res.send(result)
 })
