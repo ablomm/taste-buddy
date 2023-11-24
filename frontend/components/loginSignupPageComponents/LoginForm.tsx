@@ -6,6 +6,7 @@ import {yupResolver} from '@hookform/resolvers/yup';
 import { Formik } from 'formik';
 import LoginButton from './buttons/LogInButton';
 import Validator from 'email-validator';
+import ValidatedInput from '../validatedInput';
 
 const LoginForm = () =>{
     const [username, onChangeUsername] = React.useState('');
@@ -42,28 +43,29 @@ const LoginForm = () =>{
                 onSubmit={(values)=>{
                     console.log(values)
                 }}
+                validateOnChange={true}
                 validationSchema={LoginFormSchema}
-                validateOnMount = {true}
             >
-                {({handleChange, handleBlur, handleSubmit, values, isValid}) =>(
+                {({errors, handleChange, handleBlur, handleSubmit, values, isValid}) =>(
                     <View style={styles.container}>
-                        {errors.username && <Text>{errors.username.message}</Text>}
-                        <TextInput style={styles.input}
+                        <ValidatedInput 
                             placeholder='Username'
                             textContentType='username'
                             onChangeText={handleChange('username')}
                             onBlur={handleBlur('username')}
+                            secureTextEntry = {false}
                             value={values.username}
-                            
+                            error={errors.username}
                         />
                         
-                        <TextInput style={styles.input}
+                        <ValidatedInput 
                             placeholder='Password'
                             secureTextEntry = {true}
                             textContentType='password'
                             onChangeText={handleChange('password')}
                             onBlur={handleBlur('password')}
                             value={values.password}
+                            error={errors.password}
                         />
                         <LoginButton handlePress={handleSubmit} isButtonInteractable={isValid}/>
                     </View>
@@ -89,8 +91,6 @@ const styles = StyleSheet.create({
         padding:10,
         margin: 10,
         borderRadius: 10,
-        backgroundColor: "#F6F6F6",
-        color: "#BDBDBD",
         borderColor: "#E8E8E8"
     }
 })
