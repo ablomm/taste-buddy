@@ -22,20 +22,7 @@ const LoginForm = () =>{
         .string()
         .required('Password is required')
         .min(10, 'Password must contain at least 10 characters')
-
-    });
-
-    //set up form with validation schema, pass resolver property with yupResolver(schema) to handle validation logic
-    const{
-        control,
-        handleSubmit,
-        formState: {errors},
-    } = useForm({
-        resolver: yupResolver(LoginFormSchema),
-        defaultValues:{
-            username: ''
-        }
-    })
+    });    
 
     return(
             <Formik
