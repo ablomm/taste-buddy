@@ -1,39 +1,28 @@
-import React from 'react';
-import { View, Text, StyleSheet, TextInput, Button, Pressable, Alert } from "react-native";
+import React, {useState} from 'react';
+import {View, Text, StyleSheet, TextInput, Button, Pressable, Alert} from "react-native";
 import * as yup from 'yup';
-import { useForm, Controller } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
+import {useForm, Controller} from 'react-hook-form';
+import {yupResolver} from '@hookform/resolvers/yup';
+import { Formik } from 'formik';
 import LoginButton from './buttons/LogInButton';
+import Validator from 'email-validator';
+import ValidatedInput from '../validatedInput';
 
-const LoginForm = () => {
+const LoginForm = () =>{
     const [username, onChangeUsername] = React.useState('');
     const [password, onChangePassword] = React.useState('');
 
     // define validation rules for each field
-    const schema = yup.object().shape({
+    const LoginFormSchema = yup.object().shape({
         username: yup
             .string()
             .required('Username is required')
             .min(3, 'Username must contain at least 3 characters'),
         password: yup
-            .string()
-            .required('Password is required')
-            .min(10, 'Password must contain at least 10 characters')
-
-    });
-
-    //set up form with validation schema, pass resolver property with yupResolver(schema) to handle validation logic
-    const {
-        control,
-        handleSubmit,
-        formState: { errors },
-    } = useForm({
-        resolver: yupResolver(schema),
-        defaultValues: {
-            //username: ''
-        }
-    })
-
+        .string()
+        .required('Password is required')
+        .min(10, 'Password must contain at least 10 characters')
+    });    
     let onSubmitHandler = async () => {
         try {
             let response = await fetch('http://localhost:8080/login', {
@@ -58,39 +47,41 @@ const LoginForm = () => {
             console.error('Error:', error);
         }
     };
-
-    return (
-
-        <View style={styles.container}>
-            {/*<Controller 
-            control={control}
-            rules={{required:true,}}
-            render={({field:{onChange, value}}) => (
-                <TextInput 
-                style={styles.input}
-                value ={value}
-                onChangeText={onChange}
-                />
-            )}
-            name="username"
-            />*/}
-
-            {errors.username && <Text>{errors.username.message}</Text>}
-            <TextInput style={styles.input}
-                onChangeText={onChangeUsername}
-                value={username}
-                placeholder='Username'
-            />
-
-            <TextInput style={styles.input}
-                onChangeText={onChangePassword}
-                value={password}
-                placeholder='Password'
-                secureTextEntry={true}
-            />
-            <LoginButton onPress={() => onSubmitHandler()} />
-        </View>
-
+    return(
+            <Formik
+                initialValues={{username: '', password: ''}}
+                onSubmit={(values)=>{
+                    console.log(values)
+                }}
+                validateOnChange={true}
+                validationSchema={LoginFormSchema}
+            >
+                {({errors, handleChange, handleBlur, handleSubmit, values, isValid}) =>(
+                    <View style={styles.container}>
+                        <ValidatedInput 
+                            placeholder='Username'
+                            textContentType='username'
+                            onChangeText={handleChange('username')}
+                            onBlur={handleBlur('username')}
+                            secureTextEntry = {false}
+                            value={values.username}
+                            error={errors.username}
+                        />
+                        
+                        <ValidatedInput 
+                            placeholder='Password'
+                            secureTextEntry = {true}
+                            textContentType='password'
+                            onChangeText={handleChange('password')}
+                            onBlur={handleBlur('password')}
+                            value={values.password}
+                            error={errors.password}
+                        />
+                        <LoginButton handlePress={handleSubmit} isButtonInteractable={isValid}/>
+                    </View>
+                )}
+            </Formik>
+        
     );
 }
 export default LoginForm;
@@ -110,8 +101,6 @@ const styles = StyleSheet.create({
         padding: 10,
         margin: 10,
         borderRadius: 10,
-        backgroundColor: "#F6F6F6",
-        color: "#BDBDBD",
         borderColor: "#E8E8E8"
     }
 })
