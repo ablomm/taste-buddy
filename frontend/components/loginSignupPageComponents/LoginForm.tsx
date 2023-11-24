@@ -1,18 +1,18 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {View, Text, StyleSheet, TextInput, Button, Pressable} from "react-native";
 import * as yup from 'yup';
 import {useForm, Controller} from 'react-hook-form';
 import {yupResolver} from '@hookform/resolvers/yup';
+import { Formik } from 'formik';
 import LoginButton from './buttons/LogInButton';
-
-
+import Validator from 'email-validator';
 
 const LoginForm = () =>{
     const [username, onChangeUsername] = React.useState('');
     const [password, onChangePassword] = React.useState('');
 
     // define validation rules for each field
-    const schema = yup.object().shape({
+    const LoginFormSchema = yup.object().shape({
         username: yup
         .string()
         .required('Username is required')
@@ -30,42 +30,46 @@ const LoginForm = () =>{
         handleSubmit,
         formState: {errors},
     } = useForm({
-        resolver: yupResolver(schema),
+        resolver: yupResolver(LoginFormSchema),
         defaultValues:{
             username: ''
         }
     })
 
     return(
-        <View style={styles.container}>
-            {/*<Controller 
-            control={control}
-            rules={{required:true,}}
-            render={({field:{onChange, value}}) => (
-                <TextInput 
-                style={styles.input}
-                value ={value}
-                onChangeText={onChange}
-                />
-            )}
-            name="username"
-            />*/}
-            
-            {errors.username && <Text>{errors.username.message}</Text>}
-            <TextInput style={styles.input}
-                onChangeText={onChangeUsername}
-                value={username}
-                placeholder='Username'
-            />
-            
-            <TextInput style={styles.input}
-                onChangeText={onChangePassword}
-                value={password}
-                placeholder='Password'
-                secureTextEntry = {true}
-            />
-            <LoginButton/>
-        </View>
+            <Formik
+                initialValues={{username: '', password: ''}}
+                onSubmit={(values)=>{
+                    console.log(values)
+                }}
+                validationSchema={LoginFormSchema}
+                validateOnMount = {true}
+            >
+                {({handleChange, handleBlur, handleSubmit, values, isValid}) =>(
+                    <View style={styles.container}>
+                        {errors.username && <Text>{errors.username.message}</Text>}
+                        <TextInput style={styles.input}
+                            placeholder='Username'
+                            textContentType='username'
+                            onChangeText={handleChange('username')}
+                            onBlur={handleBlur('username')}
+                            value={values.username}
+                            
+                        />
+                        
+                        <TextInput style={styles.input}
+                            placeholder='Password'
+                            secureTextEntry = {true}
+                            textContentType='password'
+                            onChangeText={handleChange('password')}
+                            onBlur={handleBlur('password')}
+                            value={values.password}
+                        />
+                        <LoginButton handlePress={handleSubmit} isButtonInteractable={isValid}/>
+                    </View>
+                )}
+            </Formik>
+        
     );
 }
 export default LoginForm;
