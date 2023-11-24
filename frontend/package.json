@@ -16,6 +16,7 @@
     "@react-navigation/stack": "^6.3.20",
     "@types/react": "~18.2.14",
     "axios": "^1.6.2",
+    "cors": "^2.8.5",
     "email-validator": "^2.0.4",
     "expo": "~49.0.15",
     "expo-constants": "~14.4.2",
