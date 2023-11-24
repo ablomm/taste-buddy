@@ -23,7 +23,7 @@ const LoginForm = () =>{
         .required('Password is required')
         .min(10, 'Password must contain at least 10 characters')
     });    
-    let onSubmitHandler = async () => {
+    const onSubmit = async () => {
         try {
             let response = await fetch('http://localhost:8080/login', {
                 method: 'POST',
@@ -50,9 +50,7 @@ const LoginForm = () =>{
     return(
             <Formik
                 initialValues={{username: '', password: ''}}
-                onSubmit={(values)=>{
-                    console.log(values)
-                }}
+                onSubmit={onSubmit}
                 validateOnChange={true}
                 validationSchema={LoginFormSchema}
             >
