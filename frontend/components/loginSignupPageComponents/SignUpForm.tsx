@@ -58,11 +58,15 @@ const SignUpForm = () => {
                             placeholder="Username"
                             onChangeText={handleChange('username')}
                             onBlur={handleBlur('username')}
+                            textContentType='username'
+                            secureTextEntry = {false}
                             value={values.username}
                             error={errors.username}
                         />
                         <ValidatedInput
                             placeholder="Email"
+                            textContentType='emailAddress'
+                            secureTextEntry = {false}
                             onChangeText={handleChange('email')}
                             onBlur={handleBlur('email')}
                             value={values.email}
@@ -70,6 +74,8 @@ const SignUpForm = () => {
                         />
                         <ValidatedInput
                             placeholder="Password"
+                            secureTextEntry = {true}
+                            textContentType='password'
                             onChangeText={handleChange('password')}
                             onBlur={handleBlur('password')}
                             value={values.password}
@@ -77,6 +83,8 @@ const SignUpForm = () => {
                         />
                         <ValidatedInput
                             placeholder="Confirm Password"
+                            secureTextEntry = {true}
+                            textContentType='password'
                             onChangeText={handleChange('confirmPassword')}
                             onBlur={handleBlur('passwordConfirm')}
                             value={values.confirmPassword}
@@ -84,7 +92,7 @@ const SignUpForm = () => {
                         />
 
                         {/* <Button title="Sign Up" color={"black"}></Button> */}
-                        <SignUpButton handlePress={handleSubmit as any} />
+                        <SignUpButton handlePress={handleSubmit as any} isButtonInteractable={true} />
                     </View>)}
             </Formik>
         </>);
