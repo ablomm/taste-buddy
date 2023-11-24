@@ -2,6 +2,7 @@ import {useState, useEffect} from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, SafeAreaView, ScrollView } from 'react-native';
 import LogInOrSignUpStack from "./navigation";
+import {Stack, useRouter} from 'expo-router';
 
 export default function App() {
   const router = useRouter();
