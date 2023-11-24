@@ -84,7 +84,7 @@ const SignUpForm = () => {
                         />
 
                         {/* <Button title="Sign Up" color={"black"}></Button> */}
-                        <SignUpButton handlePress={handleSubmit as any} />
+                        <SignUpButton handlePress={handleSubmit as any} isButtonInteractable={true} />
                     </View>)}
             </Formik>
         </>);

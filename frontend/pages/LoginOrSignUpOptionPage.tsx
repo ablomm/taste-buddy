@@ -10,8 +10,8 @@ const LogInOrSignUpOptionPage = ({navigation}:any) =>{
                 <Image source={require("../assets/logo/Logo.png")} height={61} width={193}/>
                 <Text style={styles.appNameText}>t a s t e    b u d d y</Text>
             </View>
-            <SignUpButton handlePress={()=>navigation.push('SignUpPage')}/>
-            <LoginButton handlePress={()=>navigation.push('LoginPage')}/>
+            <SignUpButton handlePress={()=>navigation.push('SignUpPage')} isButtonInteractable={true}/>
+            <LoginButton handlePress={()=>navigation.push('LoginPage')} isButtonInteractable={true}/>
         </View>
     );
 }
