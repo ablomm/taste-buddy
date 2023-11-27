@@ -15,3 +15,16 @@ export async function createUser(email: string, username: string, plainTextPassw
         },
     })
 }
+
+// Retrieve moderator status of user 
+export async function getModeratorStatus(username: string) {
+    // Retrieve mod status from db 
+    const userData = await prisma.user.findFirst({
+        where: {
+            username: username
+        }
+    });
+
+    // User should always exist since this is checked after logging in
+    return userData?.isModerator;
+}
