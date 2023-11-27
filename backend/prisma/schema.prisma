@@ -17,3 +17,43 @@ model User {
   password String
   createDate DateTime @default(now())
 }
+
+model Recipe {
+  id Int     @id @default(autoincrement())
+  user User 
+  recipeTitle String
+  description String
+  cookTimeHours Int
+  cootTimeMinutes Int
+  calories Int
+  servings Int
+  recipeIngredients RecipeIngredients[] 
+  recipeInstructions RecipeInstructions[]
+  tags RecipeTags[]
+}
+
+model RecipeIngredients {
+  recipeID Int
+  recipe Recipe @relation(fields:[recipeID], references: [id])
+  ingredient String
+  amount Int
+  measurementType String
+}
+
+model RecipeInstructions {
+  recipeID Int
+  recipe Recipe @relation(fields:[recipeID], references: [id])
+  step Int
+  instruction String
+}
+
+model RecipeTags {
+  tag String
+  recipe Recipe[]
+}
+
+model UserSavedRecipes {
+  userID int
+  user User @relation(fields:[userID], references: [id])
+  recipeID Recipe
+}
