@@ -1,30 +1,22 @@
 import React from 'react';
 import {View, Text, StyleSheet, TextInput, Button, Pressable} from "react-native";
-
-const SignUpButton = ({onPress, title}:any) =>{
+import {TouchableRipple } from "react-native-paper"; 
+const SignUpButton = ({onPress, title, style, textColor}:any) =>{
     return(
-        <View style={styles.container}>
-            <Pressable style={({pressed}) => [{backgroundColor: pressed ? '#BDBDBD' : 'white',} ,styles.button]} onPress={onPress}>
-                <Text style={styles.buttonText}>{title}</Text>
-            </Pressable>
-        </View>
+            <TouchableRipple style={[styles.button, style]} onPress={onPress} borderless={true}>
+                <Text style={[styles.buttonText, textColor]}>{title}</Text>
+            </TouchableRipple>
     );
 }
 
 
 const styles = StyleSheet.create({
-    container: {
-        //flex: 1,
-        paddingHorizontal: 12,
-        paddingVertical: 10,
-        alignItems: 'center',
-    },
     button:{
         height: 50,
         width: '95%',
         borderRadius: 100,
         borderWidth: 2,
-        marginHorizontal: 10,
+        margin: 10,
         justifyContent: 'center',
         alignItems: 'center'
     },

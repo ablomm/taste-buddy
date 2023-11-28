@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TextInput, StyleSheet, Button, Pressable, Modal } from "react-native";
+import { View, Text, TextInput, StyleSheet, Button, Pressable, Modal, ScrollView } from "react-native";
 import * as yup from 'yup';
 import { Formik, Form, Field } from 'formik';
 import ValidatedInput from '../components/validatedInput';
@@ -16,6 +16,9 @@ const SignUpPage = () => {
     description: yup
       .string()
       .optional(),
+    instructions: yup
+      .string()
+      .required(),
     cookTime: yup
       .number()
       .optional()
@@ -57,6 +60,7 @@ const SignUpPage = () => {
         initialValues={{
           title: '',
           description: '',
+          instructions: '',
           cookTime: '',
           calories: '',
           servings: ''
@@ -69,79 +73,115 @@ const SignUpPage = () => {
         }}>
 
         {({ errors, handleChange, handleBlur, handleSubmit, values }) => (
-          <View style = {{width: "100%"}}>
+          <>
+            <View style={styles.titleBar}>
+              <Text style={styles.title}>Create Recipe</Text>
+              <TBButton title="Post" style={styles.submitButton} textColor={{ color: "white" }} onPress={handleSubmit} />
+            </View>
+            <ScrollView>
 
-            <ValidatedInput
-              placeholder="Title"
-              onChangeText={handleChange('title')}
-              onBlur={handleBlur('title')}
-              value={values.title}
-              error={errors.title}
-            />
-
-            <ValidatedInput
-              placeholder="Description"
-              onChangeText={handleChange('description')}
-              onBlur={handleBlur('description')}
-              value={values.description}
-              error={errors.description}
-            />
-
-            <ValidatedInput
-              placeholder="Cook Time (min)"
-              onChangeText={handleChange('cookTime')}
-              onBlur={handleBlur('cookTime')}
-              value={values.cookTime}
-              error={errors.cookTime}
-            />
-
-            <ValidatedInput
-              placeholder="Calories"
-              onChangeText={handleChange('calories')}
-              onBlur={handleBlur('calories')}
-              value={values.calories}
-              error={errors.calories}
-            />
-            <ValidatedInput
-              placeholder="Servings"
-              onChangeText={handleChange('servings')}
-              onBlur={handleBlur('servings')}
-              value={values.servings}
-              error={errors.servings}
-            />
-    
-            {ingredients.map((ingredient) => {
-              return(<Text>{ingredient.title}</Text>);
-            })}          
-
-            <TBButton onPress={() => setIngredientsModalVisible(true)} title="Add Ingredients" />
+              <Text style={styles.header}>Title*</Text>
+              <ValidatedInput
+                placeholder='Taco Salad'
+                onChangeText={handleChange('title')}
+                onBlur={handleBlur('title')}
+                value={values.title}
+                error={errors.title}
+              />
 
 
-            <TBButton onPress={onSubmit} title="Submit" />
-          </View>
+              <Text style={styles.header}>Instructions*</Text>
+              <ValidatedInput
+                placeholder={"Step 1:\n\tCook the meat.\n\nStep 2:\n\tCut the lettuce.\n\nStep 3:\n\tPut the meat in the lettuce."}
+                onChangeText={handleChange('instructions')}
+                onBlur={handleBlur('instructions')}
+                value={values.instructions}
+                error={errors.instructions}
+                multiline={true}
+                style={{
+                  height: "auto",
+                  textAlignVertical: 'top',
+                }}
+              />
+
+              <Text style={styles.header}>Description</Text>
+              <ValidatedInput
+                placeholder='A simple taco salad recipe passed down by my grandmother; it is very good, and very easy.'
+                onChangeText={handleChange('description')}
+                onBlur={handleBlur('description')}
+                value={values.description}
+                error={errors.description}
+                multiline={true}
+                style={{
+                  height: "auto",
+                  textAlignVertical: 'top',
+                }}
+              />
+
+              <Text style={styles.header}>Cook Time (min)</Text>
+              <ValidatedInput
+                placeholder='60'
+                onChangeText={handleChange('cookTime')}
+                onBlur={handleBlur('cookTime')}
+                value={values.cookTime}
+                error={errors.cookTime}
+              />
+
+              <Text style={styles.header}>Calories</Text>
+              <ValidatedInput
+                placeholder="1000"
+                onChangeText={handleChange('calories')}
+                onBlur={handleBlur('calories')}
+                value={values.calories}
+                error={errors.calories}
+              />
+
+              <Text style={styles.header}>Servings</Text>
+              <ValidatedInput
+                placeholder="4"
+                onChangeText={handleChange('servings')}
+                onBlur={handleBlur('servings')}
+                value={values.servings}
+                error={errors.servings}
+              />
+
+
+              {ingredients.map((ingredient) => {
+                return (<Text>{ingredient.title}</Text>);
+              })}
+
+              <TBButton onPress={() => setIngredientsModalVisible(true)} title="Add Ingredients" />
+
+            </ScrollView>
+          </>
         )}
       </Formik>
     </>);
 }
 
-const onSubmit = () => {
-
-}
-
 const styles = StyleSheet.create({
-  button: {
-    height: 50,
-    width: 340,
-    borderRadius: 100,
-    borderWidth: 2,
-    margin: 10,
-    justifyContent: 'center',
-    alignItems: 'center'
+  header: {
+    fontSize: 20,
+    marginLeft: 10,
+    fontWeight: "bold"
   },
-  signupText: {
-    fontSize: 16,
-    lineHeight: 19,
-    fontWeight: "600"
+  title: {
+    fontSize: 35,
+    marginLeft: 10,
+    margin: 'auto', // dunno
+    fontWeight: "bold"
+  },
+  titleBar: {
+    display: "flex",
+    flexDirection: "row"
+  },
+  submitButton: {
+    flex: 1,
+    flexGrow: 1,
+    height: 40,
+    backgroundColor: "#4077be",
+    color: "white",
+    borderWidth: 0
   }
 })
 export default SignUpPage;

@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, TextInput, StyleSheet, Button, Pressable, Modal } from "react-native";
 
-const PopUpMenu = ({visible, setVisible, children}: any) => {
+const PopUpMenu = ({ visible, setVisible, children }: any) => {
 
     return (
-        <View>
+        <>
             <Modal
                 animationType='fade'
                 transparent={true}
@@ -18,27 +18,27 @@ const PopUpMenu = ({visible, setVisible, children}: any) => {
                 </View>
 
             </Modal>
-        </View>
+        </>
     )
 
 }
 
 const styles = StyleSheet.create({
     background: {
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: "rgba(0,0,0,0.5)",
-      width: '100%',
-      height: 'auto',
-      flex: 1
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: "rgba(0,0,0,0.5)",
+        width: '100%',
+        height: 'auto',
+        flex: 1
     },
     foreground: {
-      backgroundColor: '#EEEEEE',
-      borderRadius: 20,
-      width: "95%",
-      padding: 30
-      //box sizing border box
+        backgroundColor: '#EEEEEE',
+        borderRadius: 20,
+        width: "95%",
+        padding: 30
+        //box sizing border box
     }
-  })
+})
 
 export default PopUpMenu;

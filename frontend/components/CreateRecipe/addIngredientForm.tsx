@@ -44,7 +44,7 @@ const AddIngredientsForm = ({ visible, setVisible, addIngredients }: any) => {
 
             {({ errors, handleChange, handleBlur, handleSubmit, values }) => (
 
-              <View>
+              <>
                 <Text style={styles.header}>Add Ingredient</Text>
 
                 <ValidatedInput
@@ -63,9 +63,9 @@ const AddIngredientsForm = ({ visible, setVisible, addIngredients }: any) => {
                   error={errors.amount}
                 />
 
-                <TBButton onPress={handleSubmit as any} title="Save" />
+                <TBButton onPress={handleSubmit as any} title="Save"/>
                 <TBButton onPress={() => setVisible(false)} title="Cancel" />
-              </View>
+              </>
             )}
           </Formik>
       </PopUpMenu>
