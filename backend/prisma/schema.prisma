@@ -48,6 +48,12 @@ model RecipeInstructions {
   instruction String
 }
 
+model RecipeImages {
+  recipeID Int
+  recipe Recipe @relation(fields:[recipeID], references: [id])
+  image String
+}
+
 model RecipeTags {
   tag String
   recipe Recipe[]
