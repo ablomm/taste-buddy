@@ -7,12 +7,12 @@ export interface ValidatedInputProps {
     onBlur: ((e: NativeSyntheticEvent<TextInputFocusEventData>) => void) | undefined,
     value: string | undefined,
     error: any,
-    textContentType: any,
-    secureTextEntry: boolean,
+    textContentType?: any,
+    secureTextEntry?: boolean,
 }
 
 const ValidatedInput = (props: ValidatedInputProps) => {
-    let { placeholder, textContentType, secureTextEntry, onChangeText, onBlur, value, error } = props;
+    let { placeholder, textContentType = "none", secureTextEntry = false, onChangeText, onBlur, value, error } = props;
 
     return (
         <View style={styles.input}>
