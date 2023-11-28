@@ -20,7 +20,8 @@ model User {
 
 model Recipe {
   id Int     @id @default(autoincrement())
-  user User 
+  author User @relation(fields:[authorID], references:[id])
+  authorID Int
   recipeTitle String
   description String
   cookTimeHours Int
