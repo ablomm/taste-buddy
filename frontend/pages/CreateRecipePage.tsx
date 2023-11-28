@@ -3,7 +3,8 @@ import { View, Text, TextInput, StyleSheet, Button, Pressable, Modal } from "rea
 import * as yup from 'yup';
 import { Formik, Form, Field } from 'formik';
 import ValidatedInput from '../components/validatedInput';
-import AddIngredientsForm, { Ingredient } from '../components/addIngredientForm';
+import AddIngredientsForm, { Ingredient } from '../components/CreateRecipe/addIngredientForm';
+import TBButton from '../components/TBButton';
 
 const SignUpPage = () => {
 
@@ -29,8 +30,6 @@ const SignUpPage = () => {
       .typeError("Must be a number"),
   });
 
-
-
   const [title, onChangeTitle] = React.useState('');
   const [description, onChangeDescription] = React.useState('');
   const [cookTime, onChangeCookTime] = React.useState('');
@@ -40,10 +39,11 @@ const SignUpPage = () => {
   const [ingredientsModalVisible, setIngredientsModalVisible] = React.useState(false);
 
   const addIngredients = (ingredient: Ingredient) => {
-    setIngredients(ingredients.push(ingredient))
+    setIngredients(ingredients.concat([ingredient]))
+
+    console.log(ingredients)
   }
 
-  console.log(cookTime)
   return (
     <>
       <AddIngredientsForm
@@ -69,7 +69,7 @@ const SignUpPage = () => {
         }}>
 
         {({ errors, handleChange, handleBlur, handleSubmit, values }) => (
-          <View>
+          <View style = {{width: "100%"}}>
 
             <ValidatedInput
               placeholder="Title"
@@ -109,10 +109,15 @@ const SignUpPage = () => {
               value={values.servings}
               error={errors.servings}
             />
-            <Button onPress={() => setIngredientsModalVisible(true)} title="Add Ingredients" />
+    
+            {ingredients.map((ingredient) => {
+              return(<Text>{ingredient.title}</Text>);
+            })}          
+
+            <TBButton onPress={() => setIngredientsModalVisible(true)} title="Add Ingredients" />
 
 
-            <Button onPress={handleSubmit as any} title="Submit" />
+            <TBButton onPress={onSubmit} title="Submit" />
           </View>
         )}
       </Formik>
