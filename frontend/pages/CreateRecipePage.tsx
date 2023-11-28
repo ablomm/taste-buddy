@@ -18,7 +18,7 @@ const SignUpPage = () => {
       .optional(),
     instructions: yup
       .string()
-      .required(),
+      .required("required"),
     cookTime: yup
       .number()
       .optional()
@@ -168,10 +168,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 35,
     marginLeft: 10,
-    margin: 'auto', // dunno
     fontWeight: "bold"
   },
   titleBar: {
+    alignItems: "center",
     display: "flex",
     flexDirection: "row"
   },
