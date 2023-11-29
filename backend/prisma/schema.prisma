@@ -16,6 +16,8 @@ model User {
   username  String
   password String
   createDate DateTime @default(now())
+  savedRecipes UserSavedRecipes[]
+  recipes Recipe[]
 }
 
 model Recipe {
@@ -30,10 +32,13 @@ model Recipe {
   servings Int
   recipeIngredients RecipeIngredients[] 
   recipeInstructions RecipeInstructions[]
+  recipeImage String
   tags RecipeTags[]
+  usersSaved UserSavedRecipes[]
 }
 
 model RecipeIngredients {
+  id Int     @id @default(autoincrement())
   recipeID Int
   recipe Recipe @relation(fields:[recipeID], references: [id])
   ingredient String
@@ -42,25 +47,25 @@ model RecipeIngredients {
 }
 
 model RecipeInstructions {
+  id Int     @id @default(autoincrement())
   recipeID Int
   recipe Recipe @relation(fields:[recipeID], references: [id])
   step Int
   instruction String
 }
 
-model RecipeImages {
-  recipeID Int
-  recipe Recipe @relation(fields:[recipeID], references: [id])
-  image String
-}
-
 model RecipeTags {
+  id Int     @id @default(autoincrement())
   tag String
   recipe Recipe[]
 }
 
 model UserSavedRecipes {
-  userID int
+  userID Int
   user User @relation(fields:[userID], references: [id])
-  recipeID Recipe
+  recipeID Int
+  recipe Recipe @relation(fields:[recipeID], references: [id])
+  timeSaved DateTime @default(now())
+
+  @@id([userID, recipeID])
 }
