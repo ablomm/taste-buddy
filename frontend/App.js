@@ -3,6 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, SafeAreaView, ScrollView } from 'react-native';
 import LogInOrSignUpStack from "./navigation";
 import {Stack, useRouter} from 'expo-router';
+import CreateRecipePage from './pages/CreateRecipePage'
 
 export default function App() {
   const router = useRouter();
@@ -41,7 +42,8 @@ export default function App() {
 
 const styles = StyleSheet.create({
   container: {
+    marginTop: 25, // This is to keep some space clear at the top, as phones usually have a status bar there
     flex: 1,
-    backgroundColor: '#fff'
+    backgroundColor: '#fff',
   },
 });
