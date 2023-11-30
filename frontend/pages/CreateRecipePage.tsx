@@ -40,12 +40,6 @@ const SignUpPage = () => {
       .typeError("Must be a number"),
   });
 
-  // const [title, onChangeTitle] = React.useState('');
-  // const [description, onChangeDescription] = React.useState('');
-  // const [cookTime, onChangeCookTime] = React.useState('');
-  // const [calories, onChangeCalories] = React.useState('');
-  // const [servings, onChangeServings] = React.useState('');
-
   // add Ingredient Modal
   const [ingredients, setIngredients]: [Ingredient[], any] = React.useState([]);
   const [ingredientsModalVisible, setIngredientsModalVisible] = React.useState(false);

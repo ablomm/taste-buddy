@@ -34,7 +34,7 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <CreateRecipePage/>
+      <LogInOrSignUpStack/>
       <StatusBar style="auto" />
     </SafeAreaView>
   );
