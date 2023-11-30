@@ -1,10 +1,14 @@
 import React from 'react';
-import { View, Text, TextInput, StyleSheet, Button, Pressable, Modal, ScrollView } from "react-native";
+import { View, Text, TextInput, StyleSheet, Button, Pressable, Modal, ScrollView, Image } from "react-native";
 import * as yup from 'yup';
 import { Formik, Form, Field } from 'formik';
 import ValidatedInput from '../components/validatedInput';
 import AddIngredientsForm, { Ingredient } from '../components/CreateRecipe/addIngredientForm';
 import TBButton from '../components/TBButton';
+import * as ImagePicker from 'expo-image-picker';
+import { TouchableRipple } from 'react-native-paper';
+import IngredientListItem from '../components/CreateRecipe/IngredientListItem';
+import EditIngredientForm from '../components/CreateRecipe/EditIngredientsForm';
 
 const SignUpPage = () => {
 
@@ -40,11 +44,52 @@ const SignUpPage = () => {
   const [servings, onChangeServings] = React.useState('');
   const [ingredients, setIngredients]: [Ingredient[], any] = React.useState([]);
   const [ingredientsModalVisible, setIngredientsModalVisible] = React.useState(false);
+  const [image, setImage] = React.useState(null);
+
+  const [editIngredientsModalVisible, setEditIngredientsModalVisible] = React.useState(false);
+  const [ingredientEdit, setIngredientEdit]: [Ingredient, any] = React.useState({title: "", amount: 0});
+  const [ingredientEditIndex, setIngredientEditIndex] = React.useState(0);
+
+
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri as any);
+    }
+  };
 
   const addIngredients = (ingredient: Ingredient) => {
     setIngredients(ingredients.concat([ingredient]))
 
     console.log(ingredients)
+  };
+
+  const editIngredient = (index: number, ingredient: Ingredient) => {
+    let toEdit = [...ingredients];
+    toEdit[index] = ingredient;
+    setIngredients(toEdit);
+  };
+
+  const deleteIngredient = (index: number) => {
+    let toEdit = [...ingredients];
+    toEdit.splice(index, 1);
+    setIngredients(toEdit);
+  }
+
+  const openEditingredientsForm = (index: number, ingredient: Ingredient) => {
+    setIngredientEditIndex(index);
+    setIngredientEdit(ingredient);
+    setEditIngredientsModalVisible(true);
+
   }
 
   return (
@@ -53,6 +98,13 @@ const SignUpPage = () => {
         visible={ingredientsModalVisible}
         setVisible={setIngredientsModalVisible}
         addIngredients={addIngredients}
+      />
+       <EditIngredientForm
+        visible={editIngredientsModalVisible}
+        setVisible={setEditIngredientsModalVisible}
+        ingredient = {ingredientEdit}
+        editIngredient={(ingredient: Ingredient) => {editIngredient(ingredientEditIndex, ingredient)}}
+        deleteIngredient={() => {deleteIngredient(ingredientEditIndex)}}
       />
 
 
@@ -79,6 +131,12 @@ const SignUpPage = () => {
               <TBButton title="Post" style={styles.submitButton} textColor={{ color: "white" }} onPress={handleSubmit} />
             </View>
             <ScrollView>
+
+              <Text style={styles.header}>Image*</Text>
+              <TouchableRipple onPress={pickImage} borderless={true} style={styles.image}>
+                <Image source={image ? { uri: image } : require("../assets/no-image.png") as any} style={{ width: "100%", height: "100%" }} />
+              </TouchableRipple>
+
 
               <Text style={styles.header}>Title*</Text>
               <ValidatedInput
@@ -145,9 +203,9 @@ const SignUpPage = () => {
                 error={errors.servings}
               />
 
-
-              {ingredients.map((ingredient) => {
-                return (<Text>{ingredient.title}</Text>);
+              <Text style={styles.header}>Ingredients</Text>
+              {ingredients.map((ingredient, index) => {
+                return (<IngredientListItem onPress={() => {openEditingredientsForm(index, ingredient)}}  ingredient={ingredient} key = {index}/>);
               })}
 
               <TBButton onPress={() => setIngredientsModalVisible(true)} title="Add Ingredients" />
@@ -182,6 +240,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#4077be",
     color: "white",
     borderWidth: 0
+  },
+  image: {
+    width: "95%",
+    height: 300,
+    alignSelf: "center",
+    marginBottom: 10,
+    borderRadius: 10
   }
 })
 export default SignUpPage;
