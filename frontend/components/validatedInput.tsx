@@ -2,17 +2,19 @@ import React from 'react';
 import { View, Text, TextInput, StyleSheet, Button, Pressable, NativeSyntheticEvent, TextInputFocusEventData } from "react-native";
 
 export interface ValidatedInputProps {
-    placeholder: string,
+    placeholder?: string,
     onChangeText: ((text: string) => void) | undefined,
     onBlur: ((e: NativeSyntheticEvent<TextInputFocusEventData>) => void) | undefined,
     value: string | undefined,
     error: any,
-    textContentType: any,
-    secureTextEntry: boolean,
+    style?: any,
+    multiline?: boolean,
+    textContentType?: any,
+    secureTextEntry?: boolean,
 }
 
 const ValidatedInput = (props: ValidatedInputProps) => {
-    let { placeholder, textContentType, secureTextEntry, onChangeText, onBlur, value, error } = props;
+    let { placeholder = "", textContentType = "none", secureTextEntry = false, onChangeText, onBlur, value, error, style, multiline = false } = props;
 
     return (
         <View style={styles.input}>
@@ -21,12 +23,15 @@ const ValidatedInput = (props: ValidatedInputProps) => {
                 onChangeText={onChangeText}
                 onBlur={onBlur}
                 textContentType={textContentType}
-                secureTextEntry = {secureTextEntry}
+                secureTextEntry={secureTextEntry}
                 value={value}
+                multiline={multiline}
                 style={[
-                    {backgroundColor: value? 'white' : '#F6F6F6',
-                    color: value ? "#000":"#BDBDBD",
-                    borderColor: error?'red':"#E8E8E8"} ,styles.textInput]}
+                    {
+                        backgroundColor: value ? 'white' : '#F6F6F6',
+                        color: value ? "#000" : "#BDBDBD",
+                        borderColor: error ? 'red' : "#E8E8E8"
+                    }, styles.textInput, style]}
             />
             {error && <Text style={styles.error}>{error}</Text>}
         </View>
@@ -38,13 +43,13 @@ const styles = StyleSheet.create({
         margin: 10
     },
     error: {
-        display:"flex",
+        display: "flex",
         color: "red",
         paddingLeft: 10
     },
     textInput: {
         height: 50,
-        width: 340,
+        width: "100%",
         borderWidth: 1,
         padding: 10,
         borderRadius: 10,

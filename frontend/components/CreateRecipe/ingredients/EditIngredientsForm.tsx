@@ -2,7 +2,9 @@ import React from 'react';
 import { View, Text, TextInput, StyleSheet, Button, Pressable, Modal } from "react-native";
 import * as yup from 'yup';
 import { Formik, Form, Field } from 'formik';
-import ValidatedInput from './validatedInput';
+import ValidatedInput from '../../validatedInput';
+import TBButton from '../../TBButton';
+import PopUpMenu from '../../PopUpMenu';
 
 export interface Ingredient {
   title: string,
@@ -22,35 +24,32 @@ const recipeSchema = yup.object().shape({
 });
 
 
-const AddIngredientsForm = (props: any) => {
-
-  let { visible, setVisible, addIngredients } = props;
-
+const EditIngredientForm = ({ visible, setVisible, ingredient, editIngredient, deleteIngredient }: any) => {
+  const handleDelete = () => {
+    deleteIngredient();
+    setVisible(false);
+  }
   return (
-    <View
-    >
-    <Modal
-      animationType='slide'
-      transparent={true}
+    <PopUpMenu
       visible={visible}
-      onRequestClose={() => setVisible(false)}
+      setVisible={setVisible}
     >
       <Formik
         initialValues={{
-          title: '',
-          amount: '',
+          title: ingredient.title,
+          amount: ingredient.amount,
         }}
 
         validationSchema={recipeSchema}
         onSubmit={values => {
-          addIngredients(values);
+          editIngredient(values);
           setVisible(false);
-          console.log(values);
         }}>
 
         {({ errors, handleChange, handleBlur, handleSubmit, values }) => (
-          <View style={styles.modalView}>
-            <View style = {styles.form}>
+
+          <>
+            <Text style={styles.header}>Edit Ingredient</Text>
 
             <ValidatedInput
               placeholder="Title"
@@ -60,7 +59,7 @@ const AddIngredientsForm = (props: any) => {
               error={errors.title}
             />
 
-          <ValidatedInput
+            <ValidatedInput
               placeholder="Amount"
               onChangeText={handleChange('amount')}
               onBlur={handleBlur('amount')}
@@ -68,30 +67,24 @@ const AddIngredientsForm = (props: any) => {
               error={errors.amount}
             />
 
-          <Button onPress={handleSubmit as any} title="Save" />
-          <Button onPress={() => setVisible(false)} title="Cancel" />
-          </View>
-          </View>
+            <TBButton onPress={handleSubmit as any} title="Save" />
+            <TBButton onPress={handleDelete as any} title="Delete" />
+            <TBButton onPress={() => setVisible(false)} title="Cancel" />
+          </>
         )}
       </Formik>
-    </Modal>
-    </View>
+    </PopUpMenu>
+
   )
 }
 
 const styles = StyleSheet.create({
-  modalView: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: 'auto',
-    height: 'auto',
-    flex: 1
-  },
-  form: {
-    backgroundColor: 'lightgray',
-    borderRadius: 20,
-    //box sizing border box
+  header: {
+    fontSize: 25,
+    textAlign: 'center',
+    marginBottom: 10,
   }
+
 })
 
-export default AddIngredientsForm;
+export default EditIngredientForm;
