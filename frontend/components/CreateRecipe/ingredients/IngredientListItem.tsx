@@ -1,12 +1,11 @@
 import React from 'react';
 import { View, Text, StyleSheet } from "react-native";
-import { Ingredient } from '../CreateRecipe/addIngredientForm';
+import { Ingredient } from './AddIngredientForm';
 import { TouchableRipple } from 'react-native-paper';
 
 export interface IngredientListItemProps {
     ingredient: Ingredient,
     onPress: any,
-    key: number
 }
 
 
@@ -26,7 +25,7 @@ const styles = StyleSheet.create({
     view: {
         flex: 1,
         flexDirection: 'row',
-        backgroundColor: "#F8F8F8",
+        backgroundColor: "white",
         borderRadius: 10,
         margin: 10,
         marginBottom: 0,

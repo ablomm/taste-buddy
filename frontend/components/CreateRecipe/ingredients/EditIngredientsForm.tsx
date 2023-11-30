@@ -2,9 +2,9 @@ import React from 'react';
 import { View, Text, TextInput, StyleSheet, Button, Pressable, Modal } from "react-native";
 import * as yup from 'yup';
 import { Formik, Form, Field } from 'formik';
-import ValidatedInput from '../validatedInput';
-import TBButton from '../TBButton';
-import PopUpMenu from '../PopUpMenu';
+import ValidatedInput from '../../validatedInput';
+import TBButton from '../../TBButton';
+import PopUpMenu from '../../PopUpMenu';
 
 export interface Ingredient {
   title: string,

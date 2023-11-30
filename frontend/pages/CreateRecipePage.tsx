@@ -3,12 +3,15 @@ import { View, Text, TextInput, StyleSheet, Button, Pressable, Modal, ScrollView
 import * as yup from 'yup';
 import { Formik, Form, Field } from 'formik';
 import ValidatedInput from '../components/validatedInput';
-import AddIngredientsForm, { Ingredient } from '../components/CreateRecipe/addIngredientForm';
+import AddIngredientForm, { Ingredient } from '../components/CreateRecipe/ingredients/AddIngredientForm';
 import TBButton from '../components/TBButton';
 import * as ImagePicker from 'expo-image-picker';
 import { TouchableRipple } from 'react-native-paper';
-import IngredientListItem from '../components/CreateRecipe/IngredientListItem';
-import EditIngredientForm from '../components/CreateRecipe/EditIngredientsForm';
+import IngredientListItem from '../components/CreateRecipe/ingredients/IngredientListItem';
+import EditIngredientForm from '../components/CreateRecipe/ingredients/EditIngredientsForm';
+import AddTagForm, { Tag } from '../components/CreateRecipe/tags/addTagForm';
+import EditTagForm from '../components/CreateRecipe/tags/EditTagForm';
+import TagListItem from '../components/CreateRecipe/tags/TagListItem';
 
 const SignUpPage = () => {
 
@@ -37,18 +40,29 @@ const SignUpPage = () => {
       .typeError("Must be a number"),
   });
 
-  const [title, onChangeTitle] = React.useState('');
-  const [description, onChangeDescription] = React.useState('');
-  const [cookTime, onChangeCookTime] = React.useState('');
-  const [calories, onChangeCalories] = React.useState('');
-  const [servings, onChangeServings] = React.useState('');
+  // const [title, onChangeTitle] = React.useState('');
+  // const [description, onChangeDescription] = React.useState('');
+  // const [cookTime, onChangeCookTime] = React.useState('');
+  // const [calories, onChangeCalories] = React.useState('');
+  // const [servings, onChangeServings] = React.useState('');
+
+  // add Ingredient Modal
   const [ingredients, setIngredients]: [Ingredient[], any] = React.useState([]);
   const [ingredientsModalVisible, setIngredientsModalVisible] = React.useState(false);
-  const [image, setImage] = React.useState(null);
 
+  // edit Ingredient Modal
   const [editIngredientsModalVisible, setEditIngredientsModalVisible] = React.useState(false);
-  const [ingredientEdit, setIngredientEdit]: [Ingredient, any] = React.useState({title: "", amount: 0});
-  const [ingredientEditIndex, setIngredientEditIndex] = React.useState(0);
+  const [ingredientEditIndex, setIngredientEditIndex] = React.useState(0); // the index of the ingredient we are editing
+
+  // add tag Modal
+  const [tags, setTags]: [Tag[], any] = React.useState([]);
+  const [tagModalVisible, setTagModalVisible] = React.useState(false);
+
+  // edit tag Modal
+  const [editTagModalVisible, setEditTagModalVisible] = React.useState(false);
+  const [tagEditIndex, setTagEditIndex] = React.useState(0); // the index of the tag we are editing
+
+  const [image, setImage] = React.useState(null);
 
 
   const pickImage = async () => {
@@ -67,10 +81,9 @@ const SignUpPage = () => {
     }
   };
 
-  const addIngredients = (ingredient: Ingredient) => {
-    setIngredients(ingredients.concat([ingredient]))
-
-    console.log(ingredients)
+  //ingredients
+  const addIngredient = (ingredient: Ingredient) => {
+    setIngredients(ingredients.concat([ingredient]));
   };
 
   const editIngredient = (index: number, ingredient: Ingredient) => {
@@ -85,26 +98,60 @@ const SignUpPage = () => {
     setIngredients(toEdit);
   }
 
-  const openEditingredientsForm = (index: number, ingredient: Ingredient) => {
+  const openEditIngredientForm = (index: number) => {
     setIngredientEditIndex(index);
-    setIngredientEdit(ingredient);
     setEditIngredientsModalVisible(true);
-
   }
+
+  //tags
+  const addTag = (tag: Tag) => {
+    setTags(tags.concat([tag]));
+  }
+
+  const editTag = (index: number, tag: Tag) => {
+    let toEdit = [...tags];
+    toEdit[index] = tag;
+    setTags(toEdit);
+  };
+
+  const deleteTag = (index: number) => {
+    let toEdit = [...tags];
+    toEdit.splice(index, 1);
+    setTags(toEdit);
+  }
+
+  const openEditTagForm = (index: number) => {
+    setTagEditIndex(index);
+    setEditTagModalVisible(true);
+  }
+
 
   return (
     <>
-      <AddIngredientsForm
+      <AddIngredientForm
         visible={ingredientsModalVisible}
         setVisible={setIngredientsModalVisible}
-        addIngredients={addIngredients}
+        addIngredients={addIngredient}
       />
-       <EditIngredientForm
+      <EditIngredientForm
         visible={editIngredientsModalVisible}
         setVisible={setEditIngredientsModalVisible}
-        ingredient = {ingredientEdit}
-        editIngredient={(ingredient: Ingredient) => {editIngredient(ingredientEditIndex, ingredient)}}
-        deleteIngredient={() => {deleteIngredient(ingredientEditIndex)}}
+        ingredient={ingredients[ingredientEditIndex] || { title: "", amount: "" }}
+        editIngredient={(ingredient: Ingredient) => { editIngredient(ingredientEditIndex, ingredient) }}
+        deleteIngredient={() => { deleteIngredient(ingredientEditIndex) }}
+      />
+
+      <AddTagForm
+        visible={tagModalVisible}
+        setVisible={setTagModalVisible}
+        addTag={addTag}
+      />
+      <EditTagForm
+        visible={editTagModalVisible}
+        setVisible={setEditTagModalVisible}
+        tag={tags[tagEditIndex] || { value: "" }}
+        editTag={(tag: Tag) => { editTag(tagEditIndex, tag) }}
+        deleteTag={() => { deleteTag(tagEditIndex) }}
       />
 
 
@@ -204,12 +251,20 @@ const SignUpPage = () => {
               />
 
               <Text style={styles.header}>Ingredients</Text>
-              {ingredients.map((ingredient, index) => {
-                return (<IngredientListItem onPress={() => {openEditingredientsForm(index, ingredient)}}  ingredient={ingredient} key = {index}/>);
-              })}
+              <View style={styles.multiContainer}>
+                {ingredients.map((ingredient, index) => {
+                  return (<IngredientListItem onPress={() => { openEditIngredientForm(index) }} ingredient={ingredient} key={index} />);
+                })}
+                <TBButton style={styles.addButton} onPress={() => setIngredientsModalVisible(true)} title="+" />
+              </View>
 
-              <TBButton onPress={() => setIngredientsModalVisible(true)} title="Add Ingredients" />
-
+              <Text style={styles.header}>Tags</Text>
+              <View style={styles.multiContainer}>
+                {tags.map((tag, index) => {
+                  return (<TagListItem onPress={() => { openEditTagForm(index) }} tag={tag} key={index} />);
+                })}
+                <TBButton style={styles.addButton} onPress={() => setTagModalVisible(true)} title="+" />
+              </View>
             </ScrollView>
           </>
         )}
@@ -247,6 +302,17 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     marginBottom: 10,
     borderRadius: 10
+  },
+  addButton: {
+    backgroundColor: "white",
+    borderRadius: 10,
+    margin: 10,
+    borderWidth: 0
+  },
+  multiContainer: {
+    backgroundColor: "#f6f6f6",
+    borderRadius: 10,
+    margin: 5
   }
 })
 export default SignUpPage;
