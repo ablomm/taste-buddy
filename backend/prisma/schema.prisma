@@ -16,6 +16,7 @@ model User {
   username     String
   password     String
   createDate   DateTime           @default(now())
+  isModerator Boolean @default(false)
   savedRecipes UserSavedRecipes[]
   recipes      Recipe[]
 }

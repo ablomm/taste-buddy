@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {View, Text, StyleSheet, TextInput, Button, Pressable} from "react-native";
+import {View, Text, StyleSheet, TextInput, Button, Pressable, Alert} from "react-native";
 import * as yup from 'yup';
 import {useForm, Controller} from 'react-hook-form';
 import {yupResolver} from '@hookform/resolvers/yup';
@@ -15,21 +15,42 @@ const LoginForm = () =>{
     // define validation rules for each field
     const LoginFormSchema = yup.object().shape({
         username: yup
-        .string()
-        .required('Username is required')
-        .min(3, 'Username must contain at least 3 characters'),
+            .string()
+            .required('Username is required')
+            .min(3, 'Username must contain at least 3 characters'),
         password: yup
         .string()
         .required('Password is required')
         .min(10, 'Password must contain at least 10 characters')
     });    
+    const onSubmit = async (data:any) => {
+        try {
+            let response = await fetch('http://localhost:8080/login', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    username: data.username,
+                    password: data.password,
+                }),
+            });
+            console.log('Response:', response);
 
+            if (response.status !== 200) {
+                Alert.alert("Login failed please try again")
+            }
+        } catch (error) {
+            Alert.alert("Login failed please try again")
+            console.error('Error:', error);
+        }
+    };
     return(
             <Formik
                 initialValues={{username: '', password: ''}}
-                onSubmit={(values)=>{
-                    console.log(values)
-                }}
+                onSubmit={onSubmit}
                 validateOnChange={true}
                 validationSchema={LoginFormSchema}
             >
@@ -75,7 +96,7 @@ const styles = StyleSheet.create({
         height: 50,
         width: 340,
         borderWidth: 1,
-        padding:10,
+        padding: 10,
         margin: 10,
         borderRadius: 10,
         borderColor: "#E8E8E8"
