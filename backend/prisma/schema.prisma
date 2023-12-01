@@ -11,10 +11,63 @@ datasource db {
 }
 
 model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  username  String
-  password String
-  createDate DateTime @default(now())
+  id           Int                @id @default(autoincrement())
+  email        String             @unique
+  username     String
+  password     String
+  createDate   DateTime           @default(now())
   isModerator Boolean @default(false)
+  savedRecipes UserSavedRecipes[]
+  recipes      Recipe[]
+}
+
+model Recipe {
+  id                 Int                  @id @default(autoincrement())
+  author             User                 @relation(fields: [authorID], references: [id])
+  authorID           Int
+  creationTime       DateTime             @default(now())
+  recipeTitle        String
+  description        String
+  cookTimeHours      Int?
+  cootTimeMinutes    Int
+  calories           Int?
+  servings           Int
+  recipeIngredients  RecipeIngredients[]
+  recipeInstructions RecipeInstructions[]
+  recipeImage        String
+  tags               RecipeTags[]
+  usersSaved         UserSavedRecipes[]
+}
+
+model RecipeIngredients {
+  id              Int    @id @default(autoincrement())
+  recipeID        Int
+  recipe          Recipe @relation(fields: [recipeID], references: [id])
+  ingredient      String
+  amount          Int
+  measurementType String
+}
+
+model RecipeInstructions {
+  id          Int    @id @default(autoincrement())
+  recipeID    Int
+  recipe      Recipe @relation(fields: [recipeID], references: [id])
+  step        Int?
+  instruction String
+}
+
+model RecipeTags {
+  id     Int      @id @default(autoincrement())
+  tag    String
+  recipe Recipe[]
+}
+
+model UserSavedRecipes {
+  userID    Int
+  user      User     @relation(fields: [userID], references: [id])
+  recipeID  Int
+  recipe    Recipe   @relation(fields: [recipeID], references: [id])
+  timeSaved DateTime @default(now())
+
+  @@id([userID, recipeID])
 }
