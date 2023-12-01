@@ -27,9 +27,9 @@ model Recipe {
   creationTime       DateTime             @default(now())
   recipeTitle        String
   description        String
-  cookTimeHours      Int
+  cookTimeHours      Int?
   cootTimeMinutes    Int
-  calories           Int
+  calories           Int?
   servings           Int
   recipeIngredients  RecipeIngredients[]
   recipeInstructions RecipeInstructions[]
@@ -51,7 +51,7 @@ model RecipeInstructions {
   id          Int    @id @default(autoincrement())
   recipeID    Int
   recipe      Recipe @relation(fields: [recipeID], references: [id])
-  step        Int
+  step        Int?
   instruction String
 }
 
