@@ -13,7 +13,7 @@ import AddTagForm, { Tag } from '../components/CreateRecipe/tags/AddTagForm';
 import EditTagForm from '../components/CreateRecipe/tags/EditTagForm';
 import TagListItem from '../components/CreateRecipe/tags/TagListItem';
 
-const SignUpPage = () => {
+const CreateRecipePage = () => {
 
   // define validation rules for each field
   const recipeSchema = yup.object().shape({
@@ -309,4 +309,4 @@ const styles = StyleSheet.create({
     margin: 5
   }
 })
-export default SignUpPage;
+export default CreateRecipePage;
