@@ -1,17 +1,38 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Alert, Linking } from 'react-native';
 import { View, Text, StyleSheet, ScrollView, Pressable, Image, Platform, PermissionsAndroid } from 'react-native';
 import BackButton from '../components/BackButton';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import TBButton from '../components/TBButton';
-//import { CameraRoll } from "@react-native-camera-roll/camera-roll";
-
+import * as MediaLibrary from 'expo-media-library';
 
 const GalleryPage = ({navigation}:any) => {
-    /*useEffect(() => {
-        let params = {first:20};
-        CameraRoll.getPhotos(params);
-      }, []);*/
+    const [hasPermission, setHasPermission] = useState<boolean>(false);
+    const askPermission = async()=>{
+        const isCameraRollEnabled = await MediaLibrary.getPermissionsAsync();
+        if(isCameraRollEnabled){
+            // if true set component visiblie to true
+            setHasPermission(true);
+            return;
+        }
+        const {granted}= await MediaLibrary.requestPermissionsAsync();
+        if(granted){
+            const cameraRollRes = await MediaLibrary.getPermissionsAsync();
+            console.log(2,cameraRollRes);
+            setHasPermission(true);
+        }else{
+            navigation.goBack();
+        }
+    }
 
+    useEffect(() => {
+        askPermission();
+    }, [hasPermission]);
+    const albumName="Camera";
+    const getPhotos = await MediaLibrary.getAlbumAsync(albumName);
+    const getAllPhotos = await MediaLibrary.getAssetsAsync({
+        
+    })
     return(
         <View style={styles.container}>
             <View style={styles.headerWrapper}>
