@@ -8,6 +8,7 @@ import SignUpPage from "../screens/SignUpPage";
 import ExplorePage from "../screens/ExplorePage";
 import UserProvider, { UserContext } from "../providers/UserProvider";
 import CreateRecipePage from "../screens/CreateRecipePage";
+import GalleryPage from "../screens/GalleryPage";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import AccountPage from "../screens/AccountPage";
 import SearchPage from "../screens/SearchPage";
@@ -54,8 +55,8 @@ const SignedInNavigation = () => (
       />
 
       <Tab.Screen
-        name='CreateRecipePage'
-        component={CreateRecipePage}
+        name='GalleryPage'
+        component={GalleryPage}
         options={{
           tabBarIcon: ({ color, size }) => (
             <Image source={require("../../assets/NavBar/plus_btn.png")} style={{ width: size + 16, height: size + 16 }} />),

@@ -1,18 +1,29 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, Pressable, Image, Platform, PermissionsAndroid } from 'react-native';
 import BackButton from '../components/BackButton';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import TBButton from '../components/TBButton';
+//import { CameraRoll } from "@react-native-camera-roll/camera-roll";
+
 
 const GalleryPage = ({navigation}:any) => {
+    /*useEffect(() => {
+        let params = {first:20};
+        CameraRoll.getPhotos(params);
+      }, []);*/
 
     return(
         <View style={styles.container}>
             <View style={styles.headerWrapper}>
-                <View>
+                <View style={styles.headerLeftWrapper}>
                     <View><BackButton navigation = {navigation}/></View>
-                    <View><Text>Gallery</Text></View>
+                    <View style={styles.headerTiltleWrapper}><Text><Text style={styles.headerTiltle}>Gallery</Text><Icon name ='angle-down'/></Text></View>
                 </View>
                 <View>
-                    <View></View>
+                    <TBButton title="next >>" style={styles.nextButton} textColor={{ color: "white" }}  />
+                    {
+                    //<View><Text>next {`>>`}</Text></View>
+                    }
                 </View>
             </View>
             <View>
@@ -44,12 +55,37 @@ export const styles = StyleSheet.create(
     {
         container:{
             display:'flex',
-            flex: 1
+            flex: 1,
+            backgroundColor: '#fff',
+            paddingHorizontal: 12,
         },
+        nextButton: {
+            flex: 1,
+            flexGrow: 1,
+            height: 40,
+            backgroundColor: "#6752EC",
+            color: "white",
+            borderWidth: 0,
+          },
         headerWrapper:{
+            alignItems: 'center',
             display: 'flex',
             flexDirection:"row",
             justifyContent:"space-between",
+        },
+        headerLeftWrapper:{
+            alignItems: 'center',
+            display: 'flex',
+            flexDirection:"row",
+        },
+        headerTiltleWrapper:{
+            marginLeft: 15
+        },
+        headerTiltle:{
+            color:"#000",
+           // fontFamily:"Poppins",
+            fontSize: 20,
+            fontWeight: "700",
         },
         footer:{
             display:"flex",
