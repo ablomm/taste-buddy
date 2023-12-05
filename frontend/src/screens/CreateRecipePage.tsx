@@ -119,6 +119,76 @@ const SignUpPage = () => {
     setEditTagModalVisible(true);
   }
 
+  const onSubmit = async (data: any) => {
+    let imageUrl;
+    let s3AccessUrl;
+    let s3Response;
+
+    try {
+      s3AccessUrl = await fetch(`http://localhost:8080/recipe/s3Url`, {  //get secure s3 access url 
+        method: 'GET',
+      }).then(res => res.json());
+    } catch (error: any) {
+      console.log("image link generation error")
+      console.log(error)
+    }
+
+    console.log(s3AccessUrl)
+    console.log(s3AccessUrl.imageURL)
+    if (s3AccessUrl) {
+      try {
+        s3Response = await fetch(s3AccessUrl.imageURL, {  //put the image on the bucket
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          body: image
+        });
+
+        console.log("s3Response")
+        console.log(s3Response)
+        imageUrl = s3AccessUrl.imageURL.split('?')[0];
+      } catch (error: any) {
+        console.log("image put failed")
+        console.log(error)
+      }
+    } else {
+      console.log("imageURL is null")
+    }
+
+    try {
+      let response = await fetch(`http://localhost:8080/recipe/save`, {  //save the recipe
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          title: data.title,
+          description: data.description,
+          instructions: data.instructions,
+          cookTime: data.cookTime,
+          calories: data.calories,
+          servings: data.servings,
+          image: imageUrl
+        }),
+      });
+
+      if (response.status !== 200) {
+        console.log("upload failed")
+        console.log(response)
+      } else {
+        //userContext.login(data.username)
+        console.log("upload successful")
+      }
+    } catch (error: any) {
+      
+      console.log("upload error")
+      console.error(error.stack);
+    }
+  };
+
 
   return (
     <>
@@ -160,9 +230,8 @@ const SignUpPage = () => {
         }}
 
         validationSchema={recipeSchema}
-        onSubmit={values => {
-          // same shape as initial values
-          console.log(values);
+        onSubmit={(values) => {
+          onSubmit(values)
         }}>
 
         {({ errors, handleChange, handleBlur, handleSubmit, values }) => (

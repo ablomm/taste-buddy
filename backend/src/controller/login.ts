@@ -8,10 +8,10 @@ import bcrypt from "bcrypt";
 
 router.post("/", async (req: express.Request, res: express.Response) => {
   const { username, password } = req.body;
-
+  
   const user = await getUserByUsername(username);
   if (user == null) {
-    console.log("usernmae incorrect");
+    console.log("username incorrect");
     return res.sendStatus(401);
   }
   const result = await bcrypt.compare(password, user.password)
