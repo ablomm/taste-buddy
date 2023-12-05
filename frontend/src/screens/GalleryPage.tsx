@@ -13,26 +13,34 @@ const GalleryPage = ({navigation}:any) => {
         if(isCameraRollEnabled){
             // if true set component visiblie to true
             setHasPermission(true);
+            getCameraRoll();
             return;
         }
         const {granted}= await MediaLibrary.requestPermissionsAsync();
         if(granted){
             const cameraRollRes = await MediaLibrary.getPermissionsAsync();
+            getCameraRoll();
             console.log(2,cameraRollRes);
             setHasPermission(true);
         }else{
             navigation.goBack();
         }
     }
+    const getCameraRoll = async()=>{
+        const albumName="Camera";
+        const getPhotos = await MediaLibrary.getAlbumAsync(albumName);
+        const getAllPhotos = await MediaLibrary.getAssetsAsync({
+            first:20,
+            album: getPhotos,
+            sortBy: ['creationTime'],
+            mediaType: ['photo']
+        })
+        return getAllPhotos;
+    }
 
     useEffect(() => {
         askPermission();
     }, [hasPermission]);
-    const albumName="Camera";
-    const getPhotos = await MediaLibrary.getAlbumAsync(albumName);
-    const getAllPhotos = await MediaLibrary.getAssetsAsync({
-        
-    })
     return(
         <View style={styles.container}>
             <View style={styles.headerWrapper}>
