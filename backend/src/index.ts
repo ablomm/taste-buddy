@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 import userController from "./controller/user"
 import loginController from "./controller/login"
 import authController from "./controller/authorize"
+import recipeController from "./controller/recipe"
 
 const app = express(); 
 
@@ -23,6 +24,7 @@ app.use(cors({
 app.use('/user', userController);
 app.use('/login', loginController);
 app.use('/authorize', authController);
+app.use('/recipe', recipeController);
 
 //error handler; must be last
 app.use((err: Error, req: express.Request, res: express.Response, next: express.RequestHandler) => {
