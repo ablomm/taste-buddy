@@ -1,20 +1,23 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Alert, Linking } from 'react-native';
-import { View, Text, StyleSheet, ScrollView, Pressable, Image, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, Image, Dimensions, TouchableOpacity } from 'react-native';
 import BackButton from '../components/BackButton';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import TBButton from '../components/TBButton';
 import * as MediaLibrary from 'expo-media-library';
 import { PagedInfo, Asset } from 'expo-media-library';
+import * as ImagePicker from 'expo-image-picker';
+import { ToggleButton } from 'react-native-paper';
 
 const windowWidth= Dimensions.get('window').width;
 const windowHeight= Dimensions.get('window').height;
-console.log(windowWidth)
+
 const GalleryPage = ({navigation}:any) => {
     const [hasPermission, setHasPermission] = useState<boolean>(false);
     const [images, setImages] = useState<Asset[]>([]);
     const [pickedImage, setPickedImage] = useState<Asset>();
-
+    const [value, setValue] = React.useState('left');
+    
     const askPermission = async()=>{
         const isCameraRollEnabled = await MediaLibrary.getPermissionsAsync();
         if(isCameraRollEnabled.granted){
@@ -30,12 +33,10 @@ const GalleryPage = ({navigation}:any) => {
             navigation.goBack();
         }
     }
-    const getCameraRoll = async()=>{
-        const albumName="Camera";
-        const getPhotos = await MediaLibrary.getAlbumAsync(albumName);
+    const getCameraRoll = async(lastImage?:string)=>{
         const getAllPhotos = await MediaLibrary.getAssetsAsync({
-            first:20,
-            album: getPhotos,
+            first:36,
+            after:lastImage,
             sortBy: ['creationTime'],
             mediaType: ['photo']
         })
@@ -47,15 +48,24 @@ const GalleryPage = ({navigation}:any) => {
         if(hasPermission) {
             getCameraRoll().then((i: PagedInfo<Asset>)=>{
                 setImages(i.assets);
+                setPickedImage(i.assets[0]);
             }).catch((error)=>{
                 console.error(error);
             });
         }
     }, [hasPermission]);
 
+    function imagePressed(item: Asset){
+        setPickedImage(item);
+    }
+    
     function displayImages(){
-        return images.map((item)=>{
-            return(<View><Image style={styles.image} source={{uri:item.uri}} ></Image></View>)
+        return images.map((item, key)=>{
+            return(
+            <TouchableOpacity key={key} onPressIn={()=>{imagePressed(item)}} >
+                <Image style={[{opacity: pickedImage == item  ? 0.5 : 1},styles.image]} source={{uri:item.uri}} ></Image>
+                {pickedImage == item && <Icon style={styles.pickedImageIcon} name = 'check-circle'/>}
+            </TouchableOpacity>)
         });
     }
 
@@ -64,37 +74,24 @@ const GalleryPage = ({navigation}:any) => {
             <View style={styles.headerWrapper}>
                 <View style={styles.headerLeftWrapper}>
                     <View><BackButton navigation = {navigation}/></View>
-                    <View style={styles.headerTiltleWrapper}><Text><Text style={styles.headerTiltle}>Gallery</Text><Icon name ='angle-down'/></Text></View>
+                    <View style={styles.headerTiltleWrapper}><Text style={styles.headerTiltle}>Select an Image {`<_<`}</Text></View>
                 </View>
                 <View>
                     <TBButton title="next >>" style={styles.nextButton} textColor={{ color: "white" }}  />
-                    {
-                    //<View><Text>next {`>>`}</Text></View>
-                    }
                 </View>
             </View>
-            <View>
-                <Text>Picked Image</Text>
+            <View style={styles.pickedImageWrapper}>
+                <Image style={styles.pickedImage} source={{uri:pickedImage?.uri}}/>
             </View>
+            <ToggleButton.Row onValueChange={value => setValue(value)} value={value}>
+                <ToggleButton icon="Post" value="left" />
+                <ToggleButton icon="format-align-right" value="right" />
+            </ToggleButton.Row>
             <ScrollView>
                 <View style={styles.galleryImagesWrapper}>
                     {displayImages()}
                 </View>
             </ScrollView>
-            {
-                //Im just copying the video for the section below
-            }
-            <View style={styles.footer}>
-                <View style={styles.footerSection}>
-                    <Text style={styles.footerTitle}>Gallery</Text>
-                </View>
-                <View style={styles.footerSection}>
-                    <Text style={styles.footerTitle}>Photo</Text>
-                </View>
-                <View style={styles.footerSection}>
-                    <Text style={styles.footerTitle}>Video</Text>
-                </View>
-            </View>
         </View>
     );
 }
@@ -113,8 +110,26 @@ export const styles = StyleSheet.create(
             flexWrap:'wrap',
         },
         image:{
-            width: windowWidth/4,
-            height:windowWidth/4,
+            width: (windowWidth-32)/3,
+            height:(windowWidth-32)/3,
+            borderRadius: 8,
+            margin:5
+            
+        },
+        pickedImageIcon:{
+            color:"#0029FF",
+            alignItems:"center",
+            position:"absolute",
+            top: "20%",
+            left: "20%",
+            fontSize: 70,
+        },
+        pickedImage:{
+            height:windowHeight/2,
+            width:windowHeight/2
+        },
+        pickedImageWrapper:{
+            paddingBottom:5,
         },
         nextButton: {
             flex: 1,
