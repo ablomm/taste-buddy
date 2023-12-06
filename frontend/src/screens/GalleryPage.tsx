@@ -1,26 +1,30 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Alert, Linking } from 'react-native';
-import { View, Text, StyleSheet, ScrollView, Pressable, Image, Platform, PermissionsAndroid } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, Image, Dimensions } from 'react-native';
 import BackButton from '../components/BackButton';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import TBButton from '../components/TBButton';
 import * as MediaLibrary from 'expo-media-library';
+import { PagedInfo, Asset } from 'expo-media-library';
 
+const windowWidth= Dimensions.get('window').width;
+const windowHeight= Dimensions.get('window').height;
+console.log(windowWidth)
 const GalleryPage = ({navigation}:any) => {
     const [hasPermission, setHasPermission] = useState<boolean>(false);
+    const [images, setImages] = useState<Asset[]>([]);
+    const [pickedImage, setPickedImage] = useState<Asset>();
+
     const askPermission = async()=>{
         const isCameraRollEnabled = await MediaLibrary.getPermissionsAsync();
-        if(isCameraRollEnabled){
+        if(isCameraRollEnabled.granted){
             // if true set component visiblie to true
             setHasPermission(true);
-            getCameraRoll();
             return;
         }
         const {granted}= await MediaLibrary.requestPermissionsAsync();
         if(granted){
             const cameraRollRes = await MediaLibrary.getPermissionsAsync();
-            getCameraRoll();
-            console.log(2,cameraRollRes);
             setHasPermission(true);
         }else{
             navigation.goBack();
@@ -40,7 +44,21 @@ const GalleryPage = ({navigation}:any) => {
 
     useEffect(() => {
         askPermission();
+        if(hasPermission) {
+            getCameraRoll().then((i: PagedInfo<Asset>)=>{
+                setImages(i.assets);
+            }).catch((error)=>{
+                console.error(error);
+            });
+        }
     }, [hasPermission]);
+
+    function displayImages(){
+        return images.map((item)=>{
+            return(<View><Image style={styles.image} source={{uri:item.uri}} ></Image></View>)
+        });
+    }
+
     return(
         <View style={styles.container}>
             <View style={styles.headerWrapper}>
@@ -59,7 +77,9 @@ const GalleryPage = ({navigation}:any) => {
                 <Text>Picked Image</Text>
             </View>
             <ScrollView>
-                <Text>Gallery Images</Text>
+                <View style={styles.galleryImagesWrapper}>
+                    {displayImages()}
+                </View>
             </ScrollView>
             {
                 //Im just copying the video for the section below
@@ -85,8 +105,16 @@ export const styles = StyleSheet.create(
         container:{
             display:'flex',
             flex: 1,
-            backgroundColor: '#fff',
-            paddingHorizontal: 12,
+            backgroundColor: '#fff'
+        },
+        galleryImagesWrapper:{
+            display:"flex",
+            flexDirection:"row",
+            flexWrap:'wrap',
+        },
+        image:{
+            width: windowWidth/4,
+            height:windowWidth/4,
         },
         nextButton: {
             flex: 1,
@@ -101,6 +129,7 @@ export const styles = StyleSheet.create(
             display: 'flex',
             flexDirection:"row",
             justifyContent:"space-between",
+            paddingHorizontal: 12,
         },
         headerLeftWrapper:{
             alignItems: 'center',
