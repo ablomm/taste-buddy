@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Alert, Linking } from 'react-native';
+import { FlatList} from 'react-native';
 import { View, Text, StyleSheet, ScrollView, Pressable, Image, Dimensions, TouchableOpacity } from 'react-native';
 import BackButton from '../components/BackButton';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -34,8 +34,14 @@ const GalleryPage = ({navigation}:any) => {
         }
     }
     const getCameraRoll = async(lastImage?:string)=>{
+        const getCount = await MediaLibrary.getAssetsAsync({
+            first:1,
+            after:lastImage,
+            sortBy: ['creationTime'],
+            mediaType: ['photo']
+        })
         const getAllPhotos = await MediaLibrary.getAssetsAsync({
-            first:36,
+            first:getCount.totalCount,
             after:lastImage,
             sortBy: ['creationTime'],
             mediaType: ['photo']
@@ -59,16 +65,12 @@ const GalleryPage = ({navigation}:any) => {
         setPickedImage(item);
     }
     
-    function displayImages(){
-        return images.map((item, key)=>{
-            return(
-            <TouchableOpacity key={key} onPressIn={()=>{imagePressed(item)}} >
+    const displayImage = ({ item }) => (
+        <TouchableOpacity onPressIn={()=>{imagePressed(item)}} >
                 <Image style={[{opacity: pickedImage == item  ? 0.5 : 1},styles.image]} source={{uri:item.uri}} ></Image>
                 {pickedImage == item && <Icon style={styles.pickedImageIcon} name = 'check-circle'/>}
-            </TouchableOpacity>)
-        });
-    }
-
+        </TouchableOpacity>
+      );
     return(
         <View style={styles.container}>
             <View style={styles.headerWrapper}>
@@ -83,15 +85,14 @@ const GalleryPage = ({navigation}:any) => {
             <View style={styles.pickedImageWrapper}>
                 <Image style={styles.pickedImage} source={{uri:pickedImage?.uri}}/>
             </View>
-            <ToggleButton.Row onValueChange={value => setValue(value)} value={value}>
-                <ToggleButton icon="Post" value="left" />
-                <ToggleButton icon="format-align-right" value="right" />
-            </ToggleButton.Row>
-            <ScrollView>
-                <View style={styles.galleryImagesWrapper}>
-                    {displayImages()}
-                </View>
-            </ScrollView>
+            <FlatList
+                numColumns={3}
+                style={styles.galleryImagesWrapper}
+                data={images}
+                renderItem={displayImage}
+                keyExtractor={(item) => item.id}
+            />
+                
         </View>
     );
 }
