@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import { View, Text, Image } from "react-native";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import LogInOrSignUpOptionPage from "../screens/LoginOrSignUpOptionPage";
 import LoginPage from "../screens/LoginPage";
 import SignUpPage from "../screens/SignUpPage";
@@ -13,6 +13,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import AccountPage from "../screens/AccountPage";
 import SearchPage from "../screens/SearchPage";
 import RecommenderPage from "../screens/RecommenderPage";
+import DietaryPreference from "../screens/DietaryPreference";
 
 const Stack = createStackNavigator();
 
@@ -69,11 +70,18 @@ const SignedInNavigation = () => (
       />
 
       <Tab.Screen
-        name='AccountPage'
-        component={AccountPage}
+        name='AccountPageStack'
+        component={AccountPageStack}
       />
     </Tab.Navigator>
   </NavigationContainer>
+);
+
+const AccountPageStack = () => (
+  <Stack.Navigator initialRouteName='AccountPage' screenOptions={stackOptions}>
+    <Stack.Screen name='AccountPage' component={AccountPage} />
+    <Stack.Screen name='DietaryPreference' component={DietaryPreference} />
+  </Stack.Navigator>
 );
 
 export default Navigation;
