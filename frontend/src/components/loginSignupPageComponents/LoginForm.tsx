@@ -27,7 +27,7 @@ const LoginForm = () => {
     });
     const onSubmit = async (data: any) => {
         try {
-            let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/login`, {
+            let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/login`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',

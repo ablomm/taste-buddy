@@ -38,6 +38,17 @@ export async function getUserByUsername(username: string) {
     return user;
 }
 
+export async function getUserById(id: number) {
+
+    const user = await prisma.user.findUnique({
+        where: {
+            id: id
+        },
+    })
+
+    return user;
+}
+
 // Retrieve moderator status of user 
 export async function getModeratorStatus(username: string) {
     // Retrieve mod status from db 
