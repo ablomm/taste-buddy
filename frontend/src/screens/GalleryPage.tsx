@@ -16,7 +16,7 @@ const GalleryPage = ({navigation}:any) => {
     const [hasPermission, setHasPermission] = useState<boolean>(false);
     const [images, setImages] = useState<Asset[]>([]);
     const [pickedImage, setPickedImage] = useState<Asset>();
-    const [value, setValue] = React.useState('left');
+    const [isPostSelected, setIsPostSelected] = useState<boolean>(true);
     
     const askPermission = async()=>{
         const isCameraRollEnabled = await MediaLibrary.getPermissionsAsync();
@@ -85,6 +85,14 @@ const GalleryPage = ({navigation}:any) => {
             <View style={styles.pickedImageWrapper}>
                 <Image style={styles.pickedImage} source={{uri:pickedImage?.uri}}/>
             </View>
+            <View style={styles.postType}>
+                <View style={styles.postTypeSection}>
+                    <TBButton title="Post"  style={styles.postTypeButton} textColor={[{ color: isPostSelected?"black":"#BDBDBD" }, styles.postTypeTitle]}  onPress={()=>setIsPostSelected(true)}/>
+                </View>
+                <View style={styles.postTypeSection}>
+                    <TBButton title="Recipe" style={styles.postTypeButton} textColor={[{ color: isPostSelected?"#BDBDBD":"black" }, styles.postTypeTitle]} onPress={()=>setIsPostSelected(false)}/>
+                </View>
+            </View>
             <FlatList
                 numColumns={3}
                 style={styles.galleryImagesWrapper}
@@ -126,7 +134,7 @@ export const styles = StyleSheet.create(
             fontSize: 70,
         },
         pickedImage:{
-            height:windowHeight/2,
+            height:windowHeight/3,
             width:windowHeight/2
         },
         pickedImageWrapper:{
@@ -139,7 +147,13 @@ export const styles = StyleSheet.create(
             backgroundColor: "#6752EC",
             color: "white",
             borderWidth: 0,
-          },
+        },
+        postTypeButton:{
+            backgroundColor: "white",
+            borderWidth:0,
+            margin: 0,
+            height:30
+        },
         headerWrapper:{
             alignItems: 'center',
             display: 'flex',
@@ -161,20 +175,19 @@ export const styles = StyleSheet.create(
             fontSize: 20,
             fontWeight: "700",
         },
-        footer:{
+        postType:{
             display:"flex",
             flexDirection:"row",
             alignItems:"center"
         },
-        footerSection:{
+        postTypeSection:{
             flex:1,
             alignItems:"center",
             padding:10
         },
-        footerTitle:{
+        postTypeTitle:{
             fontSize:18,
             fontWeight: "600",
-            color: "#BDBDBD"
         },
         pickedFooterSection:{
             flex:1,
