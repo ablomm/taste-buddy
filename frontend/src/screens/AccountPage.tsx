@@ -2,6 +2,8 @@ import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity  } from 'react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
+import LogoutButton from "../components/loginSignupPageComponents/buttons/LogoutButton";
+import {UserContext} from "../providers/UserProvider";
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -45,6 +47,7 @@ const SavedPostsScreen: React.FC<SavedPostsScreenProps> = ({ savedPosts }) => (
 );
 
 const AccountPage = () => {
+  const userContext = React.useContext(UserContext) as any;
   const username = 'example_user';
   const recentPosts = [
     { id: 1, content: '' },
@@ -86,6 +89,7 @@ const AccountPage = () => {
           </Tab.Screen>
         </Tab.Navigator>
       </NavigationContainer>
+      <LogoutButton handlePress={userContext.logout} isButtonInteractable={true}/>
     </View>
   );
 };
