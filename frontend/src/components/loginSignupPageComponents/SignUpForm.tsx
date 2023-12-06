@@ -47,7 +47,7 @@ const SignUpForm = () => {
                 onSubmit={async values => {
                     console.log(values);
                     try {
-                        let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/user`, {
+                        let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/user`, {
                           method: 'POST',
                           headers: {
                             'Accept': 'application/json',

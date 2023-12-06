@@ -18,12 +18,12 @@ router.post("/", async (req: express.Request, res: express.Response) => {
 
   if (result) {
     
-    const token = jwt.sign(user as any, process.env.JWTSHARED as any, { expiresIn: "1h" });
+    const token = jwt.sign({"id" : user.id}, process.env.JWTSHARED as any, { expiresIn: "1h" });
 
     res.cookie("token", token, {
       httpOnly: true,
     })
-
+    res.json({"username": user.username, "id" : user.id})
     res.sendStatus(200);
   } else {
     res.sendStatus(401);

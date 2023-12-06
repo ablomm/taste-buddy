@@ -12,8 +12,11 @@ import EditIngredientForm from '../components/CreateRecipe/ingredients/EditIngre
 import AddTagForm, { Tag } from '../components/CreateRecipe/tags/AddTagForm';
 import EditTagForm from '../components/CreateRecipe/tags/EditTagForm';
 import TagListItem from '../components/CreateRecipe/tags/TagListItem';
+import { UserContext } from '../providers/UserProvider';
+
 
 const SignUpPage = () => {
+  const userContext = React.useContext(UserContext) as any;
 
   // define validation rules for each field
   const recipeSchema = yup.object().shape({
@@ -123,16 +126,16 @@ const SignUpPage = () => {
     let imageUrl;
     let s3AccessUrl;
     let s3Response;
-
+    //const username = "";
     try {
-      s3AccessUrl = await fetch(`http://localhost:8080/recipe/s3Url`, {  //get secure s3 access url 
+      s3AccessUrl = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/recipe/s3Url`, {  //get secure s3 access url 
         method: 'GET',
       }).then(res => res.json());
     } catch (error: any) {
       console.log("image link generation error")
       console.log(error)
     }
-
+    //console.log("context username: " +userContext.state.username)
     console.log(s3AccessUrl)
     console.log(s3AccessUrl.imageURL)
     if (s3AccessUrl) {
@@ -145,7 +148,12 @@ const SignUpPage = () => {
           body: image
         });
 
-        console.log("s3Response")
+        if(s3Response.status !== 200){
+          console.log("s3Response, s3 error")
+        } else {
+          console.log("s3Response")
+        }
+        
         console.log(s3Response)
         imageUrl = s3AccessUrl.imageURL.split('?')[0];
       } catch (error: any) {
@@ -156,8 +164,9 @@ const SignUpPage = () => {
       console.log("imageURL is null")
     }
 
+
     try {
-      let response = await fetch(`http://localhost:8080/recipe/save`, {  //save the recipe
+      let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/recipe/save`, {  //save the recipe
         method: 'POST',
         headers: {
           'Accept': 'application/json',
@@ -165,12 +174,15 @@ const SignUpPage = () => {
         },
         credentials: 'include',
         body: JSON.stringify({
+          username: userContext.state.username,
           title: data.title,
           description: data.description,
           instructions: data.instructions,
           cookTime: data.cookTime,
           calories: data.calories,
           servings: data.servings,
+          ingredients: ingredients,
+          tags: tags,
           image: imageUrl
         }),
       });
@@ -179,11 +191,10 @@ const SignUpPage = () => {
         console.log("upload failed")
         console.log(response)
       } else {
-        //userContext.login(data.username)
         console.log("upload successful")
+        console.log(ingredients)
       }
     } catch (error: any) {
-      
       console.log("upload error")
       console.error(error.stack);
     }
