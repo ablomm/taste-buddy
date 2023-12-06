@@ -15,7 +15,7 @@ import TagListItem from '../components/CreateRecipe/tags/TagListItem';
 import { UserContext } from '../providers/UserProvider';
 
 
-const SignUpPage = () => {
+const CreateRecipePage = () => {
   const userContext = React.useContext(UserContext) as any;
 
   // define validation rules for each field
@@ -389,4 +389,4 @@ const styles = StyleSheet.create({
     margin: 5
   }
 })
-export default SignUpPage;
+export default CreateRecipePage;

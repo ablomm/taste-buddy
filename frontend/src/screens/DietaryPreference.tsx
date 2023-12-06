@@ -1,63 +1,71 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
-// Define the dietary and allergy options
 const dietaryOptions = ['Vegetarian', 'Vegan', 'Gluten-Free', 'Dairy-Free', 'Nut-Free'];
 const allergyOptions = ['Shellfish', 'Soy', 'Egg', 'Fish', 'Other'];
 
-// Functional component for the diet selection page
 const DietSelectionPage: React.FC = () => {
-  // State to track selected dietary and allergy options
+  const navigation = useNavigation();
   const [selectedDietaryOptions, setSelectedDietaryOptions] = useState<string[]>([]);
   const [selectedAllergyOptions, setSelectedAllergyOptions] = useState<string[]>([]);
 
-  // Function to toggle the selected dietary option
   const toggleDietaryOption = (option: string) => {
-    if (selectedDietaryOptions.includes(option)) {
-      setSelectedDietaryOptions(selectedDietaryOptions.filter((item) => item !== option));
-    } else {
-      setSelectedDietaryOptions([...selectedDietaryOptions, option]);
-    }
+    setSelectedDietaryOptions((prevOptions) =>
+      prevOptions.includes(option)
+        ? prevOptions.filter((item) => item !== option)
+        : [...prevOptions, option]
+    );
   };
 
-  // Function to toggle the selected allergy option
   const toggleAllergyOption = (option: string) => {
-    if (selectedAllergyOptions.includes(option)) {
-      setSelectedAllergyOptions(selectedAllergyOptions.filter((item) => item !== option));
-    } else {
-      setSelectedAllergyOptions([...selectedAllergyOptions, option]);
-    }
+    setSelectedAllergyOptions((prevOptions) =>
+      prevOptions.includes(option)
+        ? prevOptions.filter((item) => item !== option)
+        : [...prevOptions, option]
+    );
+  };
+
+  const handleSkip = () => {
+    navigation.navigate('AccountPage');
+  };
+
+  const handleContinue = () => {
+    navigation.navigate('AccountPage');
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>Select Dietary and Allergy Options</Text>
+      <TouchableOpacity style={styles.skipButton} onPress={handleSkip}>
+        <Text style={{ color: '#4CAF50', fontSize: 16, fontWeight: 'bold' }}>Skip</Text>
+      </TouchableOpacity>
 
-      {/* Render the list of dietary options */}
       <Text style={styles.subHeading}>Dietary Preferences:</Text>
-      {dietaryOptions.map((option) => (
-        <TouchableOpacity
-          key={option}
-          style={[styles.option, selectedDietaryOptions.includes(option) && styles.selectedOption]}
-          onPress={() => toggleDietaryOption(option)}
-        >
-          <Text style={styles.optionText}>{option}</Text>
-        </TouchableOpacity>
-      ))}
+      <View style={styles.optionsContainer}>
+        {dietaryOptions.map((option) => (
+          <TouchableOpacity
+            key={option}
+            style={[styles.option, selectedDietaryOptions.includes(option) && styles.selectedOption]}
+            onPress={() => toggleDietaryOption(option)}
+          >
+            <Text style={styles.optionText}>{option}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
 
-      {/* Render the list of allergy options */}
       <Text style={styles.subHeading}>Food Allergies:</Text>
-      {allergyOptions.map((option) => (
-        <TouchableOpacity
-          key={option}
-          style={[styles.option, selectedAllergyOptions.includes(option) && styles.selectedOption]}
-          onPress={() => toggleAllergyOption(option)}
-        >
-          <Text style={styles.optionText}>{option}</Text>
-        </TouchableOpacity>
-      ))}
+      <View style={styles.optionsContainer}>
+        {allergyOptions.map((option) => (
+          <TouchableOpacity
+            key={option}
+            style={[styles.option, selectedAllergyOptions.includes(option) && styles.selectedOption]}
+            onPress={() => toggleAllergyOption(option)}
+          >
+            <Text style={styles.optionText}>{option}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
 
-      {/* Display the selected options */}
       <View style={styles.selectedOptionsContainer}>
         <Text style={styles.selectedOptionsText}>Selected Dietary Options:</Text>
         {selectedDietaryOptions.map((option) => (
@@ -73,15 +81,37 @@ const DietSelectionPage: React.FC = () => {
           </Text>
         ))}
       </View>
+
+      <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
+        <Text style={styles.buttonText}>Continue</Text>
+      </TouchableOpacity>
     </View>
   );
 };
 
-// Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+  },
+  skipButton: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+  },
+  continueButton: {
+    position: 'absolute',
+    bottom: 16,
+    alignSelf: 'center',
+    backgroundColor: '#4CAF50',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   heading: {
     fontSize: 24,
@@ -94,9 +124,14 @@ const styles = StyleSheet.create({
     marginTop: 16,
     marginBottom: 8,
   },
+  optionsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 16,
+  },
   option: {
-    padding: 12,
-    marginBottom: 8,
+    padding: 8,
+    margin: 4,
     borderWidth: 1,
     borderColor: '#ddd',
     borderRadius: 8,
@@ -107,7 +142,7 @@ const styles = StyleSheet.create({
     borderColor: '#4CAF50',
   },
   optionText: {
-    fontSize: 16,
+    fontSize: 14,
   },
   selectedOptionsContainer: {
     marginTop: 16,
