@@ -39,7 +39,7 @@ const AddTagForm = ({ visible, setVisible, addTag }: any) => {
             {({ errors, handleChange, handleBlur, handleSubmit, values }) => (
 
               <>
-                <Text style={styles.header}>Add Ingredient</Text>
+                <Text style={styles.header}>Add Tag</Text>
 
                 <ValidatedInput
                   placeholder="Value"
