@@ -61,7 +61,7 @@ const CreateRecipePage = ({ route, navigation }: any) => {
   const [editTagModalVisible, setEditTagModalVisible] = React.useState(false);
   const [tagEditIndex, setTagEditIndex] = React.useState(0); // the index of the tag we are editing
 
-  const [image, setImage] = React.useState(pickedImage.uri);
+  const [image, setImage] = React.useState(pickedImage? pickedImage.uri: null);
 
 
   const pickImage = async () => {
