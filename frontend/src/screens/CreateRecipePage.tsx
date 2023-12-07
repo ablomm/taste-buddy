@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TextInput, StyleSheet, Button, Pressable, Modal, ScrollView, Image } from "react-native";
+import { View, Text, TextInput, StyleSheet, KeyboardAvoidingView, ScrollView, Image } from "react-native";
 import * as yup from 'yup';
 import { Formik, Form, Field } from 'formik';
 import ValidatedInput from '../components/ValidatedInput';
@@ -12,12 +12,13 @@ import EditIngredientForm from '../components/CreateRecipe/ingredients/EditIngre
 import AddTagForm, { Tag } from '../components/CreateRecipe/tags/AddTagForm';
 import EditTagForm from '../components/CreateRecipe/tags/EditTagForm';
 import TagListItem from '../components/CreateRecipe/tags/TagListItem';
-import { Asset } from 'expo-media-library';
+import BackButton from '../components/BackButton';
 import { UserContext } from '../providers/UserProvider';
 
 
-const CreateRecipePage = ({ route }: any) => {
-  const { pickedImage } = route.params;  const userContext = React.useContext(UserContext) as any;
+const CreateRecipePage = ({ route, navigation }: any) => {
+  const { pickedImage } = route.params;  
+  const userContext = React.useContext(UserContext) as any;
 
   // define validation rules for each field
   const recipeSchema = yup.object().shape({
@@ -248,10 +249,19 @@ const CreateRecipePage = ({ route }: any) => {
 
         {({ errors, handleChange, handleBlur, handleSubmit, values }) => (
           <>
-            <View style={styles.titleBar}>
-              <Text style={styles.title}>Create Recipe</Text>
-              <TBButton title="Post" style={styles.submitButton} textColor={{ color: "white" }} onPress={handleSubmit} />
+            <View style={styles.headerWrapper}>
+                <View style={styles.headerLeftWrapper}>
+                    <View><BackButton navigation = {navigation}/></View>
+                    <View style={styles.headerTiltleWrapper}><Text style={styles.headerTiltle}>Create Recipe {`<_<`}</Text></View>
+                </View>
+                <View>
+                    <TBButton title="post" style={styles.postButton} textColor={{ color: "white" }} onPress={handleSubmit} />
+                </View>
             </View>
+            <KeyboardAvoidingView
+                behavior='position'
+                keyboardVerticalOffset = {40}
+            >
             <ScrollView>
 
               <Text style={styles.header}>Image*</Text>
@@ -341,6 +351,7 @@ const CreateRecipePage = ({ route }: any) => {
                 <TBButton style={styles.addButton} onPress={() => setTagModalVisible(true)} title="+" />
               </View>
             </ScrollView>
+            </KeyboardAvoidingView>
           </>
         )}
       </Formik>
@@ -353,24 +364,34 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     fontWeight: "bold"
   },
-  title: {
-    fontSize: 35,
-    marginLeft: 10,
-    fontWeight: "bold"
-  },
-  titleBar: {
-    alignItems: "center",
-    display: "flex",
-    flexDirection: "row"
-  },
-  submitButton: {
+  postButton: {
     flex: 1,
     flexGrow: 1,
     height: 40,
-    backgroundColor: "#4077be",
+    backgroundColor: "#6752EC",
     color: "white",
-    borderWidth: 0
-  },
+    borderWidth: 0,
+},
+headerWrapper:{
+    alignItems: 'center',
+    display: 'flex',
+    flexDirection:"row",
+    justifyContent:"space-between",
+    paddingHorizontal: 12,
+},
+headerLeftWrapper:{
+    alignItems: 'center',
+    display: 'flex',
+    flexDirection:"row",
+},
+headerTiltleWrapper:{
+    marginLeft: 15
+},
+headerTiltle:{
+    color:"#000",
+    fontSize: 20,
+    fontWeight: "700",
+},
   image: {
     width: "95%",
     height: 300,
