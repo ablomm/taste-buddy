@@ -79,7 +79,7 @@ const GalleryPage = ({navigation}:any) => {
                     <View style={styles.headerTiltleWrapper}><Text style={styles.headerTiltle}>Select an Image {`<_<`}</Text></View>
                 </View>
                 <View>
-                    <TBButton title="next >>" style={styles.nextButton} textColor={{ color: "white" }}  />
+                    <TBButton title="next >>" onPress={()=>{isPostSelected?navigation.push('CreatePostPage', { pickedImage }):navigation.push('CreateRecipePage', { pickedImage })}} style={styles.nextButton} textColor={{ color: "white" }}  />
                 </View>
             </View>
             <View style={styles.pickedImageWrapper}>
