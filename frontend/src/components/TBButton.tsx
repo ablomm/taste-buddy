@@ -22,7 +22,8 @@ const styles = StyleSheet.create({
     buttonText: {
         fontSize:16,
         lineHeight:19,
-        fontWeight: "600"
+        fontWeight: "600", 
+        padding:5
     }
 });
 
