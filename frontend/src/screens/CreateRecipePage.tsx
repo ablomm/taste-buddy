@@ -12,9 +12,10 @@ import EditIngredientForm from '../components/CreateRecipe/ingredients/EditIngre
 import AddTagForm, { Tag } from '../components/CreateRecipe/tags/AddTagForm';
 import EditTagForm from '../components/CreateRecipe/tags/EditTagForm';
 import TagListItem from '../components/CreateRecipe/tags/TagListItem';
+import { Asset } from 'expo-media-library';
 
-const CreateRecipePage = () => {
-
+const CreateRecipePage = ({ route }: any) => {
+  const { pickedImage } = route.params;
   // define validation rules for each field
   const recipeSchema = yup.object().shape({
     title: yup
@@ -56,7 +57,7 @@ const CreateRecipePage = () => {
   const [editTagModalVisible, setEditTagModalVisible] = React.useState(false);
   const [tagEditIndex, setTagEditIndex] = React.useState(0); // the index of the tag we are editing
 
-  const [image, setImage] = React.useState(null);
+  const [image, setImage] = React.useState(pickedImage.uri);
 
 
   const pickImage = async () => {
