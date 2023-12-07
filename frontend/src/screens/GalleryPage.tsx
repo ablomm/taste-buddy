@@ -1,13 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { FlatList} from 'react-native';
-import { View, Text, StyleSheet, ScrollView, Pressable, Image, Dimensions, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Image, Dimensions, TouchableOpacity, FlatList } from 'react-native';
 import BackButton from '../components/BackButton';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import TBButton from '../components/TBButton';
 import * as MediaLibrary from 'expo-media-library';
 import { PagedInfo, Asset } from 'expo-media-library';
-import * as ImagePicker from 'expo-image-picker';
-import { ToggleButton } from 'react-native-paper';
 
 const windowWidth= Dimensions.get('window').width;
 const windowHeight= Dimensions.get('window').height;
