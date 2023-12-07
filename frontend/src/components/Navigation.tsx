@@ -8,11 +8,13 @@ import SignUpPage from "../screens/SignUpPage";
 import ExplorePage from "../screens/ExplorePage";
 import UserProvider, { UserContext } from "../providers/UserProvider";
 import CreateRecipePage from "../screens/CreateRecipePage";
+import GalleryPage from "../screens/GalleryPage";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import AccountPage from "../screens/AccountPage";
 import SearchPage from "../screens/SearchPage";
 import RecommenderPage from "../screens/RecommenderPage";
 import DietaryPreference from "../screens/DietaryPreference";
+import CreatePostPage from "../screens/CreatePostPage";
 
 const Stack = createStackNavigator();
 
@@ -55,8 +57,8 @@ const SignedInNavigation = () => (
       />
 
       <Tab.Screen
-        name='CreateRecipePage'
-        component={CreateRecipePage}
+        name='CreatePostOrRecipeStack'
+        component={CreatePostOrRecipeStack}
         options={{
           tabBarIcon: ({ color, size }) => (
             <Image source={require("../../assets/NavBar/plus_btn.png")} style={{ width: size + 16, height: size + 16 }} />),
@@ -75,7 +77,13 @@ const SignedInNavigation = () => (
     </Tab.Navigator>
   </NavigationContainer>
 );
-
+const CreatePostOrRecipeStack = () => (
+  <Stack.Navigator initialRouteName='GalleryPage' screenOptions={stackOptions}>
+    <Stack.Screen name='GalleryPage' component={GalleryPage} />
+    <Stack.Screen name='CreateRecipePage' component={CreateRecipePage} />
+    <Stack.Screen name='CreatePostPage' component={CreatePostPage} />
+  </Stack.Navigator>
+);
 const AccountPageStack = () => (
   <Stack.Navigator initialRouteName='AccountPage' screenOptions={stackOptions}>
     <Stack.Screen name='AccountPage' component={AccountPage} />
