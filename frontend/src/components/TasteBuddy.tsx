@@ -4,30 +4,31 @@ import { StyleSheet, SafeAreaView } from 'react-native';
 import Navigation from "../components/Navigation";
 import UserProvider, { UserContext } from '../providers/UserProvider';
 
-const checkJWT = async (userContext: any) => {
-    try {
-        let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/authorize`, {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-        });
-
-        if (response.status !== 200) {
-            console.log("account authenication failed; JWT invalid");
-        } else {
-            console.log("account authenication successful");
-            userContext.login('placeholder');
-        }
-    } catch (error: any) {
-        console.error(error.stack);
-    }
-}
-
 const TasteBuddy = () => {
     const userContext = React.useContext(UserContext) as any;
+
+    const checkJWT = async (userContext: any) => {
+        try {
+            let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/authorize`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include', 
+            });
+
+            if (response.status !== 200) {
+                console.log("account authenication failed; JWT invalid");
+            } else {
+                console.log("account authenication successful");
+                const json = await response.json()
+                userContext.login(json.username);
+            }
+        } catch (error: any) {
+            console.error(error.stack);
+        }
+    }
 
     React.useEffect(() => {
         checkJWT(userContext);

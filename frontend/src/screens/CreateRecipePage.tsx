@@ -13,9 +13,12 @@ import AddTagForm, { Tag } from '../components/CreateRecipe/tags/AddTagForm';
 import EditTagForm from '../components/CreateRecipe/tags/EditTagForm';
 import TagListItem from '../components/CreateRecipe/tags/TagListItem';
 import { Asset } from 'expo-media-library';
+import { UserContext } from '../providers/UserProvider';
+
 
 const CreateRecipePage = ({ route }: any) => {
-  const { pickedImage } = route.params;
+  const { pickedImage } = route.params;  const userContext = React.useContext(UserContext) as any;
+
   // define validation rules for each field
   const recipeSchema = yup.object().shape({
     title: yup
@@ -120,6 +123,84 @@ const CreateRecipePage = ({ route }: any) => {
     setEditTagModalVisible(true);
   }
 
+  const onSubmit = async (data: any) => {
+    let imageUrl;
+    let s3AccessUrl;
+    let s3Response;
+    //const username = "";
+    try {
+      s3AccessUrl = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/recipe/s3Url`, {  //get secure s3 access url 
+        method: 'GET',
+      }).then(res => res.json());
+    } catch (error: any) {
+      console.log("image link generation error")
+      console.log(error)
+    }
+    //console.log("context username: " +userContext.state.username)
+    console.log(s3AccessUrl)
+    console.log(s3AccessUrl.imageURL)
+    if (s3AccessUrl) {
+      try {
+        s3Response = await fetch(s3AccessUrl.imageURL, {  //put the image on the bucket
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          body: image
+        });
+
+        if(s3Response.status !== 200){
+          console.log("s3Response, s3 error")
+        } else {
+          console.log("s3Response")
+        }
+        
+        console.log(s3Response)
+        imageUrl = s3AccessUrl.imageURL.split('?')[0];
+      } catch (error: any) {
+        console.log("image put failed")
+        console.log(error)
+      }
+    } else {
+      console.log("imageURL is null")
+    }
+
+
+    try {
+      let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/recipe/save`, {  //save the recipe
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          username: userContext.state.username,
+          title: data.title,
+          description: data.description,
+          instructions: data.instructions,
+          cookTime: data.cookTime,
+          calories: data.calories,
+          servings: data.servings,
+          ingredients: ingredients,
+          tags: tags,
+          image: imageUrl
+        }),
+      });
+
+      if (response.status !== 200) {
+        console.log("upload failed")
+        console.log(response)
+      } else {
+        console.log("upload successful")
+        console.log(ingredients)
+      }
+    } catch (error: any) {
+      console.log("upload error")
+      console.error(error.stack);
+    }
+  };
+
 
   return (
     <>
@@ -161,9 +242,8 @@ const CreateRecipePage = ({ route }: any) => {
         }}
 
         validationSchema={recipeSchema}
-        onSubmit={values => {
-          // same shape as initial values
-          console.log(values);
+        onSubmit={(values) => {
+          onSubmit(values)
         }}>
 
         {({ errors, handleChange, handleBlur, handleSubmit, values }) => (
