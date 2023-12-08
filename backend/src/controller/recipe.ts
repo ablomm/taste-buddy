@@ -1,7 +1,7 @@
 import express, { Response, Request } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { generateUploadURL } from '../service/s3';
-import { createRecipe, createIngredients, createInstructions, getRecipeByUserAndTitle } from '../service/recipe';
+import { createRecipe, createIngredients, createInstructions, getRecipeByUserAndTitle, getRecipes } from '../service/recipe';
 import { getUserByUsername } from "../service/user";
 const prisma = new PrismaClient();
 const router = express.Router();
@@ -34,6 +34,11 @@ router.post("/save", async (req: express.Request, res: express.Response) => {
 router.get("/s3Url", async (req: express.Request, res: express.Response) => {
     const imageURL = await generateUploadURL()
     return res.send({ imageURL });
+});
+
+router.get("/getPosts", async (req: express.Request, res: express.Response) => {
+    const posts = await getRecipes()
+    return res.send({posts});
 });
 
 export default router;
