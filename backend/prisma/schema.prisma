@@ -19,6 +19,7 @@ model User {
   isModerator Boolean @default(false)
   savedRecipes UserSavedRecipes[]
   recipes      Recipe[]
+  userPosts    UserPosts[]
 }
 
 model Recipe {
@@ -71,3 +72,30 @@ model UserSavedRecipes {
 
   @@id([userID, recipeID])
 }
+
+model Posts {
+  id            Int         @id @default(autoincrement())
+  author        Int
+  description   String
+  tags          String
+  image         String
+  recipeURL     String
+  creationTime  DateTime    @default(now())
+  userPosts     UserPosts[]
+  postTags      PostTags[]
+}
+
+model UserPosts {
+  postID    Int     @unique
+  author    Int
+  userID    User    @relation(fields: [author], references: [id], onDelete: Cascade)
+  post      Posts   @relation(fields: [postID], references: [id], onDelete: Cascade)
+}
+
+model PostTags {
+  id        Int         @id @default(autoincrement())
+  postID    Int
+  tag       String
+  postId    Posts       @relation(fields: [postID], references: [id], onDelete: Cascade)
+}
+
