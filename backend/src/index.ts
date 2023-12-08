@@ -8,6 +8,7 @@ import userController from "./controller/user"
 import loginController from "./controller/login"
 import authController from "./controller/authorize"
 import recipeController from "./controller/recipe"
+import postController from "./controller/post"
 
 const app = express(); 
 
@@ -25,6 +26,7 @@ app.use('/user', userController);
 app.use('/login', loginController);
 app.use('/authorize', authController);
 app.use('/recipe', recipeController);
+app.use('/post', postController);
 
 //error handler; must be last
 app.use((err: Error, req: express.Request, res: express.Response, next: express.RequestHandler) => {

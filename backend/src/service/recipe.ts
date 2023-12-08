@@ -1,7 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { getUserByEmail, getUserByUsername } from "../service/user";
-import { AnyArn } from 'aws-sdk/clients/groundstation';
-import { InstanceAccessControlAttributeConfiguration } from 'aws-sdk/clients/ssoadmin';
+
 const prisma = new PrismaClient()
 
 function formatInstructions(instructions: string): any {
@@ -74,3 +72,44 @@ export async function getRecipeByUserAndTitle(userID: number|undefined, title: s
 
     return recipe;
 }
+
+// export async function updateRecipe(recipeID:number, userID: number|any, title: string,description: string,instructions: string,cookTime: number,calories: number,servings: number,tags: any,image: string) {
+//     const cookTimeHours = Math.floor(cookTime/60);
+//     const cootTimeMinutes = cookTime%60;
+//
+//     await prisma.recipe.update({
+//         where: {
+//           id: recipeID,
+//           authorID: userID
+//         },
+//         data: {
+//             recipeTitle: title,
+//             description: description,
+//             cookTimeHours: cookTimeHours,
+//             cootTimeMinutes: cootTimeMinutes,
+//             calories: calories/1,
+//             servings: servings/1,
+//             recipeImage: image
+//         },
+//     });
+// }
+//
+// export async function updateInstructions(userId: number|any, recipeID: number|any, instructions: string) {
+//     await prisma.recipeInstructions.update({
+//        where: {
+//            recipeID: recipeID
+//        }
+//     });
+// }
+//
+// export async function updateIngredients(recipeID: number, ingredients: any) {
+//     let data = []
+//     //TO DO: replace measurementType with input field.
+//     for (let id in ingredients) {
+//         data.push({recipeID: recipeID, ingredient: ingredients[id].title, amount: Number(ingredients[id].amount), measurementType: ingredients[id].title});
+//     }
+//
+//     await prisma.recipeIngredients.updateMany({
+//         data: data,
+//     })
+// }
