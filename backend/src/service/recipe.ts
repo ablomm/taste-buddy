@@ -74,3 +74,11 @@ export async function getRecipeByUserAndTitle(userID: number|undefined, title: s
 
     return recipe;
 }
+
+export async function getRecipes() {
+
+    const user = await prisma.recipe.findMany({
+    })
+
+    return user;
+}

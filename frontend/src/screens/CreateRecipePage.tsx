@@ -140,12 +140,18 @@ const CreateRecipePage = ({ route, navigation }: any) => {
     //console.log("context username: " +userContext.state.username)
     console.log(s3AccessUrl)
     console.log(s3AccessUrl.imageURL)
+
+    console.log("")
+    console.log(image)
+    console.log("type")
+    console.log(typeof image)
     if (s3AccessUrl) {
       try {
+        
         s3Response = await fetch(s3AccessUrl.imageURL, {  //put the image on the bucket
           method: 'PUT',
           headers: {
-            'Content-Type': 'multipart/form-data',
+            'Content-Type': 'image',
           },
           body: image
         });
@@ -157,6 +163,7 @@ const CreateRecipePage = ({ route, navigation }: any) => {
         }
         
         console.log(s3Response)
+        console.log(s3AccessUrl.imageURL)
         imageUrl = s3AccessUrl.imageURL.split('?')[0];
       } catch (error: any) {
         console.log("image put failed")
