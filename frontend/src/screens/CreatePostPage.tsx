@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, KeyboardAvoidingView } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Image, KeyboardAvoidingView, Platform } from "react-native";
 import * as yup from 'yup';
 import { Formik, Form, Field } from 'formik';
 import BackButton from '../components/BackButton';
@@ -117,7 +117,7 @@ const CreatePostPage = ({ route, navigation }: any) => {
 
             <KeyboardAvoidingView
                 behavior='position'
-                keyboardVerticalOffset = {40}
+                keyboardVerticalOffset = {Platform.OS === 'ios' ? 40 : 0}
             >
             <ScrollView>
       

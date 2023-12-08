@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TextInput, StyleSheet, KeyboardAvoidingView, ScrollView, Image } from "react-native";
+import { View, Text, TextInput, StyleSheet, KeyboardAvoidingView, ScrollView, Image, Platform } from "react-native";
 import * as yup from 'yup';
 import { Formik, Form, Field } from 'formik';
 import ValidatedInput from '../components/ValidatedInput';
@@ -260,7 +260,7 @@ const CreateRecipePage = ({ route, navigation }: any) => {
             </View>
             <KeyboardAvoidingView
                 behavior='position'
-                keyboardVerticalOffset = {40}
+                keyboardVerticalOffset = {Platform.OS === 'ios' ? 40 : 0}
             >
             <ScrollView>
 

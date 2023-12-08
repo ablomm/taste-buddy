@@ -96,6 +96,9 @@ const GalleryPage = ({navigation}:any) => {
                 data={images}
                 renderItem={displayImage}
                 keyExtractor={(item) => item.id}
+                initialNumToRender={18}
+                maxToRenderPerBatch={18}
+                windowSize={10}
             />
                 
         </View>
