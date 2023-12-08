@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, KeyboardAvoidingView, Platform } from "react-native";
 import * as yup from 'yup';
-import { Formik, Form, Field } from 'formik';
+import { Formik } from 'formik';
 import BackButton from '../components/BackButton';
 import ValidatedInput from '../components/ValidatedInput';
 import TBButton from '../components/TBButton';
@@ -10,9 +10,11 @@ import { TouchableRipple } from 'react-native-paper';
 import AddTagForm, { Tag } from '../components/CreateRecipe/tags/AddTagForm';
 import EditTagForm from '../components/CreateRecipe/tags/EditTagForm';
 import TagListItem from '../components/CreateRecipe/tags/TagListItem';
+import {UserContext} from "../providers/UserProvider";
 
 const CreatePostPage = ({ route, navigation }: any) => {
   const { pickedImage } = route.params;
+  const userContext = React.useContext(UserContext) as any;
   // define validation rules for each field
   const recipeSchema = yup.object().shape({
     description: yup
@@ -35,7 +37,7 @@ const CreatePostPage = ({ route, navigation }: any) => {
   const [editTagModalVisible, setEditTagModalVisible] = React.useState(false);
   const [tagEditIndex, setTagEditIndex] = React.useState(0); // the index of the tag we are editing
 
-  const [image, setImage] = React.useState(pickedImage? pickedImage.uri: null);
+  const [image, setImage] = React.useState<any>(pickedImage? pickedImage.uri: null);
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -98,9 +100,80 @@ const CreatePostPage = ({ route, navigation }: any) => {
         }}
 
         validationSchema={recipeSchema}
-        onSubmit={values => {
-          // same shape as initial values
-          console.log(values);
+        onSubmit={async values => {
+            console.log(values);
+            let imageUrl: string;
+            let s3AccessUrl: any;
+            let s3Response: any;
+
+            try {
+                s3AccessUrl = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/post/s3Url`, {  //get secure s3 access url
+                    method: 'GET',
+                }).then(res => res.json());
+            } catch (error: any) {
+                console.log("image link generation error")
+                console.log(error)
+            }
+            //console.log("context username: " +userContext.state.username)
+            console.log(s3AccessUrl)
+            console.log(s3AccessUrl.imageURL)
+            if (s3AccessUrl) {
+                try {
+                    s3Response = await fetch(s3AccessUrl.imageURL, {  //put the image on the bucket
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                        body: image
+                    });
+
+                    if(s3Response.status !== 200){
+                        console.log("s3Response, s3 error")
+                    } else {
+                        console.log("s3Response")
+                    }
+
+                    console.log(s3Response)
+                    imageUrl = s3AccessUrl.imageURL.split('?')[0];
+                } catch (error: any) {
+                    console.log("image put failed")
+                    console.log(error)
+                }
+            } else {
+                console.log("imageURL is null")
+            }
+
+            try {
+                // Save the post
+                let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/post/create`, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        username: userContext.state.username,
+                        description: values.description,
+                        tags: tags,
+                        image: imageUrl,
+                        recipeURL: values.recipeUrl
+                    }),
+                });
+
+                if (response.status !== 200) {
+                    console.log("upload failed")
+                    console.log(response)
+                } else {
+                    console.log("upload successful")
+                    console.log(values)
+                }
+
+                navigation.navigate('AccountPage');
+            } catch (error: any) {
+                console.log("upload error")
+                console.error(error.stack);
+            }
         }}>
 
         {({ errors, handleChange, handleBlur, handleSubmit, values }) => (
