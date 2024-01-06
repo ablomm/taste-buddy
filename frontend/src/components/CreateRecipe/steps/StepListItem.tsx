@@ -1,21 +1,26 @@
 import React from 'react';
-import { View, Text, StyleSheet } from "react-native";
-import { Ingredient } from './AddIngredientForm';
+import { Text, StyleSheet } from "react-native";
 import { TouchableRipple } from 'react-native-paper';
 
-export interface IngredientListItemProps {
-    ingredient: Ingredient,
+export interface Step {
+    step: string,
+  }
+  
+
+export interface StepListItemProps {
+    item: Step,
+    index: number,
     onPress: any,
 }
 
 
-const IngredientListItem = ({ ingredient, onPress }: IngredientListItemProps) => {
+const StepListItem = ({ item, index, onPress }: StepListItemProps) => {
     return (
 
         <TouchableRipple style={styles.view} onPress={onPress} borderless={true}>
             <>
-                <Text style={styles.title}>{ingredient.title}</Text>
-                <Text style={styles.amount}>{ingredient.amount} {ingredient.unit}</Text>
+            <Text style={styles.index}>{index + 1}</Text>
+            <Text style={styles.step}>{item.step}</Text>
             </>
         </TouchableRipple>
     )
@@ -30,17 +35,18 @@ const styles = StyleSheet.create({
         margin: 10,
         marginBottom: 0,
     },
-    title: {
+    step: {
         fontSize: 20,
         margin: 10,
         flexGrow: 1
     },
-    amount: {
+    index: {
         flexBasis: '20%',
-        borderLeftWidth: 1,
+        borderRightWidth: 1,
         alignSelf: 'center',
         textAlign: 'center'
     }
 })
 
-export default IngredientListItem;
+
+export default StepListItem;
