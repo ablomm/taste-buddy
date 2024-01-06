@@ -14,6 +14,9 @@ import EditTagForm from '../components/CreateRecipe/tags/EditTagForm';
 import TagListItem from '../components/CreateRecipe/tags/TagListItem';
 import BackButton from '../components/BackButton';
 import { UserContext } from '../providers/UserProvider';
+import AddStepForm, { Step } from '../components/CreateRecipe/steps/AddStepForm';
+import EditStepForm from '../components/CreateRecipe/steps/EditStepForm';
+import StepListItem from '../components/CreateRecipe/steps/StepListItem';
 
 
 const CreateRecipePage = ({ route, navigation }: any) => {
@@ -28,9 +31,6 @@ const CreateRecipePage = ({ route, navigation }: any) => {
     description: yup
       .string()
       .optional(),
-    instructions: yup
-      .string()
-      .required("required"),
     cookTime: yup
       .number()
       .optional()
@@ -60,6 +60,14 @@ const CreateRecipePage = ({ route, navigation }: any) => {
   // edit tag Modal
   const [editTagModalVisible, setEditTagModalVisible] = React.useState(false);
   const [tagEditIndex, setTagEditIndex] = React.useState(0); // the index of the tag we are editing
+
+  // add step Modal
+  const [steps, setSteps]: [Step[], any] = React.useState([]);
+  const [stepModalVisible, setStepModalVisible] = React.useState(false);
+
+  // edit step Modal
+  const [editStepModalVisible, setEditStepModalVisible] = React.useState(false);
+  const [stepEditIndex, setStepEditIndex] = React.useState(0); // the index of the step we are editing
 
   const [image, setImage] = React.useState(pickedImage? pickedImage.uri: null);
 
@@ -124,6 +132,28 @@ const CreateRecipePage = ({ route, navigation }: any) => {
     setEditTagModalVisible(true);
   }
 
+  //steps
+  const addStep = (step: Step) => {
+    setSteps(steps.concat([step]));
+  }
+
+  const editStep = (index: number, step: Step) => {
+    let toEdit = [...steps];
+    toEdit[index] = step;
+    setSteps(toEdit);
+  };
+
+  const deleteStep = (index: number) => {
+    let toEdit = [...steps];
+    toEdit.splice(index, 1);
+    setSteps(toEdit);
+  }
+
+  const openEditStepForm = (index: number) => {
+    setStepEditIndex(index);
+    setEditStepModalVisible(true);
+  }
+
   const onSubmit = async (data: any) => {
     let imageUrl;
     let s3AccessUrl;
@@ -179,7 +209,7 @@ const CreateRecipePage = ({ route, navigation }: any) => {
           username: userContext.state.username,
           title: data.title,
           description: data.description,
-          instructions: data.instructions,
+          instructions: steps,
           cookTime: data.cookTime,
           calories: data.calories,
           servings: data.servings,
@@ -229,6 +259,19 @@ const CreateRecipePage = ({ route, navigation }: any) => {
         tag={tags[tagEditIndex] || { value: "" }}
         editTag={(tag: Tag) => { editTag(tagEditIndex, tag) }}
         deleteTag={() => { deleteTag(tagEditIndex) }}
+      />
+
+      <AddStepForm
+        visible={stepModalVisible}
+        setVisible={setStepModalVisible}
+        addItem={addStep}
+      />
+      <EditStepForm
+        visible={editStepModalVisible}
+        setVisible={setEditStepModalVisible}
+        item={steps[stepEditIndex] || { step: "" }}
+        editItem={(step: Step) => { editStep(stepEditIndex, step) }}
+        deleteItem={() => { deleteStep(stepEditIndex) }}
       />
 
 
@@ -281,18 +324,12 @@ const CreateRecipePage = ({ route, navigation }: any) => {
 
 
               <Text style={styles.header}>Instructions*</Text>
-              <ValidatedInput
-                placeholder={"Step 1:\n\tCook the meat.\n\nStep 2:\n\tCut the lettuce.\n\nStep 3:\n\tPut the meat in the lettuce."}
-                onChangeText={handleChange('instructions')}
-                onBlur={handleBlur('instructions')}
-                value={values.instructions}
-                error={errors.instructions}
-                multiline={true}
-                style={{
-                  height: "auto",
-                  textAlignVertical: 'top',
-                }}
-              />
+              <View style={styles.multiContainer}>
+                {steps.map((step, index) => {
+                  return (<StepListItem onPress={() => { openEditStepForm(index) }} item={step} index={index} key={index} />);
+                })}
+                <TBButton style={styles.addButton} onPress={() => setStepModalVisible(true)} title="+" />
+              </View>
 
               <Text style={styles.header}>Description</Text>
               <ValidatedInput
