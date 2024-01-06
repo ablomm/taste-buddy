@@ -15,7 +15,7 @@ const IngredientListItem = ({ ingredient, onPress }: IngredientListItemProps) =>
         <TouchableRipple style={styles.view} onPress={onPress} borderless={true}>
             <>
                 <Text style={styles.title}>{ingredient.title}</Text>
-                <Text style={styles.amount}>{ingredient.amount}</Text>
+                <Text style={styles.amount}>{ingredient.amount} {ingredient.unit}</Text>
             </>
         </TouchableRipple>
     )

@@ -42,7 +42,7 @@ const AddStepForm = ({ visible, setVisible, addItem }: any) => {
             <Text style={styles.header}>Add Step</Text>
 
             <ValidatedInput
-              placeholder="Step"
+              placeholder="place the meat inside the pan and put the burner on medium."
               onChangeText={handleChange('step')}
               onBlur={handleBlur('step')}
               value={values.step}
