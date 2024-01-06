@@ -209,7 +209,7 @@ const CreateRecipePage = ({ route, navigation }: any) => {
           username: userContext.state.username,
           title: data.title,
           description: data.description,
-          instructions: data.instructions,
+          instructions: steps,
           cookTime: data.cookTime,
           calories: data.calories,
           servings: data.servings,
