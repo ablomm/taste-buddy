@@ -45,7 +45,6 @@ const styles = StyleSheet.create({
         paddingLeft: 10
     },
     textInput: {
-        flexGrow: 1,
         alignSelf: 'center',
         height: 50,
         margin: 10,
