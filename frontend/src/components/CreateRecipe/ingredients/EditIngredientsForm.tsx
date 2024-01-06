@@ -5,10 +5,13 @@ import { Formik, Form, Field } from 'formik';
 import ValidatedInput from '../../ValidatedInput';
 import TBButton from '../../TBButton';
 import PopUpMenu from '../../PopUpMenu';
+import { measurements } from "./AddIngredientForm";
+import { Dropdown } from 'react-native-element-dropdown';
 
 export interface Ingredient {
   title: string,
   amount: number
+  unit: string
 }
 
 
@@ -25,6 +28,8 @@ const recipeSchema = yup.object().shape({
 
 
 const EditIngredientForm = ({ visible, setVisible, ingredient, editIngredient, deleteIngredient }: any) => {
+  const [unit, setUnit] = React.useState(ingredient.unit);
+  
   const handleDelete = () => {
     deleteIngredient();
     setVisible(false);
@@ -42,7 +47,7 @@ const EditIngredientForm = ({ visible, setVisible, ingredient, editIngredient, d
 
         validationSchema={recipeSchema}
         onSubmit={values => {
-          editIngredient(values);
+          editIngredient({...values, unit: unit});
           setVisible(false);
         }}>
 
@@ -59,13 +64,27 @@ const EditIngredientForm = ({ visible, setVisible, ingredient, editIngredient, d
               error={errors.title}
             />
 
-            <ValidatedInput
-              placeholder="Amount"
-              onChangeText={handleChange('amount')}
-              onBlur={handleBlur('amount')}
-              value={values.amount}
-              error={errors.amount}
-            />
+            <View style={styles.amountBar}>
+              <ValidatedInput
+                style={styles.amountInput}
+                placeholder="Amount"
+                onChangeText={handleChange('amount')}
+                onBlur={handleBlur('amount')}
+                value={values.amount}
+                error={errors.amount}
+              />
+              <Dropdown
+                style={styles.amountUnit}
+                data={measurements}
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                value={ingredient.unit}
+                onChange={item => {
+                  setUnit(item.value);
+                }} />
+
+            </View>
 
             <TBButton onPress={handleSubmit as any} title="Save" />
             <TBButton onPress={handleDelete as any} title="Delete" />
@@ -83,6 +102,25 @@ const styles = StyleSheet.create({
     fontSize: 25,
     textAlign: 'center',
     marginBottom: 10,
+  },
+  amountBar: {
+    display: "flex",
+    flexDirection: "row",
+    width: "95%",
+    alignSelf: "center"
+  },
+  amountInput: {
+    flexGrow: 2,
+    marginLeft: 0,
+    width: "auto"
+  },
+  amountUnit: {
+    flexGrow: 1,
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 10,
+    alignSelf: "center",
+    height: 50
   }
 
 })
