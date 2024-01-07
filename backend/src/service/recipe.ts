@@ -2,16 +2,12 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient()
 
-function formatInstructions(instructions: string): any {
-    return instructions;
-}
-
 export async function createRecipe(userID: number|any, title: string,description: string,instructions: string,cookTime: number,calories: number,servings: number,tags: any,image: string) {
     
     const cookTimeHours = Math.floor(cookTime/60);
     const cootTimeMinutes = cookTime%60;
 
-    const post = await prisma.recipe.create({
+    const recipe = await prisma.recipe.create({
         data: {
             authorID: userID,
             recipeTitle: title,
@@ -29,33 +25,26 @@ export async function createRecipe(userID: number|any, title: string,description
 
 export async function createIngredients(recipeID: number|any, ingredients: any) {
 
-    //let ingredientList: { [id: string] : Ingredient; } = formatInstructions(instructions);
-
-    console.log('ingredients')
-    console.log(ingredients)
     let data = []
-    //TO DO: replace measurementType with input field.
+
     for (let id in ingredients) {
-        data.push({recipeID: recipeID, ingredient: ingredients[id].title, amount: Number(ingredients[id].amount), measurementType: ingredients[id].title});
+        data.push({recipeID: recipeID, ingredient: ingredients[id].title, amount: Number(ingredients[id].amount), measurementType: ingredients[id].unit});
     }
 
-    const post = await prisma.recipeIngredients.createMany({
+    const post = await prisma.recipeingredients.createMany({
         data: data,
     }) 
 }
 
-export async function createInstructions(recipeID: number|any, instructions: string) {
+export async function createInstructions(recipeID: number|any, instructions: any) {
 
-    let instructionList = formatInstructions(instructions);
+    let data = []; 
 
-    console.log('instructionList')
-    console.log(instructionList)
-    let data = [{recipeID: recipeID, step: 1, instruction: instructionList}]; //temp
-    /*for (let id in instructionList) {
-        data.push({recipeID: recipeID, step: instructionList[id].step, instruction: instructionList[id].instruction});
-    }*/
+    for (let i = 0; i < instructions.length; i++ ) {
+        data.push({recipeID: recipeID, step: i+1, instruction: instructions[i].step});
+    }
 
-    const post = await prisma.recipeInstructions.createMany({
+    const post = await prisma.recipeinstructions.createMany({
         data: data,
     }) 
 
