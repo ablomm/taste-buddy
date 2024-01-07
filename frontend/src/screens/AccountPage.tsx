@@ -2,8 +2,8 @@ import React, {useEffect, useState} from 'react';
 import {View, Text, Image, StyleSheet, TouchableOpacity, RefreshControl, ScrollView} from 'react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
-import LogoutButton from "../components/loginSignupPageComponents/buttons/LogoutButton";
 import {UserContext} from "../providers/UserProvider";
+import TBButton from '../components/TBButton';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -127,7 +127,7 @@ const AccountPage = () => {
           </Tab.Screen>
         </Tab.Navigator>
       </NavigationContainer>
-      <LogoutButton handlePress={userContext.logout} isButtonInteractable={true}/>
+      <TBButton onPress={userContext.logout} title="Logout"/>
     </View>
 );
 };

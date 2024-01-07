@@ -20,7 +20,7 @@ import StepListItem from '../components/CreateRecipe/steps/StepListItem';
 
 
 const CreateRecipePage = ({ route, navigation }: any) => {
-  const { pickedImage } = route.params;  
+  const { pickedImage } = route.params;
   const userContext = React.useContext(UserContext) as any;
 
   // define validation rules for each field
@@ -69,7 +69,7 @@ const CreateRecipePage = ({ route, navigation }: any) => {
   const [editStepModalVisible, setEditStepModalVisible] = React.useState(false);
   const [stepEditIndex, setStepEditIndex] = React.useState(0); // the index of the step we are editing
 
-  const [image, setImage] = React.useState(pickedImage? pickedImage.uri: null);
+  const [image, setImage] = React.useState(pickedImage ? pickedImage.uri : null);
 
 
   const pickImage = async () => {
@@ -180,12 +180,12 @@ const CreateRecipePage = ({ route, navigation }: any) => {
           body: image
         });
 
-        if(s3Response.status !== 200){
+        if (s3Response.status !== 200) {
           console.log("s3Response, s3 error")
         } else {
           console.log("s3Response")
         }
-        
+
         console.log(s3Response)
         imageUrl = s3AccessUrl.imageURL.split('?')[0];
       } catch (error: any) {
@@ -231,7 +231,6 @@ const CreateRecipePage = ({ route, navigation }: any) => {
       console.error(error.stack);
     }
   };
-
 
   return (
     <>
@@ -293,102 +292,103 @@ const CreateRecipePage = ({ route, navigation }: any) => {
         {({ errors, handleChange, handleBlur, handleSubmit, values }) => (
           <>
             <View style={styles.headerWrapper}>
-                <View style={styles.headerLeftWrapper}>
-                    <View><BackButton navigation = {navigation}/></View>
-                    <View style={styles.headerTiltleWrapper}><Text style={styles.headerTiltle}>Create Recipe {`<_<`}</Text></View>
-                </View>
-                <View>
-                    <TBButton title="post" style={styles.postButton} textColor={{ color: "white" }} onPress={handleSubmit} />
-                </View>
+              <View style={styles.headerLeftWrapper}>
+                <View><BackButton navigation={navigation} /></View>
+                <View style={styles.headerTiltleWrapper}><Text style={styles.headerTiltle}>Create Recipe {`<_<`}</Text></View>
+              </View>
+              <View>
+                <TBButton title="post" style={styles.postButton} textColor={{ color: "white" }} onPress={handleSubmit} />
+              </View>
             </View>
-            <KeyboardAvoidingView
-                behavior='position'
-                keyboardVerticalOffset = {Platform.OS === 'ios' ? 40 : 0}
-            >
             <ScrollView>
+              <KeyboardAvoidingView
+                behavior='position'
+                enabled={Platform.OS === "ios"}
+                keyboardVerticalOffset={40}
+              >
 
-              <Text style={styles.header}>Image*</Text>
-              <TouchableRipple onPress={pickImage} borderless={true} style={styles.image}>
-                <Image source={image ? { uri: image } : require("../../assets/no-image.png") as any} style={{ width: "100%", height: "100%" }} />
-              </TouchableRipple>
-
-
-              <Text style={styles.header}>Title*</Text>
-              <ValidatedInput
-                placeholder='Taco Salad'
-                onChangeText={handleChange('title')}
-                onBlur={handleBlur('title')}
-                value={values.title}
-                error={errors.title}
-              />
+                <Text style={styles.header}>Image*</Text>
+                <TouchableRipple onPress={pickImage} borderless={true} style={styles.image}>
+                  <Image source={image ? { uri: image } : require("../../assets/no-image.png") as any} style={{ width: "100%", height: "100%" }} />
+                </TouchableRipple>
 
 
-              <Text style={styles.header}>Instructions*</Text>
-              <View style={styles.multiContainer}>
-                {steps.map((step, index) => {
-                  return (<StepListItem onPress={() => { openEditStepForm(index) }} item={step} index={index} key={index} />);
-                })}
-                <TBButton style={styles.addButton} onPress={() => setStepModalVisible(true)} title="+" />
-              </View>
+                <Text style={styles.header}>Title*</Text>
+                <ValidatedInput
+                  placeholder='Taco Salad'
+                  onChangeText={handleChange('title')}
+                  onBlur={handleBlur('title')}
+                  value={values.title}
+                  error={errors.title}
+                />
 
-              <Text style={styles.header}>Description</Text>
-              <ValidatedInput
-                placeholder='A simple taco salad recipe passed down by my grandmother; it is very good, and very easy.'
-                onChangeText={handleChange('description')}
-                onBlur={handleBlur('description')}
-                value={values.description}
-                error={errors.description}
-                multiline={true}
-                style={{
-                  height: "auto",
-                  textAlignVertical: 'top',
-                }}
-              />
 
-              <Text style={styles.header}>Cook Time (min)</Text>
-              <ValidatedInput
-                placeholder='60'
-                onChangeText={handleChange('cookTime')}
-                onBlur={handleBlur('cookTime')}
-                value={values.cookTime}
-                error={errors.cookTime}
-              />
+                <Text style={styles.header}>Instructions*</Text>
+                <View style={styles.multiContainer}>
+                  {steps.map((step, index) => {
+                    return (<StepListItem onPress={() => { openEditStepForm(index) }} item={step} index={index} key={index} />);
+                  })}
+                  <TBButton style={styles.addButton} onPress={() => setStepModalVisible(true)} title="+" />
+                </View>
 
-              <Text style={styles.header}>Calories</Text>
-              <ValidatedInput
-                placeholder="1000"
-                onChangeText={handleChange('calories')}
-                onBlur={handleBlur('calories')}
-                value={values.calories}
-                error={errors.calories}
-              />
+                <Text style={styles.header}>Description</Text>
+                <ValidatedInput
+                  placeholder='A simple taco salad recipe passed down by my grandmother; it is very good, and very easy.'
+                  onChangeText={handleChange('description')}
+                  onBlur={handleBlur('description')}
+                  value={values.description}
+                  error={errors.description}
+                  multiline={true}
+                  style={{
+                    height: "auto",
+                    textAlignVertical: 'top',
+                  }}
+                />
 
-              <Text style={styles.header}>Servings</Text>
-              <ValidatedInput
-                placeholder="4"
-                onChangeText={handleChange('servings')}
-                onBlur={handleBlur('servings')}
-                value={values.servings}
-                error={errors.servings}
-              />
+                <Text style={styles.header}>Cook Time (min)</Text>
+                <ValidatedInput
+                  placeholder='60'
+                  onChangeText={handleChange('cookTime')}
+                  onBlur={handleBlur('cookTime')}
+                  value={values.cookTime}
+                  error={errors.cookTime}
+                />
 
-              <Text style={styles.header}>Ingredients</Text>
-              <View style={styles.multiContainer}>
-                {ingredients.map((ingredient, index) => {
-                  return (<IngredientListItem onPress={() => { openEditIngredientForm(index) }} ingredient={ingredient} key={index} />);
-                })}
-                <TBButton style={styles.addButton} onPress={() => setIngredientsModalVisible(true)} title="+" />
-              </View>
+                <Text style={styles.header}>Calories</Text>
+                <ValidatedInput
+                  placeholder="1000"
+                  onChangeText={handleChange('calories')}
+                  onBlur={handleBlur('calories')}
+                  value={values.calories}
+                  error={errors.calories}
+                />
 
-              <Text style={styles.header}>Tags</Text>
-              <View style={styles.multiContainer}>
-                {tags.map((tag, index) => {
-                  return (<TagListItem onPress={() => { openEditTagForm(index) }} tag={tag} key={index} />);
-                })}
-                <TBButton style={styles.addButton} onPress={() => setTagModalVisible(true)} title="+" />
-              </View>
+                <Text style={styles.header}>Servings</Text>
+                <ValidatedInput
+                  placeholder="4"
+                  onChangeText={handleChange('servings')}
+                  onBlur={handleBlur('servings')}
+                  value={values.servings}
+                  error={errors.servings}
+                />
+
+                <Text style={styles.header}>Ingredients</Text>
+                <View style={styles.multiContainer}>
+                  {ingredients.map((ingredient, index) => {
+                    return (<IngredientListItem onPress={() => { openEditIngredientForm(index) }} ingredient={ingredient} key={index} />);
+                  })}
+                  <TBButton style={styles.addButton} onPress={() => setIngredientsModalVisible(true)} title="+" />
+                </View>
+
+                <Text style={styles.header}>Tags</Text>
+                <View style={styles.multiContainer}>
+                  {tags.map((tag, index) => {
+                    return (<TagListItem onPress={() => { openEditTagForm(index) }} tag={tag} key={index} />);
+                  })}
+                  <TBButton style={styles.addButton} onPress={() => setTagModalVisible(true)} title="+" />
+                </View>
+              </KeyboardAvoidingView>
             </ScrollView>
-            </KeyboardAvoidingView>
           </>
         )}
       </Formik>
@@ -408,27 +408,29 @@ const styles = StyleSheet.create({
     backgroundColor: "#6752EC",
     color: "white",
     borderWidth: 0,
-},
-headerWrapper:{
+  },
+  headerWrapper: {
     alignItems: 'center',
+    height: 60,
+    backgroundColor: "white",
     display: 'flex',
-    flexDirection:"row",
-    justifyContent:"space-between",
+    flexDirection: "row",
+    justifyContent: "space-between",
     paddingHorizontal: 12,
-},
-headerLeftWrapper:{
+  },
+  headerLeftWrapper: {
     alignItems: 'center',
     display: 'flex',
-    flexDirection:"row",
-},
-headerTiltleWrapper:{
+    flexDirection: "row",
+  },
+  headerTiltleWrapper: {
     marginLeft: 15
-},
-headerTiltle:{
-    color:"#000",
+  },
+  headerTiltle: {
+    color: "#000",
     fontSize: 20,
     fontWeight: "700",
-},
+  },
   image: {
     width: "95%",
     height: 300,

@@ -1,19 +1,21 @@
 import React from "react";
 import {View, Text, StyleSheet, Pressable} from "react-native";
+import { TouchableRipple } from "react-native-paper";
 
 const BackButton = ({navigation}:any) =>{
     return(
-        <Pressable style={({pressed}) => [{backgroundColor: pressed ? '#BDBDBD' : 'white',} ,styles.buttonContainer]} onPress={() => navigation.goBack()}>
-            <Text style={styles.buttonText}>{`<<`}</Text>
-        </Pressable>
+        <TouchableRipple style={styles.buttonContainer} onPress={() => navigation.goBack()} borderless={true}>
+            <Text style={styles.buttonText}>{`⇐`}</Text>
+        </TouchableRipple>
     );
 }
 export default BackButton;
 
 const styles = StyleSheet.create({
     buttonContainer:{
-        height: 60,
-        width: 30,
+        height: 40,
+        width: 40,
+        borderRadius: 100,
         float:'left',
         alignItems: 'center',
         justifyContent: 'center',
