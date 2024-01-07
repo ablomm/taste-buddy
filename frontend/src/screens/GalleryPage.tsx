@@ -156,6 +156,7 @@ export const styles = StyleSheet.create(
         },
         headerWrapper:{
             alignItems: 'center',
+            height: 60,
             display: 'flex',
             flexDirection:"row",
             justifyContent:"space-between",
