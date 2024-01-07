@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, TextInput, StyleSheet, KeyboardAvoidingView, ScrollView, Image, Platform, Animated, Dimensions } from "react-native";
+import { View, Text, TextInput, StyleSheet, KeyboardAvoidingView, ScrollView, Image, Platform, Animated, Dimensions, ImageBackground} from "react-native";
 import Header from '../components/header/Header';
 import PosterHeader from '../components/RecipesAndPosts/PosterHeader';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const HEADER_EXPANDED_HEIGHT = 120;
 const HEADER_COLLAPSED_HEIGHT = 50;
@@ -36,19 +37,29 @@ const RecipePage = ({ route, navigation }: any) => {
             <View>
                 <PosterHeader/>
                 
-                    <Animated.View style={{height: headerHeight, width: SCREEN_WIDTH,position: 'absolute', top: 0, left: 0}}>
-                        {
-                        //animated image
+                <Animated.View style={{ height: headerHeight, width: SCREEN_WIDTH, position: 'absolute', top: 0, left: 0 }}>
+                    <ImageBackground
+                        source={require('../../assets/temp/tempfood.jpg')}
+                        style={{ flex: 1 }}
+                    >
+                        <LinearGradient
+                            colors={['rgba(0,0,0,0.49)', 'rgba(0,0,0,0.49)']} // Customize gradient colors
+                            start={{ x: 0, y: 0 }} // Linear gradient start point
+                            end={{ x: 0, y: 1 }} // Linear gradient end point
+                            style={{ flex: 1 }}
+                        >
+                        {/* Other components like text can be added inside ImageBackground 
                             //recipe title 
                             //tags
                             //cook time
                             //calories
                             //servings
-                        }
-                        <Animated.Image source={require("../../assets/temp/tempfood.jpg")} style={{height: headerHeight, width: SCREEN_WIDTH, top: 0, left: 0}}/>
-                        <Animated.Text style={{textAlign: 'center', marginTop: 28, opacity: headerTitleOpacity}}>idke</Animated.Text>
-                        <Animated.Text style={{position: 'absolute', bottom: 16, left: 16, opacity: heroTitleOpacity}}>idk</Animated.Text>
-                    </Animated.View>
+                        */}
+                            <Animated.Text style={{ textAlign: 'center', marginTop: 28, opacity: headerTitleOpacity }}>idke</Animated.Text>
+                            <Animated.Text style={{ position: 'absolute', bottom: 16, left: 16, opacity: heroTitleOpacity }}>idk</Animated.Text>
+                        </LinearGradient>
+                    </ImageBackground>
+                </Animated.View>
                     <ScrollView contentContainerStyle={styles.scrollContainer}
                     onScroll={Animated.event(
                         [{ nativeEvent: {
