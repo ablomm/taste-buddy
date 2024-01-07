@@ -187,13 +187,14 @@ const CreatePostPage = ({ route, navigation }: any) => {
                 <TBButton title="post" style={styles.postButton} textColor={{ color: "white" }} onPress={handleSubmit} />
               </View>
             </View>
-            <ScrollView>
 
-              <KeyboardAvoidingView
-                behavior='position'
-                enabled={Platform.OS === "ios"}
-                keyboardVerticalOffset={40}
-              >
+            <KeyboardAvoidingView
+              style={styles.avoidingView}
+              behavior='position'
+              enabled={Platform.OS === "ios"}
+              keyboardVerticalOffset={40}
+            >
+              <ScrollView>
                 <Text style={styles.header}>Image*</Text>
                 <TouchableRipple onPress={pickImage} borderless={true} style={styles.image}>
                   <Image source={image ? { uri: image } : require("../../assets/no-image.png") as any} style={{ width: "100%", height: "100%" }} />
@@ -234,8 +235,8 @@ const CreatePostPage = ({ route, navigation }: any) => {
                     textAlignVertical: 'top',
                   }}
                 />
-              </KeyboardAvoidingView>
-            </ScrollView>
+              </ScrollView>
+            </KeyboardAvoidingView>
           </>
         )}
       </Formik>
@@ -295,6 +296,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#f6f6f6",
     borderRadius: 10,
     margin: 5
+  },
+  avoidingView: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
   }
 })
 export default CreatePostPage;
