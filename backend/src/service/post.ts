@@ -17,7 +17,7 @@ export async function createPost(userID: number|any, description: string, tags: 
 
     console.log(`Newly created post ID: ${post.id}`)
 
-    await prisma.userPosts.create({
+    await prisma.userposts.create({
        data: {
            author: userID,
            postID: post.id
@@ -36,7 +36,7 @@ export async function createPost(userID: number|any, description: string, tags: 
         });
     }
 
-    await prisma.postTags.createMany({
+    await prisma.posttags.createMany({
         data: formatted_tags
     });
 
