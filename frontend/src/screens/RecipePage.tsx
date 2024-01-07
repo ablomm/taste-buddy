@@ -3,7 +3,7 @@ import { View, Text, TextInput, StyleSheet, KeyboardAvoidingView, ScrollView, Im
 import Header from '../components/header/Header';
 import PosterHeader from '../components/RecipesAndPosts/PosterHeader';
 
-const HEADER_EXPANDED_HEIGHT = 100;
+const HEADER_EXPANDED_HEIGHT = 120;
 const HEADER_COLLAPSED_HEIGHT = 50;
 const { width: SCREEN_WIDTH } = Dimensions.get('screen');
 
@@ -37,6 +37,15 @@ const RecipePage = ({ route, navigation }: any) => {
                 <PosterHeader/>
                 
                     <Animated.View style={{height: headerHeight, width: SCREEN_WIDTH,position: 'absolute', top: 0, left: 0}}>
+                        {
+                        //animated image
+                            //recipe title 
+                            //tags
+                            //cook time
+                            //calories
+                            //servings
+                        }
+                        <Animated.Image source={require("../../assets/temp/tempfood.jpg")} style={{height: headerHeight, width: SCREEN_WIDTH, top: 0, left: 0}}/>
                         <Animated.Text style={{textAlign: 'center', marginTop: 28, opacity: headerTitleOpacity}}>idke</Animated.Text>
                         <Animated.Text style={{position: 'absolute', bottom: 16, left: 16, opacity: heroTitleOpacity}}>idk</Animated.Text>
                     </Animated.View>
@@ -49,6 +58,11 @@ const RecipePage = ({ route, navigation }: any) => {
                            }
                         }])}
                       scrollEventThrottle={16}>
+                        {
+                            //description
+                            //ingrediants (check list)
+                            //instructions (text)
+                        }
                         <Text style={styles.title}>This is Title</Text>
                         <Text>Collapsing toolbar is really cool, both visually and in user experience point of view. We can start with initial view with huge header, giving the user a bit of context, then collapsing it when the user start scrolling the content, giving her the screen real estate to enjoy the page’s content. In this article, I will explore how we can achieve that using React Native. View Structure
 Let’s start with a very simple view structure. We will have a header that we will collapse and a ScrollView that will contain our long content.
@@ -81,17 +95,16 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
-        paddingHorizontal: 12,
     },
     scrollContainer: {
         padding: 16,
         flexGrow: 1,
         paddingBottom: 150,
-        paddingTop: HEADER_EXPANDED_HEIGHT
+        paddingTop: HEADER_EXPANDED_HEIGHT 
     }, 
     title: {
         fontSize: 24,
-        marginVertical: 16
+        //marginVertical: 16
     }
 });
 export default RecipePage;
