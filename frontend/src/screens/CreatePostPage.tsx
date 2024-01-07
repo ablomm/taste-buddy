@@ -10,7 +10,7 @@ import { TouchableRipple } from 'react-native-paper';
 import AddTagForm, { Tag } from '../components/CreateRecipe/tags/AddTagForm';
 import EditTagForm from '../components/CreateRecipe/tags/EditTagForm';
 import TagListItem from '../components/CreateRecipe/tags/TagListItem';
-import {UserContext} from "../providers/UserProvider";
+import { UserContext } from "../providers/UserProvider";
 
 const CreatePostPage = ({ route, navigation }: any) => {
   const { pickedImage } = route.params;
@@ -26,7 +26,7 @@ const CreatePostPage = ({ route, navigation }: any) => {
         /((https?):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/,
         'Enter correct url!')
       .optional(),
-    
+
   });
 
   // add tag Modal
@@ -37,7 +37,7 @@ const CreatePostPage = ({ route, navigation }: any) => {
   const [editTagModalVisible, setEditTagModalVisible] = React.useState(false);
   const [tagEditIndex, setTagEditIndex] = React.useState(0); // the index of the tag we are editing
 
-  const [image, setImage] = React.useState<any>(pickedImage? pickedImage.uri: null);
+  const [image, setImage] = React.useState<any>(pickedImage ? pickedImage.uri : null);
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -101,142 +101,141 @@ const CreatePostPage = ({ route, navigation }: any) => {
 
         validationSchema={recipeSchema}
         onSubmit={async values => {
-            console.log(values);
-            let imageUrl: string;
-            let s3AccessUrl: any;
-            let s3Response: any;
+          console.log(values);
+          let imageUrl: string;
+          let s3AccessUrl: any;
+          let s3Response: any;
 
+          try {
+            s3AccessUrl = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/post/s3Url`, {  //get secure s3 access url
+              method: 'GET',
+            }).then(res => res.json());
+          } catch (error: any) {
+            console.log("image link generation error")
+            console.log(error)
+          }
+          //console.log("context username: " +userContext.state.username)
+          console.log(s3AccessUrl)
+          console.log(s3AccessUrl.imageURL)
+          if (s3AccessUrl) {
             try {
-                s3AccessUrl = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/post/s3Url`, {  //get secure s3 access url
-                    method: 'GET',
-                }).then(res => res.json());
+              s3Response = await fetch(s3AccessUrl.imageURL, {  //put the image on the bucket
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'multipart/form-data',
+                },
+                body: image
+              });
+
+              if (s3Response.status !== 200) {
+                console.log("s3Response, s3 error")
+              } else {
+                console.log("s3Response")
+              }
+
+              console.log(s3Response)
+              imageUrl = s3AccessUrl.imageURL.split('?')[0];
             } catch (error: any) {
-                console.log("image link generation error")
-                console.log(error)
+              console.log("image put failed")
+              console.log(error)
             }
-            //console.log("context username: " +userContext.state.username)
-            console.log(s3AccessUrl)
-            console.log(s3AccessUrl.imageURL)
-            if (s3AccessUrl) {
-                try {
-                    s3Response = await fetch(s3AccessUrl.imageURL, {  //put the image on the bucket
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'multipart/form-data',
-                        },
-                        body: image
-                    });
+          } else {
+            console.log("imageURL is null")
+          }
 
-                    if(s3Response.status !== 200){
-                        console.log("s3Response, s3 error")
-                    } else {
-                        console.log("s3Response")
-                    }
+          try {
+            // Save the post
+            let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/post/create`, {
+              method: 'POST',
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+              },
+              credentials: 'include',
+              body: JSON.stringify({
+                username: userContext.state.username,
+                description: values.description,
+                tags: tags,
+                image: imageUrl,
+                recipeURL: values.recipeUrl
+              }),
+            });
 
-                    console.log(s3Response)
-                    imageUrl = s3AccessUrl.imageURL.split('?')[0];
-                } catch (error: any) {
-                    console.log("image put failed")
-                    console.log(error)
-                }
+            if (response.status !== 200) {
+              console.log("upload failed")
+              console.log(response)
             } else {
-                console.log("imageURL is null")
+              console.log("upload successful")
+              console.log(values)
             }
 
-            try {
-                // Save the post
-                let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/post/create`, {
-                    method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                    },
-                    credentials: 'include',
-                    body: JSON.stringify({
-                        username: userContext.state.username,
-                        description: values.description,
-                        tags: tags,
-                        image: imageUrl,
-                        recipeURL: values.recipeUrl
-                    }),
-                });
-
-                if (response.status !== 200) {
-                    console.log("upload failed")
-                    console.log(response)
-                } else {
-                    console.log("upload successful")
-                    console.log(values)
-                }
-
-                navigation.navigate('AccountPage');
-            } catch (error: any) {
-                console.log("upload error")
-                console.error(error.stack);
-            }
+            navigation.navigate('AccountPage');
+          } catch (error: any) {
+            console.log("upload error")
+            console.error(error.stack);
+          }
         }}>
 
         {({ errors, handleChange, handleBlur, handleSubmit, values }) => (
           <>
             <View style={styles.headerWrapper}>
-                <View style={styles.headerLeftWrapper}>
-                    <View><BackButton navigation = {navigation}/></View>
-                    <View style={styles.headerTiltleWrapper}><Text style={styles.headerTiltle}>Create Post {`<_<`}</Text></View>
-                </View>
-                <View>
-                    <TBButton title="post" style={styles.postButton} textColor={{ color: "white" }} onPress={handleSubmit} />
-                </View>
-            </View>
-
-            <KeyboardAvoidingView
-                behavior='position'
-                keyboardVerticalOffset = {Platform.OS === 'ios' ? 40 : 0}
-            >
-            <ScrollView>
-      
-              <Text style={styles.header}>Image*</Text>
-              <TouchableRipple onPress={pickImage} borderless={true} style={styles.image}>
-                <Image source={image ? { uri: image } : require("../../assets/no-image.png") as any} style={{ width: "100%", height: "100%" }} />
-              </TouchableRipple>
-
-              <Text style={styles.header}>Description</Text>
-              <ValidatedInput
-                placeholder="Description..."
-                onChangeText={handleChange('description')}
-                onBlur={handleBlur('description')}
-                value={values.description}
-                error={errors.description}
-                multiline={true}
-                style={{
-                  height: "auto",
-                  textAlignVertical: 'top',
-                }}
-              />
-
-              <Text style={styles.header}>Tags</Text>
-              <View style={styles.multiContainer}>
-                {tags.map((tag, index) => {
-                  return (<TagListItem onPress={() => { openEditTagForm(index) }} tag={tag} key={index} />);
-                })}
-                <TBButton style={styles.addButton} onPress={() => setTagModalVisible(true)} title="+" />
+              <View style={styles.headerLeftWrapper}>
+                <View><BackButton navigation={navigation} /></View>
+                <View style={styles.headerTiltleWrapper}><Text style={styles.headerTiltle}>Create Post {`<_<`}</Text></View>
               </View>
+              <View>
+                <TBButton title="post" style={styles.postButton} textColor={{ color: "white" }} onPress={handleSubmit} />
+              </View>
+            </View>
+            <ScrollView>
 
-              <Text style={styles.header}>Recipe Link</Text>
-              <ValidatedInput
-                placeholder="Recipe Link..."
-                onChangeText={handleChange('recipeUrl')}
-                onBlur={handleBlur('recipeUrl')}
-                value={values.recipeUrl}
-                error={errors.recipeUrl}
-                multiline={true}
-                style={{
-                  height: "auto",
-                  textAlignVertical: 'top',
-                }}
-              />
-              
+              <KeyboardAvoidingView
+                behavior='position'
+                enabled={Platform.OS === "ios"}
+                keyboardVerticalOffset={40}
+              >
+                <Text style={styles.header}>Image*</Text>
+                <TouchableRipple onPress={pickImage} borderless={true} style={styles.image}>
+                  <Image source={image ? { uri: image } : require("../../assets/no-image.png") as any} style={{ width: "100%", height: "100%" }} />
+                </TouchableRipple>
+
+                <Text style={styles.header}>Description</Text>
+                <ValidatedInput
+                  placeholder="Description..."
+                  onChangeText={handleChange('description')}
+                  onBlur={handleBlur('description')}
+                  value={values.description}
+                  error={errors.description}
+                  multiline={true}
+                  style={{
+                    height: "auto",
+                    textAlignVertical: 'top',
+                  }}
+                />
+
+                <Text style={styles.header}>Tags</Text>
+                <View style={styles.multiContainer}>
+                  {tags.map((tag, index) => {
+                    return (<TagListItem onPress={() => { openEditTagForm(index) }} tag={tag} key={index} />);
+                  })}
+                  <TBButton style={styles.addButton} onPress={() => setTagModalVisible(true)} title="+" />
+                </View>
+
+                <Text style={styles.header}>Recipe Link</Text>
+                <ValidatedInput
+                  placeholder="Recipe Link..."
+                  onChangeText={handleChange('recipeUrl')}
+                  onBlur={handleBlur('recipeUrl')}
+                  value={values.recipeUrl}
+                  error={errors.recipeUrl}
+                  multiline={true}
+                  style={{
+                    height: "auto",
+                    textAlignVertical: 'top',
+                  }}
+                />
+              </KeyboardAvoidingView>
             </ScrollView>
-            </KeyboardAvoidingView>
           </>
         )}
       </Formik>
@@ -244,56 +243,58 @@ const CreatePostPage = ({ route, navigation }: any) => {
 }
 
 const styles = StyleSheet.create({
-    postButton: {
-        flex: 1,
-        flexGrow: 1,
-        height: 40,
-        backgroundColor: "#6752EC",
-        color: "white",
-        borderWidth: 0,
-    },
-    headerWrapper:{
-        alignItems: 'center',
-        display: 'flex',
-        flexDirection:"row",
-        justifyContent:"space-between",
-        paddingHorizontal: 12,
-    },
-    headerLeftWrapper:{
-        alignItems: 'center',
-        display: 'flex',
-        flexDirection:"row",
-    },
-    headerTiltleWrapper:{
-        marginLeft: 15
-    },
-    headerTiltle:{
-        color:"#000",
-        fontSize: 20,
-        fontWeight: "700",
-    },
-    header: {
-        fontSize: 20,
-        marginLeft: 10,
-        fontWeight: "bold"
-    },
-    image: {
-        width: "95%",
-        height: 300,
-        alignSelf: "center",
-        marginBottom: 10,
-        borderRadius: 10
-    },
-    addButton: {
-        backgroundColor: "white",
-        borderRadius: 10,
-        margin: 10,
-        borderWidth: 0
-    },
-    multiContainer: {
-        backgroundColor: "#f6f6f6",
-        borderRadius: 10,
-        margin: 5
-    }
+  postButton: {
+    flex: 1,
+    flexGrow: 1,
+    height: 40,
+    backgroundColor: "#6752EC",
+    color: "white",
+    borderWidth: 0,
+  },
+  headerWrapper: {
+    alignItems: 'center',
+    height: 60,
+    backgroundColor: "white",
+    display: 'flex',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: 12,
+  },
+  headerLeftWrapper: {
+    alignItems: 'center',
+    display: 'flex',
+    flexDirection: "row",
+  },
+  headerTiltleWrapper: {
+    marginLeft: 15
+  },
+  headerTiltle: {
+    color: "#000",
+    fontSize: 20,
+    fontWeight: "700",
+  },
+  header: {
+    fontSize: 20,
+    marginLeft: 10,
+    fontWeight: "bold"
+  },
+  image: {
+    width: "95%",
+    height: 300,
+    alignSelf: "center",
+    marginBottom: 10,
+    borderRadius: 10
+  },
+  addButton: {
+    backgroundColor: "white",
+    borderRadius: 10,
+    margin: 10,
+    borderWidth: 0
+  },
+  multiContainer: {
+    backgroundColor: "#f6f6f6",
+    borderRadius: 10,
+    margin: 5
+  }
 })
 export default CreatePostPage;
