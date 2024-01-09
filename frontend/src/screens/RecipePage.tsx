@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, TextInput, StyleSheet, KeyboardAvoidingView, ScrollView, Image, Platform, Animated, Dimensions, ImageBackground} from "react-native";
+import { View, Text, TextInput, StyleSheet, KeyboardAvoidingView, ScrollView, Platform, Animated, Dimensions, ImageBackground} from "react-native";
 import Header from '../components/header/Header';
 import PosterHeader from '../components/RecipesAndPosts/PosterHeader';
 import { LinearGradient } from 'expo-linear-gradient';
+import Checkbox from 'expo-checkbox';
 
-const HEADER_EXPANDED_HEIGHT = 120;
+const HEADER_EXPANDED_HEIGHT = 128;
 const HEADER_COLLAPSED_HEIGHT = 50;
 const { width: SCREEN_WIDTH } = Dimensions.get('screen');
 
@@ -19,11 +20,11 @@ const RecipePage = ({ route, navigation }: any) => {
         extrapolate: 'clamp',
     });
 
-    const headerTitleOpacity = scrollY.interpolate({
+    /*const headerTitleOpacity = scrollY.interpolate({
         inputRange: [0, HEADER_EXPANDED_HEIGHT-HEADER_COLLAPSED_HEIGHT],
         outputRange: [0, 1],
         extrapolate: 'clamp'
-    });
+    });*/
 
     const heroTitleOpacity = scrollY.interpolate({
         inputRange: [0, HEADER_EXPANDED_HEIGHT-HEADER_COLLAPSED_HEIGHT],
@@ -48,15 +49,14 @@ const RecipePage = ({ route, navigation }: any) => {
                             end={{ x: 0, y: 1 }} // Linear gradient end point
                             style={{ flex: 1 }}
                         >
-                        {/* Other components like text can be added inside ImageBackground 
-                            //recipe title 
-                            //tags
-                            //cook time
-                            //calories
-                            //servings
-                        */}
-                            <Animated.Text style={{ textAlign: 'center', marginTop: 28, opacity: headerTitleOpacity }}>idke</Animated.Text>
-                            <Animated.Text style={{ position: 'absolute', bottom: 16, left: 16, opacity: heroTitleOpacity }}>idk</Animated.Text>
+                            <View style={{ top:8, left: 8}}>
+                                <Animated.Text style={styles.recipeTitle}>Recipe Title</Animated.Text>
+                                <Animated.Text style={[styles.subSectionOfRecipeTitle, {opacity: heroTitleOpacity}]}>tags</Animated.Text>
+                                <Animated.Text style={[styles.subSectionOfRecipeTitle, {opacity: heroTitleOpacity}]}>cook time</Animated.Text>
+                                <Animated.Text style={[styles.subSectionOfRecipeTitle, {opacity: heroTitleOpacity}]}>calories</Animated.Text>
+                                <Animated.Text style={[styles.subSectionOfRecipeTitle, {opacity: heroTitleOpacity}]}>servings</Animated.Text>
+                            </View>
+                            
                         </LinearGradient>
                     </ImageBackground>
                 </Animated.View>
@@ -74,28 +74,20 @@ const RecipePage = ({ route, navigation }: any) => {
                             //ingrediants (check list)
                             //instructions (text)
                         }
-                        <Text style={styles.title}>This is Title</Text>
-                        <Text>Collapsing toolbar is really cool, both visually and in user experience point of view. We can start with initial view with huge header, giving the user a bit of context, then collapsing it when the user start scrolling the content, giving her the screen real estate to enjoy the page’s content. In this article, I will explore how we can achieve that using React Native. View Structure
-Let’s start with a very simple view structure. We will have a header that we will collapse and a ScrollView that will contain our long content.
-Our first attempt doesn’t look so good as the header stays where it is. So, we will make the height changes as we scroll the content up using RN’s Animated library.
-
-Animated and onScroll Combination
-The Animated library provides several useful APIs to create an animation, but we will focus on the event and interpolate method. The event method can map scrolling events into animated values. We w
-good as the header stays where it is. So, we will make the height changes as we scroll the content up using RN’s Animated library.
-
-Animated and onScroll Combination
-The Animated library provides several useful APIs to create an animation, but we will focus on the event and interpolate method. The eve
-Collapsing toolbar is really cool, both visually and in user experience point of view. We can start with initial view with huge header, giving the user a bit of context, then collapsing it when the user start scrolling the content, giving her the screen real estate to enjoy the page’s content. In this article, I will explore how we can achieve that using React Native. View Structure
-Let’s start with a very simple view structure. We will have a header that we will collapse and a ScrollView that will contain our long content.
-Our first attempt doesn’t look so good as the header stays where it is. So, we will make the height changes as we scroll the content up using RN’s Animated library.
-
-Animated and onScroll Combination
-The Animated library provides several useful APIs to create an animation, but we will focus on the event and interpolate method. The event method can map scrolling events into animated values. We w
-good as the header stays where it is. So, we will make the height changes as we scroll the content up using RN’s Animated library.
-
-Animated and onScroll Combination
-The Animated library provides several useful APIs to create an animation, but we will focus on the event and interpolate method. The eve
-</Text>
+                        <Text style={styles.recipeDescription}>short description</Text>
+                        <>
+                            <Text style={styles.subTitle}>Ingredients</Text>
+                            <Checkbox
+                                value={false}
+                                onValueChange={setSelection}
+                                style={styles.checkbox}
+                            />
+                        </>
+                        <>
+                            <Text style={styles.subTitle}>Instructions</Text>
+                        </>
+                        
+                        
                     </ScrollView>
                 </View>
             
@@ -113,9 +105,26 @@ const styles = StyleSheet.create({
         paddingBottom: 150,
         paddingTop: HEADER_EXPANDED_HEIGHT 
     }, 
-    title: {
-        fontSize: 24,
-        //marginVertical: 16
+    subTitle: {
+        fontSize: 20,
+        fontWeight: "700",
+        color: '#000', 
+    },
+    recipeTitle:{
+        fontWeight: "600",
+        color: '#fff', 
+        fontSize: 28
+    },
+    subSectionOfRecipeTitle:{
+        color: '#fff', 
+        fontSize: 16,
+        fontWeight: "600",
+    },
+    recipeDescription:{
+        color:'#6E6E6E',
+        fontSize: 14,
+        fontWeight: "400",
+        paddingBottom: 20
     }
 });
 export default RecipePage;

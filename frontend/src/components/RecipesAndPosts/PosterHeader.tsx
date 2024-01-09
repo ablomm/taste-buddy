@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TextInput, StyleSheet, KeyboardAvoidingView, ScrollView, Image, Platform } from "react-native";
 
-const PosterHeader = ({ route, navigation }: any) => {
+const PosterHeader = () => {
     return(
         <View style={styles.container}>
             <View style={styles.subContainer}>
