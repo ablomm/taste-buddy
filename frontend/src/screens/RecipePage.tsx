@@ -3,7 +3,7 @@ import { View, Text, TextInput, StyleSheet, KeyboardAvoidingView, ScrollView, Pl
 import Header from '../components/header/Header';
 import PosterHeader from '../components/RecipesAndPosts/PosterHeader';
 import { LinearGradient } from 'expo-linear-gradient';
-import Checkbox from 'expo-checkbox';
+import CheckboxRecipe from '../components/RecipesAndPosts/CheckboxRecipe';
 
 const HEADER_EXPANDED_HEIGHT = 128;
 const HEADER_COLLAPSED_HEIGHT = 50;
@@ -76,15 +76,14 @@ const RecipePage = ({ route, navigation }: any) => {
                         }
                         <Text style={styles.recipeDescription}>short description</Text>
                         <>
-                            <Text style={styles.subTitle}>Ingredients</Text>
-                            <Checkbox
-                                value={false}
-                                onValueChange={setSelection}
-                                style={styles.checkbox}
-                            />
+                            <Text style={styles.subTitle}>Ingredients</Text>{/**loop throught the list of ingredients */}
+                            <CheckboxRecipe checkboxText="hi"/>
+                            <CheckboxRecipe /> 
                         </>
                         <>
                             <Text style={styles.subTitle}>Instructions</Text>
+                            <CheckboxRecipe checkboxText="hi"/>
+                            <CheckboxRecipe checkboxText="hi2" /> 
                         </>
                         
                         
