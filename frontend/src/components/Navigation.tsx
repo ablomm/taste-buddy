@@ -49,7 +49,7 @@ const SignedInNavigation = () => (
     <Tab.Navigator initialRouteName='ExplorePage' screenOptions={tabBarOptions} sceneContainerStyle={{ backgroundColor: 'transparent' }}/*tabBar={props => <NavBar {...props} />}*/>
       <Tab.Screen
         name='ExplorePage'
-        component={RecipePage}
+        component={ExplorePage}
       />
 
       <Tab.Screen

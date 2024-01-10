@@ -4,6 +4,7 @@ import Header from '../components/header/Header';
 import PosterHeader from '../components/RecipesAndPosts/PosterHeader';
 import { LinearGradient } from 'expo-linear-gradient';
 import CheckboxRecipe from '../components/RecipesAndPosts/CheckboxRecipe';
+import ContentInteractionBar from '../components/RecipesAndPosts/ContentInteractionBar';
 
 const HEADER_EXPANDED_HEIGHT = 128;
 const HEADER_COLLAPSED_HEIGHT = 50;
@@ -20,12 +21,6 @@ const RecipePage = ({ route, navigation }: any) => {
         extrapolate: 'clamp',
     });
 
-    /*const headerTitleOpacity = scrollY.interpolate({
-        inputRange: [0, HEADER_EXPANDED_HEIGHT-HEADER_COLLAPSED_HEIGHT],
-        outputRange: [0, 1],
-        extrapolate: 'clamp'
-    });*/
-
     const heroTitleOpacity = scrollY.interpolate({
         inputRange: [0, HEADER_EXPANDED_HEIGHT-HEADER_COLLAPSED_HEIGHT],
         outputRange: [1, 0],
@@ -39,8 +34,9 @@ const RecipePage = ({ route, navigation }: any) => {
                 <PosterHeader/>
                 
                 <Animated.View style={{ height: headerHeight, width: SCREEN_WIDTH, position: 'absolute', top: 0, left: 0 }}>
+                    {/** place holder image */}
                     <ImageBackground
-                        source={require('../../assets/temp/tempfood.jpg')}
+                        source={require('../../assets/temp/tempfood.jpg')} 
                         style={{ flex: 1 }}
                     >
                         <LinearGradient
@@ -69,6 +65,7 @@ const RecipePage = ({ route, navigation }: any) => {
                            }
                         }])}
                       scrollEventThrottle={16}>
+                        <ContentInteractionBar/>
                         {
                             //description
                             //ingrediants (check list)
@@ -85,8 +82,8 @@ const RecipePage = ({ route, navigation }: any) => {
                             <CheckboxRecipe checkboxText="hi"/>
                             <CheckboxRecipe checkboxText="hi2" /> 
                         </>
-                        
-                        
+                        <Text style={styles.postTime}>post time</Text>
+                        <Text>~~~~~~~~~~~~~~~~</Text>
                     </ScrollView>
                 </View>
             
@@ -124,6 +121,12 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: "400",
         paddingBottom: 20
+    },
+    postTime:{
+        color:'#6E6E6E',
+        fontSize: 14,
+        fontWeight: "400",
+        padding: 5
     }
 });
 export default RecipePage;
