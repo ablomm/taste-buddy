@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -24,7 +21,6 @@ model User {
 
 model Recipe {
   id                 Int                  @id @default(autoincrement())
-  author             User                 @relation(fields: [authorID], references: [id])
   authorID           Int
   creationTime       DateTime             @default(now())
   recipeTitle        String
@@ -33,42 +29,61 @@ model Recipe {
   cootTimeMinutes    Int
   calories           Int?
   servings           Int
-  recipeIngredients  RecipeIngredients[]
-  recipeInstructions RecipeInstructions[]
   recipeImage        String
-  tags               RecipeTags[]
-  usersSaved         UserSavedRecipes[]
+  user               user                 @relation(fields: [authorID], references: [id], map: "Recipe_authorID_fkey")
+  recipeingredients  recipeingredients[]
+  recipeinstructions recipeinstructions[]
+  usersavedrecipes   usersavedrecipes[]
+  recipetags         recipetags[]         @relation("recipetorecipetags")
+
+  @@index([authorID], map: "Recipe_authorID_fkey")
 }
 
-model RecipeIngredients {
+model recipeingredients {
   id              Int    @id @default(autoincrement())
   recipeID        Int
-  recipe          Recipe @relation(fields: [recipeID], references: [id])
   ingredient      String
   amount          Int
   measurementType String
+  recipe          recipe @relation(fields: [recipeID], references: [id], map: "RecipeIngredients_recipeID_fkey")
+
+  @@index([recipeID], map: "RecipeIngredients_recipeID_fkey")
 }
 
-model RecipeInstructions {
+model recipeinstructions {
   id          Int    @id @default(autoincrement())
   recipeID    Int
-  recipe      Recipe @relation(fields: [recipeID], references: [id])
   step        Int?
   instruction String
+  recipe      recipe @relation(fields: [recipeID], references: [id], map: "RecipeInstructions_recipeID_fkey")
+
+  @@index([recipeID], map: "RecipeInstructions_recipeID_fkey")
 }
 
-model RecipeTags {
+model recipetags {
   id     Int      @id @default(autoincrement())
   tag    String
-  recipe Recipe[]
+  recipe recipe[] @relation("recipetorecipetags")
 }
 
-model UserSavedRecipes {
+model user {
+  id               Int                @id @default(autoincrement())
+  email            String             @unique(map: "User_email_key")
+  username         String             @unique(map: "User_username_key")
+  password         String
+  createDate       DateTime           @default(now())
+  isModerator      Boolean            @default(false)
+  recipe           recipe[]
+  userposts        userposts[]
+  usersavedrecipes usersavedrecipes[]
+}
+
+model usersavedrecipes {
   userID    Int
-  user      User     @relation(fields: [userID], references: [id])
   recipeID  Int
-  recipe    Recipe   @relation(fields: [recipeID], references: [id])
   timeSaved DateTime @default(now())
+  recipe    recipe   @relation(fields: [recipeID], references: [id], map: "UserSavedRecipes_recipeID_fkey")
+  user      user     @relation(fields: [userID], references: [id], map: "UserSavedRecipes_userID_fkey")
 
   @@id([userID, recipeID])
 }
