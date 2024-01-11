@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import SearchBar from '../components/SearchBar';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import Post from './Post';
 
 const PostsGrid = () => {
@@ -28,11 +27,11 @@ const PostsGrid = () => {
     }, []);
 
     return (
-        <View style={styles.app}>
+        <ScrollView contentContainerStyle={styles.app}>
             {data.map((post: any) => {
                 return <Post key={post.id} imageUrl={post.recipeImage} />;
             })}
-        </View>
+        </ScrollView>
     );
 };
 
@@ -42,8 +41,9 @@ const styles = StyleSheet.create({
 
     app: {
         marginHorizontal: "auto",
-        width: 400,
+        
         flexDirection: "row",
+        justifyContent:"center",
         flexWrap: "wrap",
     },
     item: {
@@ -53,9 +53,9 @@ const styles = StyleSheet.create({
         height: 100,
         justifyContent: "center",
         alignItems: "center",
-        padding: 10,
+        padding: 1,
         backgroundColor: "rgba(249, 180, 45, 0.25)",
-        borderWidth: 1.5,
+        borderWidth: 1,
         borderColor: "#fff"
     }
 
