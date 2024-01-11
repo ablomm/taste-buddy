@@ -96,6 +96,9 @@ const GalleryPage = ({navigation}:any) => {
                 data={images}
                 renderItem={displayImage}
                 keyExtractor={(item) => item.id}
+                initialNumToRender={18}
+                maxToRenderPerBatch={18}
+                windowSize={10}
             />
                 
         </View>
@@ -153,6 +156,7 @@ export const styles = StyleSheet.create(
         },
         headerWrapper:{
             alignItems: 'center',
+            height: 60,
             display: 'flex',
             flexDirection:"row",
             justifyContent:"space-between",

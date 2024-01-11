@@ -7,7 +7,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model recipe {
+model User {
+  id           Int                @id @default(autoincrement())
+  email        String             @unique
+  username     String             @unique
+  password     String
+  createDate   DateTime           @default(now())
+  isModerator Boolean @default(false)
+  savedRecipes UserSavedRecipes[]
+  recipes      Recipe[]
+  userPosts    UserPosts[]
+}
+
+model Recipe {
   id                 Int                  @id @default(autoincrement())
   authorID           Int
   creationTime       DateTime             @default(now())
@@ -74,35 +86,31 @@ model usersavedrecipes {
   user      user     @relation(fields: [userID], references: [id], map: "UserSavedRecipes_userID_fkey")
 
   @@id([userID, recipeID])
-  @@index([recipeID], map: "UserSavedRecipes_recipeID_fkey")
 }
 
-model posts {
-  id           Int        @id @default(autoincrement())
-  author       Int
-  description  String
-  tags         String
-  image        String
-  recipeURL    String
-  creationTime DateTime   @default(now())
-  posttags     posttags[]
-  userposts    userposts?
+model Posts {
+  id            Int         @id @default(autoincrement())
+  author        Int
+  description   String
+  tags          String
+  image         String
+  recipeURL     String
+  creationTime  DateTime    @default(now())
+  userPosts     UserPosts[]
+  postTags      PostTags[]
 }
 
-model posttags {
-  id     Int    @id @default(autoincrement())
-  postID Int
-  tag    String
-  posts  posts  @relation(fields: [postID], references: [id], onDelete: Cascade, map: "PostTags_postID_fkey")
-
-  @@index([postID], map: "PostTags_postID_fkey")
+model UserPosts {
+  postID    Int     @unique
+  author    Int
+  userID    User    @relation(fields: [author], references: [id], onDelete: Cascade)
+  post      Posts   @relation(fields: [postID], references: [id], onDelete: Cascade)
 }
 
-model userposts {
-  postID Int   @unique(map: "UserPosts_postID_key")
-  author Int
-  user   user  @relation(fields: [author], references: [id], onDelete: Cascade, map: "UserPosts_author_fkey")
-  posts  posts @relation(fields: [postID], references: [id], onDelete: Cascade, map: "UserPosts_postID_fkey")
-
-  @@index([author], map: "UserPosts_author_fkey")
+model PostTags {
+  id        Int         @id @default(autoincrement())
+  postID    Int
+  tag       String
+  postId    Posts       @relation(fields: [postID], references: [id], onDelete: Cascade)
 }
+
