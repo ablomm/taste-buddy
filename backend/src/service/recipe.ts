@@ -272,11 +272,6 @@ export async function updateRecipeTags(recipeId: number, newTags: []) {
     // TODO: Implement once tags are fully implemented
 }
 
-    })
-
-    return recipe;
-}
-
 export async function getRecipes() {
 
     const user = await prisma.recipe.findMany({
