@@ -1,4 +1,4 @@
-import express, { Response, Request } from 'express';
+import express from 'express';
 const router = express.Router();
 import jwt, { JwtPayload } from "jsonwebtoken";
 import {getUserById} from "../service/user"
@@ -12,13 +12,12 @@ router.post("/", async (req: express.Request, res: express.Response) => {
         if  (verify) {
             const user = await getUserById(verify.id as any);
             if (user) {
-                res.json({"id" : user.id, "username" : user.username})
-                res.sendStatus(200);
+                res.json({"id" : user.id, "username" : user.username});
             }
         } 
-    } 
-    res.sendStatus(401);
-
+    } else {
+        res.sendStatus(401);
+    }
 });
 
 export default router;

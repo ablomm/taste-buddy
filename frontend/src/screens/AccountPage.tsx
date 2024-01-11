@@ -1,9 +1,9 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity  } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {View, Text, Image, StyleSheet, TouchableOpacity, RefreshControl, ScrollView} from 'react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
-import LogoutButton from "../components/loginSignupPageComponents/buttons/LogoutButton";
 import {UserContext} from "../providers/UserProvider";
+import TBButton from '../components/TBButton';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -13,12 +13,18 @@ interface Post {
   id: number;
   content: string;
 }
-
-interface RecentPostsScreenProps {
-  posts: Post[];
-}
-
-const RecentPostsScreen: React.FC<RecentPostsScreenProps> = ({ posts }) => (
+const RecentPostsScreen: ({posts}: {
+  posts: any
+}, refreshFunction, refreshing) => React.JSX.Element = ({ posts, refreshFunction, refreshing }) => {
+    return (
+    <ScrollView
+        refreshControl={
+          <RefreshControl
+              refreshing={refreshing}
+              onRefresh={refreshFunction}
+          />
+        }
+    >
     <View style={styles.screen}>
       <View style={styles.postsContainer}>
         {posts.map(post => (
@@ -28,7 +34,9 @@ const RecentPostsScreen: React.FC<RecentPostsScreenProps> = ({ posts }) => (
         ))}
       </View>
     </View>
-  );
+      </ScrollView>
+    );
+}
 
 interface SavedPostsScreenProps {
   savedPosts: Post[];
@@ -48,13 +56,15 @@ const SavedPostsScreen: React.FC<SavedPostsScreenProps> = ({ savedPosts }) => (
 
 const AccountPage = () => {
   const userContext = React.useContext(UserContext) as any;
-  const username = 'example_user';
-  const recentPosts = [
-    { id: 1, content: '' },
-    { id: 2, content: '' },
-    { id: 3, content: '' },
-    { id: 4, content: '' },
-  ];
+  const username = userContext.state.username;
+
+  const [posts, setPosts] = useState();
+  const [refreshing, setRefreshing] = useState(false);
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
   const savedPosts = [
     { id: 5, content: '' },
     { id: 6, content: '' },
@@ -66,6 +76,34 @@ const AccountPage = () => {
     // Navigate to the settings page
     navigation.navigate('DietaryPreference');
   };
+
+  const fetchUserData = async () => {
+    try {
+      const response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/post/get-posts/${username}`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      await response.json().then(result => {
+        console.log(result);
+        setPosts(result);
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  const onRefresh = React.useCallback(async () => {
+    setRefreshing(true);
+    await fetchUserData()
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -82,16 +120,16 @@ const AccountPage = () => {
       <NavigationContainer independent={true}>
         <Tab.Navigator>
           <Tab.Screen name="Recent Posts">
-            {() => <RecentPostsScreen posts={recentPosts} />}
+            {()=> posts ? (<RecentPostsScreen posts={posts} refreshFunction={onRefresh} refreshing={refreshing} />) : (<Text>Loading ...</Text>)}
           </Tab.Screen>
           <Tab.Screen name="Saved Posts">
             {() => <SavedPostsScreen savedPosts={savedPosts} />}
           </Tab.Screen>
         </Tab.Navigator>
       </NavigationContainer>
-      <LogoutButton handlePress={userContext.logout} isButtonInteractable={true}/>
+      <TBButton onPress={userContext.logout} title="Logout"/>
     </View>
-  );
+);
 };
 
 const styles = StyleSheet.create({
@@ -99,6 +137,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
+  // scrollView: {
+  //   flex: 1,
+  //   alignItems: 'center',
+  //   justifyContent: 'center',
+  // },
   profileHeader: {
     flexDirection: 'row',
     alignItems: 'center',
