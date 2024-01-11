@@ -10,6 +10,8 @@ const Post = ({ imageUrl }: any) => {
     );
 };
 
+const squareDimension = Math.floor(window.innerWidth/3 - 2);
+
 // styles
 const styles = StyleSheet.create({
     post: {
@@ -17,8 +19,8 @@ const styles = StyleSheet.create({
         color: "fff",
         margin: 1,
         padding: 1,
-        height: 100,
-        width: 100,
+        height: squareDimension,
+        width: squareDimension,
         borderWidth: 1, 
         borderColor: 'white'
     }
