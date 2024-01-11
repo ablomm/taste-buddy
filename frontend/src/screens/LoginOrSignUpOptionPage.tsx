@@ -1,7 +1,6 @@
 import React from "react";
 import {View, Text, StyleSheet, Image} from "react-native";
-import SignUpButton from "../components/loginSignupPageComponents/buttons/SignUpButton";
-import LoginButton from "../components/loginSignupPageComponents/buttons/LogInButton";
+import TBButton from "../components/TBButton";
 
 const LogInOrSignUpOptionPage = ({navigation}:any) =>{
     return(
@@ -10,8 +9,8 @@ const LogInOrSignUpOptionPage = ({navigation}:any) =>{
                 <Image source={require("../../assets/logo/Logo.png")} height={61} width={193}/>
                 <Text style={styles.appNameText}>t a s t e    b u d d y</Text>
             </View>
-            <SignUpButton handlePress={()=>navigation.push('SignUpPage')} isButtonInteractable={true}/>
-            <LoginButton handlePress={()=>navigation.push('LoginPage')} isButtonInteractable={true}/>
+            <TBButton onPress={()=>navigation.push('SignUpPage')} title="Sign Up"/>
+            <TBButton onPress={()=>navigation.push('LoginPage')} title="Login"/>
         </View>
     );
 }

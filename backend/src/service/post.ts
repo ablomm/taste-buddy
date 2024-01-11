@@ -51,3 +51,13 @@ export async function getPostsByUserAndID(userID: number|undefined) {
         },
     });
 }
+
+
+export async function getPostsByPage(page: number) {
+    const postsPerPage = 12;
+
+    return await prisma.posts.findMany({
+        skip: postsPerPage * page,
+        take: postsPerPage,
+    })
+}

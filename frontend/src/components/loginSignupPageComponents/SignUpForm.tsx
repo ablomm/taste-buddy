@@ -1,12 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet, TextInput, Button, Pressable } from "react-native";
 import * as yup from 'yup';
-import { useForm, Controller } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import SignUpButton from './buttons/SignUpButton';
 import { Formik, Form, Field } from 'formik';
 import ValidatedInput from '../ValidatedInput';
 import { UserContext } from '../../providers/UserProvider';
+import TBButton from '../TBButton';
 
 const SignUpForm = () => {
 
@@ -115,7 +113,7 @@ const SignUpForm = () => {
                         />
 
                         {/* <Button title="Sign Up" color={"black"}></Button> */}
-                        <SignUpButton handlePress={handleSubmit as any} isButtonInteractable={true} />
+                        <TBButton onPress={handleSubmit} title="Sign Up"/>
                     </View>)}
             </Formik>
         </>);
@@ -124,11 +122,8 @@ export default SignUpForm;
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
         backgroundColor: '#fff',
-        paddingHorizontal: 12,
         paddingVertical: 80,
-        alignItems: 'center',
     },
     input: {
         height: 50,
