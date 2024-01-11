@@ -34,13 +34,13 @@ const PostsGrid = () => {
         retrievePosts();
     }, []);
 
-    const _onRefresh = () => {
+    const _onRefresh = React.useCallback(() => {
         setRefresh( true);
         console.log("refreshing")
         retrievePosts().then(() => {
             setRefresh(false);
         });
-    }
+    }, [])
     
     return (
         <ScrollView contentContainerStyle={styles.app}
