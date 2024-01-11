@@ -14,6 +14,7 @@ import EditTagForm from '../components/CreateRecipe/tags/EditTagForm';
 import TagListItem from '../components/CreateRecipe/tags/TagListItem';
 import BackButton from '../components/BackButton';
 import { UserContext } from '../providers/UserProvider';
+import {Buffer} from 'buffer';
 
 
 const CreateRecipePage = ({ route, navigation }: any) => {
@@ -71,6 +72,7 @@ const CreateRecipePage = ({ route, navigation }: any) => {
       allowsEditing: true,
       aspect: [1, 1],
       quality: 1,
+      base64: true
     });
 
     console.log(result);
@@ -138,33 +140,35 @@ const CreateRecipePage = ({ route, navigation }: any) => {
       console.log(error)
     }
     //console.log("context username: " +userContext.state.username)
-    console.log(s3AccessUrl)
-    console.log(s3AccessUrl.imageURL)
+    //console.log(s3AccessUrl)
+    //console.log(s3AccessUrl.imageURL)
 
-    console.log("")
-    console.log(image)
     console.log("type")
     console.log(typeof image)
     if (s3AccessUrl) {
+      const type = image.split(';')[0].split('/')[1];
+      const buf = Buffer.from(image.replace(/^data:image\/\w+;base64,/, ""),'base64') //isolate the base64 buffer
+      console.log(s3AccessUrl)
       try {
-        
-        s3Response = await fetch(s3AccessUrl.imageURL, {  //put the image on the bucket
+        s3Response = await fetch(s3AccessUrl.imageURL[0], {  //put the image on the bucket
           method: 'PUT',
           headers: {
-            'Content-Type': 'image',
+            'ContentEncoding': 'base64',
+            'Content-Type': `image/${type}`,
           },
-          body: image
+          body: buf
         });
 
-        if(s3Response.status !== 200){
+        if (s3Response.status !== 200) {
           console.log("s3Response, s3 error")
         } else {
-          console.log("s3Response")
+          //console.log("s3Response")
         }
-        
-        console.log(s3Response)
-        console.log(s3AccessUrl.imageURL)
-        imageUrl = s3AccessUrl.imageURL.split('?')[0];
+
+        //console.log(s3Response)
+        //console.log(s3AccessUrl.imageURL)
+        imageUrl = s3AccessUrl.imageURL[0].split('?')[0];
+        console.log("uploaded image url: " + imageUrl);
       } catch (error: any) {
         console.log("image put failed")
         console.log(error)
@@ -241,6 +245,7 @@ const CreateRecipePage = ({ route, navigation }: any) => {
 
       <Formik
         initialValues={{
+          image:null,
           title: '',
           description: '',
           instructions: '',
