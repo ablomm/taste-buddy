@@ -190,7 +190,6 @@ const CreateRecipePage = ({ route, navigation }: any) => {
         });
 
         if (s3Response.status !== 200) {
-        if (s3Response.status !== 200) {
           console.log("s3Response, s3 error")
         } else {
           //console.log("s3Response")

@@ -7,7 +7,8 @@ import {
     getRecipeByUserAndTitle,
     updateRecipe,
     updateIngredients,
-    updateInstructions
+    updateInstructions,
+    getRecipes
 } from '../service/recipe';
 import { getUserByUsername } from "../service/user";
 const router = express.Router();
