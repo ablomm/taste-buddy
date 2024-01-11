@@ -17,7 +17,7 @@ const ValidatedInput = (props: ValidatedInputProps) => {
     let { placeholder = "", textContentType = "none", secureTextEntry = false, onChangeText, onBlur, value, error, style, multiline = false } = props;
 
     return (
-        <View style={styles.input}>
+        <>
             <TextInput
                 placeholder={placeholder}
                 onChangeText={onChangeText}
@@ -34,21 +34,17 @@ const ValidatedInput = (props: ValidatedInputProps) => {
                     }, styles.textInput, style]}
             />
             {error && <Text style={styles.error}>{error}</Text>}
-        </View>
+        </>
     );
 }
 
 const styles = StyleSheet.create({
-    input: {
-        width: '100%',
-    },
     error: {
         display: "flex",
         color: "red",
         paddingLeft: 10
     },
     textInput: {
-        flexGrow: 1,
         alignSelf: 'center',
         height: 50,
         margin: 10,

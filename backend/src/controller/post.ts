@@ -1,7 +1,7 @@
 import express from 'express';
 import { generateUploadURL } from '../service/s3';
 import { getUserByUsername } from "../service/user";
-import {createPost, getPostsByUserAndID} from "../service/post";
+import {createPost, getPostsByPage, getPostsByUserAndID} from "../service/post";
 const router = express.Router();
 
 router.post("/create", async (req: express.Request, res: express.Response) => {
@@ -36,6 +36,11 @@ router.get("/get-posts/:username", async (req: express.Request, res: express.Res
         console.error(error);
         res.status(500).send(error);
     }
+});
+
+router.get("/page/:page", async (req: express.Request, res: express.Response) => {
+    const page: number = parseInt(req.params["page"]);
+    return res.send(await getPostsByPage(page));
 });
 
 router.get("/s3Url", async (req: express.Request, res: express.Response) => {

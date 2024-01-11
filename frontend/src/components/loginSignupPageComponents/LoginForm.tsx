@@ -1,17 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, Button, Pressable, Alert } from "react-native";
 import * as yup from 'yup';
-import { useForm, Controller } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
 import { Formik } from 'formik';
-import LoginButton from './buttons/LogInButton';
-import Validator from 'email-validator';
 import ValidatedInput from '../ValidatedInput';
 import { UserContext } from '../../providers/UserProvider';
+import TBButton from '../TBButton';
 
 const LoginForm = () => {
-    const [username, onChangeUsername] = React.useState('');
-    const [password, onChangePassword] = React.useState('');
     const userContext = React.useContext(UserContext) as any;
 
     // define validation rules for each field
@@ -78,7 +73,7 @@ const LoginForm = () => {
                         value={values.password}
                         error={errors.password}
                     />
-                    <LoginButton handlePress={handleSubmit} isButtonInteractable={isValid} />
+                    <TBButton onPress={handleSubmit} title="Login"/>
                 </View>
             )}
         </Formik>
@@ -89,11 +84,8 @@ export default LoginForm;
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
         backgroundColor: '#fff',
-        paddingHorizontal: 12,
         paddingVertical: 80,
-        alignItems: 'center',
     },
     input: {
         height: 50,

@@ -15,6 +15,7 @@ import SearchPage from "../screens/SearchPage";
 import RecommenderPage from "../screens/RecommenderPage";
 import DietaryPreference from "../screens/DietaryPreference";
 import CreatePostPage from "../screens/CreatePostPage";
+import RecipePage from "../screens/RecipePage";
 
 const Stack = createStackNavigator();
 
