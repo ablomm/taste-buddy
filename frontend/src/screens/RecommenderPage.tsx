@@ -53,12 +53,6 @@ const RecommenderPage = () => {
         })
     };
 
-    const navigation = useNavigation();
-    const navigateToSettings = () => {
-        // Navigate to the settings page
-        navigation.navigate('RecipePage');
-      };
-
     const animationStyle: TAnimationStyle = React.useCallback(
         (value: number) => {
             "worklet";
@@ -184,7 +178,7 @@ const RecommenderPage = () => {
             {/* <Button title="fetch recipes list" onPress={fetchRecipeList}/> */}
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                 <TBButton style={{ width: '25%' }} title="X" />
-                <TBButton style={{ width: '30%' }} title="Full Recipe" />
+                <TBButton style={{ width: '30%' }} title="Full Recipe"/>
                 <TBButton style={{ width: '25%' }} title="Save" />
             </View>
         </View>
