@@ -275,3 +275,11 @@ export async function updateInstructions(recipeId: number, newInstructions: Inst
 export async function updateRecipeTags(recipeId: number, newTags: []) {
     // TODO: Implement once tags are fully implemented
 }
+
+export async function getRecipes() {
+
+    const user = await prisma.recipe.findMany({
+    })
+
+    return user;
+}
