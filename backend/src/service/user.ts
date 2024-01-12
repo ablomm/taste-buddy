@@ -12,6 +12,7 @@ export async function createUser(email: string, username: string, plainTextPassw
             email,
             username,
             password: hashedPassword,
+            profilePic: ""
         },
     })
 }
@@ -60,4 +61,14 @@ export async function getModeratorStatus(username: string) {
 
     // User should always exist since this is checked after logging in
     return userData?.isModerator;
+}
+
+export async function getProfilePhotoByUsername(username: string) {
+    const userData = await prisma.user.findFirst({
+        where: {
+            username: username
+        }
+    });
+
+    return userData?.profilePic;
 }
