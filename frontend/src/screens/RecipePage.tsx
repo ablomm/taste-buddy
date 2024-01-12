@@ -4,9 +4,10 @@ import Header from '../components/header/Header';
 import PosterHeader from '../components/RecipesAndPosts/PosterHeader';
 import { LinearGradient } from 'expo-linear-gradient';
 import CheckboxRecipe from '../components/RecipesAndPosts/CheckboxRecipe';
-import ContentInteractionBar from '../components/RecipesAndPosts/ContentInteractionBar';
+import RecipeContentInteractionBar from '../components/RecipesAndPosts/RecipeContentInteractionBar';
+import RecipeReviews from '../components/RecipesAndPosts/RecipeReview';
 
-const HEADER_EXPANDED_HEIGHT = 128;
+const HEADER_EXPANDED_HEIGHT = 130;
 const HEADER_COLLAPSED_HEIGHT = 50;
 const { width: SCREEN_WIDTH } = Dimensions.get('screen');
 
@@ -30,10 +31,10 @@ const RecipePage = ({ route, navigation }: any) => {
     return(
         <View style={styles.container}>
             <Header navigation = {navigation}/>
-            <View>
+            <View style={{ zIndex: 2 }}>
                 <PosterHeader/>
                 
-                <Animated.View style={{ height: headerHeight, width: SCREEN_WIDTH, position: 'absolute', top: 0, left: 0 }}>
+                <Animated.View style={{ height: headerHeight, width: SCREEN_WIDTH,top: 0, left: 0, zIndex: 1 }}>
                     {/** place holder image */}
                     <ImageBackground
                         source={require('../../assets/temp/tempfood.jpg')} 
@@ -65,8 +66,15 @@ const RecipePage = ({ route, navigation }: any) => {
                            }
                         }])}
                       scrollEventThrottle={16}>
-                        <ContentInteractionBar/>
+                        <KeyboardAvoidingView
+                            style={styles.avoidingView}
+                            behavior='padding'
+                            enabled={Platform.OS === "ios"}
+                            keyboardVerticalOffset={40}
+                        >
+                        <RecipeContentInteractionBar/> 
                         {
+                            // stars
                             //description
                             //ingrediants (check list)
                             //instructions (text)
@@ -84,6 +92,9 @@ const RecipePage = ({ route, navigation }: any) => {
                         </>
                         <Text style={styles.postTime}>post time</Text>
                         <Text>~~~~~~~~~~~~~~~~</Text>
+                        <Text>~~~~~~~fgkalshjgflk;qjafkldghbnsa;lkdhqjafkldghbnsa;lkdhqjafkldghbnsalkdhqjafkldghlkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsabnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsa;lkdhqjafkldghbnsa;lkdhfbnaldhbnak~~fgkalshjgflk;qjafkldghbnsa~fgkalshjgflk;qjafkldghbnsa;lkdhfbnaldhbnak~fgkalshjgflk;qjafkldghbnsa;lkdhfbnaldhbnak~fgkalshjgflk;qjafkldghbnsa;lkdhfbnaldhbnak~fgkalshjgflk;qjafkldghbnsa;lkdhfbnaldhbnak;lkdhfbnaldhbnak~~fgkalshjgflk;qjafkldghbnsa;lkdhfbnaldhbnak~~fgkalshjgflk;qjafkldghbnsa;lkdhfbnaldhbnak~~fgkalshjgflk;qjafkldghbnsa;lkdhfbnaldhbnak~~fgkalshjgflk;qjafkldghbnsa;lkdhfbnaldhbnak~~fgkalshjgflk;qjafkldghbnsa;lkdhfbnaldhbnak~fgkalshjgflk;qjafkldghbnsa;lkdhfbnaldhbnaklfdhbafdhnbadhfh~~~~~~~~~~</Text>
+                        <RecipeReviews/>
+                        </KeyboardAvoidingView>
                     </ScrollView>
                 </View>
             
@@ -95,11 +106,14 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#fff',
     },
+    avoidingView: {
+        flexDirection: 'column',
+        justifyContent: 'center',
+    },
     scrollContainer: {
         padding: 16,
         flexGrow: 1,
-        paddingBottom: 150,
-        paddingTop: HEADER_EXPANDED_HEIGHT 
+        paddingBottom: 200,
     }, 
     subTitle: {
         fontSize: 20,
