@@ -49,7 +49,7 @@ const SignedInNavigation = () => (
     <Tab.Navigator initialRouteName='ExplorePage' screenOptions={tabBarOptions} sceneContainerStyle={{ backgroundColor: 'transparent' }}/*tabBar={props => <NavBar {...props} />}*/>
       <Tab.Screen
         name='ExplorePage'
-        component={ExplorePageStack}
+        component={RecipePage}
       />
 
       <Tab.Screen
@@ -91,11 +91,4 @@ const AccountPageStack = () => (
     <Stack.Screen name='DietaryPreference' component={DietaryPreference} />
   </Stack.Navigator>
 );
-const ExplorePageStack = () => (
-  <Stack.Navigator initialRouteName='ExplorePage' screenOptions={stackOptions}>
-    <Stack.Screen name='ExplorePage' component={ExplorePage} />
-    <Stack.Screen name='RecipePage' component={RecipePage} />
-  </Stack.Navigator>
-)
-
 export default Navigation;
