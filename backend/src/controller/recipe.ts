@@ -43,9 +43,15 @@ router.get("/s3Url", async (req: express.Request, res: express.Response) => {
     return res.send({ imageURL });
 });
 
-router.get("/getAllRecipes", async (req: express.Request, res: express.Response) => {
-    const allRecipes = await getAllRecipes();
-    return res.json({allRecipes});
+router.get("/get-all-recipes", async (req: express.Request, res: express.Response) => {
+    try{
+        const allRecipes = await getAllRecipes();
+        console.log("here!")
+        return res.json(allRecipes);
+    }catch (error){
+        console.error(error);
+    }
+
 });
 
 router.put("/edit-recipe", async (req: express.Request, res: express.Response) => {
