@@ -8,11 +8,7 @@ const SearchPage = () => {
     const [clicked, setClicked] = React.useState(false);
 
     return (
-        <View style={styles.container}>
-            <Text>
-                Search Page
-            </Text>
-            
+        <View style={styles.container}>          
             <SearchBar
                 searchPhrase={searchPhrase}
                 setSearchPhrase={setSearchPhrase}
