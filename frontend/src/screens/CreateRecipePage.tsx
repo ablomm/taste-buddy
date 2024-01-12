@@ -18,12 +18,11 @@ import AddStepForm, { Step } from '../components/CreateRecipe/steps/AddStepForm'
 import EditStepForm from '../components/CreateRecipe/steps/EditStepForm';
 import StepListItem from '../components/CreateRecipe/steps/StepListItem';
 import {Buffer} from 'buffer';
-
+import getBase64 from '../functions/GetBase64FromURI';
 
 const CreateRecipePage = ({ route, navigation }: any) => {
   const { pickedImage } = route.params;
   const userContext = React.useContext(UserContext) as any;
-
   // define validation rules for each field
   const recipeSchema = yup.object().shape({
     title: yup
@@ -169,6 +168,9 @@ const CreateRecipePage = ({ route, navigation }: any) => {
     }
 
     if (s3AccessUrl) {
+      if(!image.base64){
+        image.base64 = await getBase64(image.uri);
+      }
       const buf = Buffer.from(image.base64, 'base64') //isolate the base64 buffer
       let type = image.uri.substring(image.uri.lastIndexOf('.') + 1, image.uri.length);
       
