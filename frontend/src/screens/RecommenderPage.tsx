@@ -34,8 +34,6 @@ const RecommenderPage = () => {
 
             await response.json().then(result => {
                 setRecipes(result)
-                console.log("RECIPES !!!" + recipes);
-                console.log("RECIPES" + JSON.stringify(recipes));
             });
         } catch (error) {
             console.error(error);
