@@ -18,8 +18,8 @@ const styles = StyleSheet.create({
         backgroundColor: 'gray',
         margin: 1,
         padding: 1,
-        height: 300,
-        width: 300,
+        height: 150,
+        width: 150,
         borderWidth: 1, 
         borderColor: 'white'
     }
