@@ -101,12 +101,12 @@ router.post("/saveReview", async (req: express.Request, res: express.Response) =
         reviewText,
     } = req.body;
 
-    console.log("username", req.body)
     try {
         const user = await getUserByUsername(username)
         const profilePic = await getProfilePhotoByUsername(username);
         const userID = user?.id;
         await createReview(recipeID ,reviewText, rating, userID, username, profilePic?profilePic:"");
+        console.log("Review created by: " + username);
         res.sendStatus(200);
     } catch (e) {
         console.error(e);
