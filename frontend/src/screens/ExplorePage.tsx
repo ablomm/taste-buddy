@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import {View, Text} from 'react-native';
 
 const ExplorePage = () => {
     return (
@@ -10,5 +10,4 @@ const ExplorePage = () => {
         </View>
     );
 }
-
 export default ExplorePage;
