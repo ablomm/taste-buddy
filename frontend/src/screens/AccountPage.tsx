@@ -29,7 +29,7 @@ const RecentPostsScreen: ({posts}: {
       <View style={styles.postsContainer}>
         {posts.map(post => (
           <View key={post.id} style={styles.postContainer}>
-            <Image source={profilePicture} style={styles.postImage} />
+            <Image source={{uri: post.image}} style={styles.postImage} />
           </View>
         ))}
       </View>
@@ -198,9 +198,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   postImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 100,
+    height: 100,
+    borderRadius: 10,
     marginRight: 15,
   },
   postContent: {
