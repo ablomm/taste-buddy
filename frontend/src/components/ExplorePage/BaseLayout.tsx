@@ -6,11 +6,11 @@ import Animated, {
   useDerivedValue,
 } from "react-native-reanimated";
 
-import type { IOpts } from "./ExplorePage/useOffsetX";
-import { useOffsetX } from "./ExplorePage/useOffsetX";
-import type { IVisibleRanges } from "./ExplorePage/useVisibleRanges";
-import type { ILayoutConfig } from "./ExplorePage/stack";
-import { CTX } from "./ExplorePage/store";
+import type { IOpts } from "./useOffsetX";
+import { useOffsetX } from "./useOffsetX";
+import type { IVisibleRanges } from "./useVisibleRanges";
+import type { ILayoutConfig } from "./stack";
+import { CTX } from "./store";
 
 export type TAnimationStyle = (value: number) => AnimatedStyleProp<ViewStyle>;
 
