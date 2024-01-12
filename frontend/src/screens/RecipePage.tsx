@@ -57,6 +57,12 @@ const RecipePage = ({ route, navigation }: any) => {
                         </LinearGradient>
                     </ImageBackground>
                 </Animated.View>
+                <KeyboardAvoidingView
+                            style={styles.avoidingView}
+                            behavior='padding'
+                            enabled={Platform.OS === "ios"}
+                            keyboardVerticalOffset={40}
+                >
                     <ScrollView contentContainerStyle={styles.scrollContainer}
                     onScroll={Animated.event(
                         [{ nativeEvent: {
@@ -66,12 +72,7 @@ const RecipePage = ({ route, navigation }: any) => {
                            }
                         }])}
                       scrollEventThrottle={16}>
-                        <KeyboardAvoidingView
-                            style={styles.avoidingView}
-                            behavior='padding'
-                            enabled={Platform.OS === "ios"}
-                            keyboardVerticalOffset={40}
-                        >
+                        
                         <RecipeContentInteractionBar/> 
                         {
                             // stars
@@ -93,8 +94,8 @@ const RecipePage = ({ route, navigation }: any) => {
                         <Text style={styles.postTime}>post time</Text>
                         <Text>~~~~~~~~~~~~~~~~</Text>
                         <RecipeReviews/>
-                        </KeyboardAvoidingView>
                     </ScrollView>
+                    </KeyboardAvoidingView>
                 </View>
             
         </View>
