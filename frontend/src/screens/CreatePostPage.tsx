@@ -133,8 +133,6 @@ const CreatePostPage = ({ route, navigation }: any) => {
                 console.log("s3Response, s3 error")
                 console.log(s3Response);
               } else {
-                console.log("s3Response")
-                console.log(s3Response)
                 imageUrl = s3AccessUrl.imageURL[0].split('?')[0];
                 console.log("uploaded image url: " + imageUrl);
               }
