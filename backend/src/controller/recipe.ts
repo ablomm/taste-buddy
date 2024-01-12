@@ -5,6 +5,7 @@ import {
     createIngredients,
     createInstructions,
     getRecipeByUserAndTitle,
+    getAllRecipes,
     updateRecipe,
     updateIngredients,
     updateInstructions,
@@ -43,6 +44,16 @@ router.post("/save", async (req: express.Request, res: express.Response) => {
 router.get("/s3Url", async (req: express.Request, res: express.Response) => {
     const imageURL = await generateUploadURL()
     return res.send({ imageURL });
+});
+
+router.get("/get-all-recipes", async (req: express.Request, res: express.Response) => {
+    try{
+        const allRecipes = await getAllRecipes();
+        return res.json(allRecipes);
+    }catch (error){
+        console.error(error);
+    }
+
 });
 
 router.put("/edit-recipe", async (req: express.Request, res: express.Response) => {

@@ -80,6 +80,10 @@ export async function getRecipeByUserAndTitle(userID: number|undefined, title: s
     });
 }
 
+export async function getAllRecipes(){
+    return await prisma.recipe.findMany();
+}
+
 /**
  * This function updates the recipe table using the recipe and user ID.
  * Any general information changes will be updated in the database.

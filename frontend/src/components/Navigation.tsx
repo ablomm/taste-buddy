@@ -91,5 +91,4 @@ const AccountPageStack = () => (
     <Stack.Screen name='DietaryPreference' component={DietaryPreference} />
   </Stack.Navigator>
 );
-
 export default Navigation;
