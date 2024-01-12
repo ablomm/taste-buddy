@@ -5,8 +5,8 @@ import { promisify } from "util"
 
 const region = "us-east-2"
 const bucketName = "tastebuddy-images"
-const accessKeyId = process.env.AWS_ACCESS_KEY_ID
-const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY
+const accessKeyId = process.env.AWS_ACCESS_KEY_ID ?? ""
+const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY ?? ""
 
 const s3 = new aws.S3({
     region,
@@ -26,5 +26,5 @@ export async function generateUploadURL() {
     })
     
     const uploadURL = await s3.getSignedUrlPromise('putObject', params)
-    return uploadURL
+    return [uploadURL, imageName]
 }

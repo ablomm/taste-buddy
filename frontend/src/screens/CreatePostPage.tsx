@@ -11,6 +11,7 @@ import AddTagForm, { Tag } from '../components/CreateRecipe/tags/AddTagForm';
 import EditTagForm from '../components/CreateRecipe/tags/EditTagForm';
 import TagListItem from '../components/CreateRecipe/tags/TagListItem';
 import { UserContext } from "../providers/UserProvider";
+import {Buffer} from 'buffer';
 
 const CreatePostPage = ({ route, navigation }: any) => {
   const { pickedImage } = route.params;
@@ -102,7 +103,7 @@ const CreatePostPage = ({ route, navigation }: any) => {
         validationSchema={recipeSchema}
         onSubmit={async values => {
           console.log(values);
-          let imageUrl: string;
+          let imageUrl: string = "";
           let s3AccessUrl: any;
           let s3Response: any;
 
@@ -118,13 +119,17 @@ const CreatePostPage = ({ route, navigation }: any) => {
           console.log(s3AccessUrl)
           console.log(s3AccessUrl.imageURL)
           if (s3AccessUrl) {
+            const type = image.split(';')[0].split('/')[1];
+            const buf = Buffer.from(image.replace(/^data:image\/\w+;base64,/, ""),'base64') //isolate the base64 buffer
+            console.log(s3AccessUrl)
             try {
-              s3Response = await fetch(s3AccessUrl.imageURL, {  //put the image on the bucket
+              s3Response = await fetch(s3AccessUrl.imageURL[0], {  //put the image on the bucket
                 method: 'PUT',
                 headers: {
-                  'Content-Type': 'multipart/form-data',
+                  'ContentEncoding': 'base64',
+                  'Content-Type': `image/${type}`,
                 },
-                body: image
+                body: buf
               });
 
               if (s3Response.status !== 200) {
@@ -134,7 +139,8 @@ const CreatePostPage = ({ route, navigation }: any) => {
               }
 
               console.log(s3Response)
-              imageUrl = s3AccessUrl.imageURL.split('?')[0];
+              imageUrl = s3AccessUrl.imageURL[0].split('?')[0];
+              console.log("uploaded image url: " + imageUrl);
             } catch (error: any) {
               console.log("image put failed")
               console.log(error)
@@ -161,7 +167,7 @@ const CreatePostPage = ({ route, navigation }: any) => {
               }),
             });
 
-            if (response.status !== 200) {
+            if (response.status !== 200) {  
               console.log("upload failed")
               console.log(response)
             } else {
