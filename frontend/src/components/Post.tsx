@@ -16,11 +16,10 @@ const squareDimension = Math.floor(window.innerWidth/3 - 2);
 const styles = StyleSheet.create({
     post: {
         backgroundColor: 'gray',
-        color: "fff",
         margin: 1,
         padding: 1,
-        height: squareDimension,
-        width: squareDimension,
+        height: 300,
+        width: 300,
         borderWidth: 1, 
         borderColor: 'white'
     }

@@ -11,7 +11,7 @@ import AddTagForm, { Tag } from '../components/CreateRecipe/tags/AddTagForm';
 import EditTagForm from '../components/CreateRecipe/tags/EditTagForm';
 import TagListItem from '../components/CreateRecipe/tags/TagListItem';
 import { UserContext } from "../providers/UserProvider";
-import {Buffer} from 'buffer';
+import { Buffer } from 'buffer';
 
 const CreatePostPage = ({ route, navigation }: any) => {
   const { pickedImage } = route.params;
@@ -38,21 +38,20 @@ const CreatePostPage = ({ route, navigation }: any) => {
   const [editTagModalVisible, setEditTagModalVisible] = React.useState(false);
   const [tagEditIndex, setTagEditIndex] = React.useState(0); // the index of the tag we are editing
 
-  const [image, setImage] = React.useState<any>(pickedImage ? pickedImage.uri : null);
+  const [image, setImage] = React.useState<any>(pickedImage ? pickedImage : null);
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      base64: true,
       allowsEditing: true,
       aspect: [1, 1],
       quality: 1,
     });
 
-    console.log(result);
-
     if (!result.canceled) {
-      setImage(result.assets[0].uri as any);
+      setImage(result.assets[0] as any);
     }
   };
 
@@ -115,13 +114,11 @@ const CreatePostPage = ({ route, navigation }: any) => {
             console.log("image link generation error")
             console.log(error)
           }
-          //console.log("context username: " +userContext.state.username)
-          console.log(s3AccessUrl)
-          console.log(s3AccessUrl.imageURL)
+
           if (s3AccessUrl) {
-            const type = image.split(';')[0].split('/')[1];
-            const buf = Buffer.from(image.replace(/^data:image\/\w+;base64,/, ""),'base64') //isolate the base64 buffer
-            console.log(s3AccessUrl)
+            const buf = Buffer.from(image.base64, 'base64') //isolate the base64 buffer
+            let type = image.uri.substring(image.uri.lastIndexOf('.') + 1, image.uri.length);
+
             try {
               s3Response = await fetch(s3AccessUrl.imageURL[0], {  //put the image on the bucket
                 method: 'PUT',
@@ -134,13 +131,11 @@ const CreatePostPage = ({ route, navigation }: any) => {
 
               if (s3Response.status !== 200) {
                 console.log("s3Response, s3 error")
+                console.log(s3Response);
               } else {
-                console.log("s3Response")
+                imageUrl = s3AccessUrl.imageURL[0].split('?')[0];
+                console.log("uploaded image url: " + imageUrl);
               }
-
-              console.log(s3Response)
-              imageUrl = s3AccessUrl.imageURL[0].split('?')[0];
-              console.log("uploaded image url: " + imageUrl);
             } catch (error: any) {
               console.log("image put failed")
               console.log(error)
@@ -167,7 +162,7 @@ const CreatePostPage = ({ route, navigation }: any) => {
               }),
             });
 
-            if (response.status !== 200) {  
+            if (response.status !== 200) {
               console.log("upload failed")
               console.log(response)
             } else {
@@ -203,7 +198,7 @@ const CreatePostPage = ({ route, navigation }: any) => {
               <ScrollView>
                 <Text style={styles.header}>Image*</Text>
                 <TouchableRipple onPress={pickImage} borderless={true} style={styles.image}>
-                  <Image source={image ? { uri: image } : require("../../assets/no-image.png") as any} style={{ width: "100%", height: "100%" }} />
+                  <Image source={image ? { uri: image.uri } : require("../../assets/no-image.png") as any} style={{ width: "100%", height: "100%" }} />
                 </TouchableRipple>
 
                 <Text style={styles.header}>Description</Text>
