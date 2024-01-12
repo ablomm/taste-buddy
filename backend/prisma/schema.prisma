@@ -4,12 +4,11 @@
 generator client {
   provider = "prisma-client-js"
 }
-
+  
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
-
 model User {
   id           Int                @id @default(autoincrement())
   email        String             @unique
@@ -69,10 +68,8 @@ model UserSavedRecipes {
   recipeID  Int
   recipe    Recipe   @relation(fields: [recipeID], references: [id])
   timeSaved DateTime @default(now())
-
   @@id([userID, recipeID])
 }
-
 model Posts {
   id            Int         @id @default(autoincrement())
   author        Int
@@ -84,18 +81,15 @@ model Posts {
   userPosts     UserPosts[]
   postTags      PostTags[]
 }
-
 model UserPosts {
   postID    Int     @unique
   author    Int
   userID    User    @relation(fields: [author], references: [id], onDelete: Cascade)
   post      Posts   @relation(fields: [postID], references: [id], onDelete: Cascade)
 }
-
 model PostTags {
   id        Int         @id @default(autoincrement())
   postID    Int
   tag       String
   postId    Posts       @relation(fields: [postID], references: [id], onDelete: Cascade)
 }
-

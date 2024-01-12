@@ -8,7 +8,8 @@ import {
     getAllRecipes,
     updateRecipe,
     updateIngredients,
-    updateInstructions
+    updateInstructions,
+    getRecipes
 } from '../service/recipe';
 import { getUserByUsername } from "../service/user";
 const router = express.Router();
@@ -95,6 +96,11 @@ router.put("/edit-recipe", async (req: express.Request, res: express.Response) =
     }
 
     return res.send('success');
+});
+
+router.get("/getPosts", async (req: express.Request, res: express.Response) => {
+    const posts = await getRecipes()
+    return res.send({posts});
 });
 
 export default router;
