@@ -14,6 +14,13 @@ type Instruction = {
     step: string
 }
 
+enum OrderBy {
+    DateAscending = "DateAscending",
+    DateDescending = "DateDescending",
+    RatingAscending = "RatingAscending",
+    RatingDescending = "RatingDescending"
+}
+
 export async function createRecipe(userID: number|any, title: string,description: string,instructions: string,cookTime: number,calories: number,servings: number,tags: any,image: string) {
 
     const cookTimeHours = Math.floor(cookTime/60);
@@ -273,6 +280,16 @@ export async function updateRecipeTags(recipeId: number, newTags: []) {
     // TODO: Implement once tags are fully implemented
 }
 
+/**
+ * This function will create a new Review table entry given the required parameters.
+ *
+ * @param recipeID
+ * @param reviewText
+ * @param rating
+ * @param userID
+ * @param username
+ * @param profilePic
+ */
 export async function createReview(recipeID:number ,reviewText:string, rating:number, userID:number|any, username:string, profilePic:string ) {
 
     await prisma.review.create({
@@ -287,16 +304,63 @@ export async function createReview(recipeID:number ,reviewText:string, rating:nu
     })
 }
 
-export async function getReviewsByPage(recipeID: number, page: number) {
+/**
+ * This function retrieves the reviews per the page given the recipeID, page number, 
+ * and the order. If an OrderBy is given, then the query will be ordered, otherwise 
+ * it will retrieve in the same order inserted in the database.
+ *
+ * @param recipeID
+ * @param page
+ * @param order
+ */
+export async function getReviewsByPage(recipeID: number, page: number, order:OrderBy) {
     const reviewsPerPage = 15;
+    let orderBy = [{}];
+    switch (order) {
+        case OrderBy.DateAscending :
+            orderBy = [
+                {timePosted : 'asc'}
+            ]
+            break;
+        case OrderBy.DateDescending :
+            orderBy = [
+                {timePosted : 'desc'}
+            ]
+            break;
+        case OrderBy.RatingAscending :
+            orderBy = [
+                {rating : 'asc'}
+            ]
+            break;
+        case OrderBy.RatingDescending :
+            orderBy = [
+                {rating : 'desc'}
+            ]
+            break;
 
-    return await prisma.review.findMany({
-        skip: reviewsPerPage * page,
-        take: reviewsPerPage,
-        where: {
-            recipeID: recipeID
-        },
-    })
+        default :
+        return await prisma.review.findMany({
+            skip: reviewsPerPage * page,
+            take: reviewsPerPage,
+            where: {
+                recipeID: recipeID
+            },
+        })
+        break;
+        } 
+
+        return await prisma.review.findMany({
+            skip: reviewsPerPage * page,
+            take: reviewsPerPage,
+            where: {
+                recipeID: recipeID
+            },
+            orderBy:orderBy
+        })
+    
+         
+    
+    
 }
 
 export async function getRecipes() {

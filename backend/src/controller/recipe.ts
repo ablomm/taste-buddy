@@ -94,27 +94,34 @@ router.get("/getPosts", async (req: express.Request, res: express.Response) => {
     return res.send({posts});
 });
 
-router.get("/saveReview", async (req: express.Request, res: express.Response) => {
+router.post("/saveReview", async (req: express.Request, res: express.Response) => {
     const { username,
         recipeID,
         rating,
         reviewText,
     } = req.body;
 
-    const user = await getUserByUsername(username)
-    const profilePic = await getProfilePhotoByUsername(username);
-    const userID = user?.id;
-    await createReview(recipeID ,reviewText, rating, userID, username, profilePic?profilePic:"");
-
-    res.sendStatus(200);
+    console.log("username", req.body)
+    try {
+        const user = await getUserByUsername(username)
+        const profilePic = await getProfilePhotoByUsername(username);
+        const userID = user?.id;
+        await createReview(recipeID ,reviewText, rating, userID, username, profilePic?profilePic:"");
+        res.sendStatus(200);
+    } catch (e) {
+        console.error(e);
+        res.sendStatus(400);
+    }
 });
 
 router.get("/reviews", async (req: express.Request, res: express.Response) => {
     const {
         recipeID, 
-        page   
+        page,
+        orderBy   
     } = req.body;
-    const reviews = await getReviewsByPage(recipeID, page)
+    
+    const reviews = await getReviewsByPage(recipeID, page, orderBy)
     res.send({reviews});
 });
 export default router;
