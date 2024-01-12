@@ -236,6 +236,7 @@ const CreateRecipePage = ({ route, navigation }: any) => {
       } else {
         console.log("upload successful")
         console.log(ingredients)
+        navigation.navigate('AccountPageStack');
       }
     } catch (error: any) {
       console.log("upload error")

@@ -9,9 +9,11 @@ import {
     updateRecipe,
     updateIngredients,
     updateInstructions,
-    getRecipes
+    getRecipes,
+    createReview,
+    getReviewsByPage
 } from '../service/recipe';
-import { getUserByUsername } from "../service/user";
+import { getUserByUsername, getProfilePhotoByUsername } from "../service/user";
 const router = express.Router();
 
 router.post("/save", async (req: express.Request, res: express.Response) => {
@@ -103,4 +105,34 @@ router.get("/getPosts", async (req: express.Request, res: express.Response) => {
     return res.send({posts});
 });
 
+router.post("/saveReview", async (req: express.Request, res: express.Response) => {
+    const { username,
+        recipeID,
+        rating,
+        reviewText,
+    } = req.body;
+
+    try {
+        const user = await getUserByUsername(username)
+        const profilePic = await getProfilePhotoByUsername(username);
+        const userID = user?.id;
+        await createReview(recipeID ,reviewText, rating, userID, username, profilePic?profilePic:"");
+        console.log("Review created by: " + username);
+        res.sendStatus(200);
+    } catch (e) {
+        console.error(e);
+        res.sendStatus(400);
+    }
+});
+
+router.get("/reviews", async (req: express.Request, res: express.Response) => {
+    const {
+        recipeID, 
+        page,
+        orderBy   
+    } = req.body;
+    
+    const reviews = await getReviewsByPage(recipeID, page, orderBy)
+    res.send({reviews});
+});
 export default router;
