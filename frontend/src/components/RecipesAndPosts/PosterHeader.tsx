@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TextInput, StyleSheet, KeyboardAvoidingView, ScrollView, Image, Platform } from "react-native";
+import { View, Text, StyleSheet, Image} from "react-native";
 
 const PosterHeader = () => {
     return(
