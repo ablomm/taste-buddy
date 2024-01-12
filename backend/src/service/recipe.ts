@@ -28,7 +28,8 @@ export async function createRecipe(userID: number|any, title: string,description
             cootTimeMinutes: cootTimeMinutes,
             calories: calories/1,
             servings: servings/1,
-            recipeImage: image
+            recipeImage: image,
+            averageRating: 0
         },
     })
 
@@ -270,6 +271,32 @@ export async function updateInstructions(recipeId: number, newInstructions: Inst
 
 export async function updateRecipeTags(recipeId: number, newTags: []) {
     // TODO: Implement once tags are fully implemented
+}
+
+export async function createReview(recipeID:number ,reviewText:string, rating:number, userID:number|any, username:string, profilePic:string ) {
+
+    await prisma.review.create({
+        data: {
+            recipeID,      
+            reviewText,    
+            rating,    
+            userID,        
+            username,
+            profilePic      
+        },
+    })
+}
+
+export async function getReviewsByPage(recipeID: number, page: number) {
+    const reviewsPerPage = 15;
+
+    return await prisma.review.findMany({
+        skip: reviewsPerPage * page,
+        take: reviewsPerPage,
+        where: {
+            recipeID: recipeID
+        },
+    })
 }
 
 export async function getRecipes() {
