@@ -19,12 +19,11 @@ model User {
   savedRecipes UserSavedRecipes[]
   recipes      Recipe[]
   userPosts    UserPosts[]
-  profilePic   String
+  profilePic   String             @default("")
 }
 
 model Recipe {
   id                 Int                  @id @default(autoincrement())
-  author             User                 @relation(fields: [authorID], references: [id])
   author             User                 @relation(fields: [authorID], references: [id])
   authorID           Int
   creationTime       DateTime             @default(now())
@@ -39,7 +38,7 @@ model Recipe {
   recipeImage        String
   tags               RecipeTags[]
   usersSaved         UserSavedRecipes[]
-  averageRating      Int
+  averageRating      Int                  @default(0)
 }
 
 model RecipeIngredients {
