@@ -1,12 +1,14 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
 generator client {
   provider = "prisma-client-js"
 }
-
+  
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
-
 model User {
   id           Int                @id @default(autoincrement())
   email        String             @unique
@@ -21,6 +23,7 @@ model User {
 
 model Recipe {
   id                 Int                  @id @default(autoincrement())
+  author             User                 @relation(fields: [authorID], references: [id])
   authorID           Int
   creationTime       DateTime             @default(now())
   recipeTitle        String
@@ -29,65 +32,44 @@ model Recipe {
   cootTimeMinutes    Int
   calories           Int?
   servings           Int
+  recipeIngredients  RecipeIngredients[]
+  recipeInstructions RecipeInstructions[]
   recipeImage        String
-  user               user                 @relation(fields: [authorID], references: [id], map: "Recipe_authorID_fkey")
-  recipeingredients  recipeingredients[]
-  recipeinstructions recipeinstructions[]
-  usersavedrecipes   usersavedrecipes[]
-  recipetags         recipetags[]         @relation("recipetorecipetags")
-
-  @@index([authorID], map: "Recipe_authorID_fkey")
+  tags               RecipeTags[]
+  usersSaved         UserSavedRecipes[]
 }
 
-model recipeingredients {
+model RecipeIngredients {
   id              Int    @id @default(autoincrement())
   recipeID        Int
+  recipe          Recipe @relation(fields: [recipeID], references: [id])
   ingredient      String
   amount          Int
   measurementType String
-  recipe          recipe @relation(fields: [recipeID], references: [id], map: "RecipeIngredients_recipeID_fkey")
-
-  @@index([recipeID], map: "RecipeIngredients_recipeID_fkey")
 }
 
-model recipeinstructions {
+model RecipeInstructions {
   id          Int    @id @default(autoincrement())
   recipeID    Int
+  recipe      Recipe @relation(fields: [recipeID], references: [id])
   step        Int?
   instruction String
-  recipe      recipe @relation(fields: [recipeID], references: [id], map: "RecipeInstructions_recipeID_fkey")
-
-  @@index([recipeID], map: "RecipeInstructions_recipeID_fkey")
 }
 
-model recipetags {
+model RecipeTags {
   id     Int      @id @default(autoincrement())
   tag    String
-  recipe recipe[] @relation("recipetorecipetags")
+  recipe Recipe[]
 }
 
-model user {
-  id               Int                @id @default(autoincrement())
-  email            String             @unique(map: "User_email_key")
-  username         String             @unique(map: "User_username_key")
-  password         String
-  createDate       DateTime           @default(now())
-  isModerator      Boolean            @default(false)
-  recipe           recipe[]
-  userposts        userposts[]
-  usersavedrecipes usersavedrecipes[]
-}
-
-model usersavedrecipes {
+model UserSavedRecipes {
   userID    Int
+  user      User     @relation(fields: [userID], references: [id])
   recipeID  Int
+  recipe    Recipe   @relation(fields: [recipeID], references: [id])
   timeSaved DateTime @default(now())
-  recipe    recipe   @relation(fields: [recipeID], references: [id], map: "UserSavedRecipes_recipeID_fkey")
-  user      user     @relation(fields: [userID], references: [id], map: "UserSavedRecipes_userID_fkey")
-
   @@id([userID, recipeID])
 }
-
 model Posts {
   id            Int         @id @default(autoincrement())
   author        Int
@@ -99,18 +81,15 @@ model Posts {
   userPosts     UserPosts[]
   postTags      PostTags[]
 }
-
 model UserPosts {
   postID    Int     @unique
   author    Int
   userID    User    @relation(fields: [author], references: [id], onDelete: Cascade)
   post      Posts   @relation(fields: [postID], references: [id], onDelete: Cascade)
 }
-
 model PostTags {
   id        Int         @id @default(autoincrement())
   postID    Int
   tag       String
   postId    Posts       @relation(fields: [postID], references: [id], onDelete: Cascade)
 }
-
