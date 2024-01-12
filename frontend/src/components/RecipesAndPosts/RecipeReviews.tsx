@@ -66,7 +66,7 @@ const RecipeReviews = () => {
                 rating={rating}
                 onChange={setRating}
                 maxStars = {5}
-                starSize={21}
+                starSize={27}
             />
             <TextInput
               placeholder="Add a review"
