@@ -19,10 +19,12 @@ model User {
   savedRecipes UserSavedRecipes[]
   recipes      Recipe[]
   userPosts    UserPosts[]
+  profilePic   String
 }
 
 model Recipe {
   id                 Int                  @id @default(autoincrement())
+  author             User                 @relation(fields: [authorID], references: [id])
   author             User                 @relation(fields: [authorID], references: [id])
   authorID           Int
   creationTime       DateTime             @default(now())
@@ -37,6 +39,7 @@ model Recipe {
   recipeImage        String
   tags               RecipeTags[]
   usersSaved         UserSavedRecipes[]
+  averageRating      Int
 }
 
 model RecipeIngredients {
@@ -92,4 +95,15 @@ model PostTags {
   postID    Int
   tag       String
   postId    Posts       @relation(fields: [postID], references: [id], onDelete: Cascade)
+}
+
+model Review {
+  id            Int         @id @default(autoincrement())
+  recipeID      Int
+  reviewText    String
+  rating        Int
+  userID        Int
+  username      String
+  profilePic    String
+  timePosted    DateTime    @default(now())
 }
