@@ -1,6 +1,7 @@
 import React,{useState} from 'react';
-import { View, Text, TextInput, Button, FlatList, Image, TouchableOpacity } from "react-native";
+import { View, Text, TextInput, Button, FlatList, Image,StyleSheet, TouchableOpacity } from "react-native";
 import StarRating from 'react-native-star-rating-widget';
+import TBButton from '../TBButton';
 
 let userDidntWriteAReview =true; //placeholder 
 
@@ -37,7 +38,7 @@ const RecipeReviews = () => {
         if (true) { // Check if the user has already submitted a review
           const newReviewObj: Review = {
             userId: 1, //placeholder
-            username: 'placeholderUsername',
+            username: 'username',
             profilePicture: '../../assets/temp/tempfood.jpg',
             rating: rating,
             reviewText: newReview,
@@ -60,49 +61,69 @@ const RecipeReviews = () => {
         <View>
     
           {/* Review Input Field */}
-          <View>
-            {userDidntWriteAReview &&<TextInput
-              placeholder="Add a review"
-              value={newReview}
-              onChangeText={(text) => setNewReview(text)}
-            />}
-            
+          {userDidntWriteAReview &&<View>
             <StarRating
                 rating={rating}
                 onChange={setRating}
                 maxStars = {5}
                 starSize={21}
             />
-            <Button title="Submit Review" onPress={handleReviewSubmit} />
-          </View>
+            <TextInput
+              placeholder="Add a review"
+              value={newReview}
+              style={styles.reviewStyle}
+              onChangeText={(text) => setNewReview(text)}
+            />
+            <TBButton title="post" style={styles.postButton} textColor={{ color: "white" }} onPress={handleReviewSubmit} />
+          </View>}
     
           {/* Sort Reviews Button */}
-          <TouchableOpacity onPress={sortReviews}>
-            <Text>Sort Reviews</Text>
-          </TouchableOpacity>
+          {reviews.length>0 && <TouchableOpacity onPress={sortReviews} style={{padding: 5}}>
+            <Text style={{color:'#6752EC'}}>Sort Reviews</Text>
+          </TouchableOpacity>}
     
           {/* Review List */}
           <FlatList
             data={reviews}
             keyExtractor={(item, index) => index.toString()}
             renderItem={({ item }) => (
-              <View>
-                <Image source={{ uri: item.profilePicture }} style={{ width: 50, height: 50 }} />
-                <Text>{item.username}</Text>
-                <Text>Rating: {item.rating}</Text>
-                <Text>{item.reviewText}</Text>
-                <Text>{item.postingTime}</Text>
+              <View style={{flexDirection:'row', paddingHorizontal: 5, paddingVertical: 12}}>
+                <Image source={require('../../../assets/temp/tempfood.jpg')} style={{ width: 40, height: 40, borderRadius: 25 }} />
+                <View style={{flexDirection:'column', marginLeft: 10}}>
+                  <Text>{item.username}</Text>
+                  <StarRating
+                    rating={item.rating}
+                    onChange={()=>{}}
+                    maxStars = {5}
+                    starSize={18}
+                  />
+                  <Text>{item.reviewText}</Text>
+                  <Text style={{color:'#6E6E6E', fontSize: 12}}>{item.postingTime}</Text>
+                </View>
               </View>
             )}
           />
     
           {/* Load More Reviews Button */}
-          <TouchableOpacity onPress={loadMoreReviews}>
-            <Text>Load More Reviews...</Text>
-          </TouchableOpacity>
+          {reviews.length>0 && <TouchableOpacity onPress={loadMoreReviews} style={{padding: 5}}>
+            <Text style={{color:'#6752EC'}}>Load More Reviews...</Text>
+          </TouchableOpacity>}
         </View>
       );
 
 }
-
+const styles = StyleSheet.create({
+  reviewStyle:{
+      color:'#6E6E6E',
+      fontSize: 18,
+      fontWeight: "400",
+      padding: 5
+  },
+  postButton: {
+    height: 35,
+    backgroundColor: "#6752EC",
+    color: "white",
+    borderWidth: 0,
+  }
+});
 export default RecipeReviews;

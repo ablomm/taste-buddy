@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     scrollContainer: {
         padding: 16,
         flexGrow: 1,
-        paddingBottom: 200,
+        paddingBottom: 300,
     }, 
     subTitle: {
         fontSize: 20,
