@@ -175,7 +175,7 @@ const CreatePostPage = ({ route, navigation }: any) => {
               console.log(values)
             }
 
-            navigation.navigate('AccountPage');
+            navigation.navigate('AccountPageStack');
           } catch (error: any) {
             console.log("upload error")
             console.error(error.stack);
