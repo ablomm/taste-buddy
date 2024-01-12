@@ -51,6 +51,7 @@ const GalleryPage = ({navigation}:any) => {
         if(hasPermission) {
             getCameraRoll().then((i: PagedInfo<Asset>)=>{
                 setImages(i.assets);
+                console.log(i.assets[0])
                 setPickedImage(i.assets[0]);
             }).catch((error)=>{
                 console.error(error);

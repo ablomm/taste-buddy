@@ -70,23 +70,21 @@ const CreateRecipePage = ({ route, navigation }: any) => {
   const [editStepModalVisible, setEditStepModalVisible] = React.useState(false);
   const [stepEditIndex, setStepEditIndex] = React.useState(0); // the index of the step we are editing
 
-  const [image, setImage] = React.useState(pickedImage ? pickedImage.uri : null);
+  const [image, setImage] = React.useState(pickedImage ? pickedImage : null);
 
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      base64: true,
       allowsEditing: true,
       aspect: [1, 1],
       quality: 1,
-      base64: true
     });
 
-    console.log(result);
-
     if (!result.canceled) {
-      setImage(result.assets[0].uri as any);
+      setImage(result.assets[0] as any);
     }
   };
 
@@ -169,16 +167,11 @@ const CreateRecipePage = ({ route, navigation }: any) => {
       console.log("image link generation error")
       console.log(error)
     }
-    //console.log("context username: " +userContext.state.username)
-    //console.log(s3AccessUrl)
-    //console.log(s3AccessUrl.imageURL)
 
-    console.log("type")
-    console.log(typeof image)
     if (s3AccessUrl) {
-      const type = image.split(';')[0].split('/')[1];
-      const buf = Buffer.from(image.replace(/^data:image\/\w+;base64,/, ""),'base64') //isolate the base64 buffer
-      console.log(s3AccessUrl)
+      const buf = Buffer.from(image.base64, 'base64') //isolate the base64 buffer
+      let type = image.uri.substring(image.uri.lastIndexOf('.') + 1, image.uri.length);
+      
       try {
         s3Response = await fetch(s3AccessUrl.imageURL[0], {  //put the image on the bucket
           method: 'PUT',
@@ -190,15 +183,14 @@ const CreateRecipePage = ({ route, navigation }: any) => {
         });
 
         if (s3Response.status !== 200) {
+          console.log(s3Response);
           console.log("s3Response, s3 error")
         } else {
-          //console.log("s3Response")
+          console.log("s3Response")
+          console.log(s3Response)
+          imageUrl = s3AccessUrl.imageURL[0].split('?')[0];
+          console.log("uploaded image url: " + imageUrl);
         }
-
-        //console.log(s3Response)
-        //console.log(s3AccessUrl.imageURL)
-        imageUrl = s3AccessUrl.imageURL[0].split('?')[0];
-        console.log("uploaded image url: " + imageUrl);
       } catch (error: any) {
         console.log("image put failed")
         console.log(error)
@@ -323,7 +315,7 @@ const CreateRecipePage = ({ route, navigation }: any) => {
 
                 <Text style={styles.header}>Image*</Text>
                 <TouchableRipple onPress={pickImage} borderless={true} style={styles.image}>
-                  <Image source={image ? { uri: image } : require("../../assets/no-image.png") as any} style={{ width: "100%", height: "100%" }} />
+                  <Image source={image ? { uri: image.uri } : require("../../assets/no-image.png") as any} style={{ width: "100%", height: "100%" }} />
                 </TouchableRipple>
 
                 <Text style={styles.header}>Title*</Text>
