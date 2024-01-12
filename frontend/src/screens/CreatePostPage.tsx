@@ -12,11 +12,23 @@ import EditTagForm from '../components/CreateRecipe/tags/EditTagForm';
 import TagListItem from '../components/CreateRecipe/tags/TagListItem';
 import { UserContext } from "../providers/UserProvider";
 import { Buffer } from 'buffer';
+import * as FileSystem from 'expo-file-system';
 
 const CreatePostPage = ({ route, navigation }: any) => {
   const { pickedImage } = route.params;
   const userContext = React.useContext(UserContext) as any;
   // define validation rules for each field
+  const getBase64 = async (uri: string): Promise<string | null> => {
+    try {
+      const fileUri = `${FileSystem.cacheDirectory}expo-image-${Date.now()}.jpg`;
+      await FileSystem.copyAsync({ from: uri, to: fileUri });
+      const base64 = await FileSystem.readAsStringAsync(fileUri, { encoding: FileSystem.EncodingType.Base64 });
+      return base64;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  };
   const recipeSchema = yup.object().shape({
     description: yup
       .string()
@@ -116,6 +128,9 @@ const CreatePostPage = ({ route, navigation }: any) => {
           }
 
           if (s3AccessUrl) {
+            if(!image.base64){
+              image.base64 = await getBase64(image.uri);
+            }
             const buf = Buffer.from(image.base64, 'base64') //isolate the base64 buffer
             let type = image.uri.substring(image.uri.lastIndexOf('.') + 1, image.uri.length);
 
