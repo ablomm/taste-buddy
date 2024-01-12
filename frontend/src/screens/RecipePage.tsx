@@ -5,7 +5,7 @@ import PosterHeader from '../components/RecipesAndPosts/PosterHeader';
 import { LinearGradient } from 'expo-linear-gradient';
 import CheckboxRecipe from '../components/RecipesAndPosts/CheckboxRecipe';
 import RecipeContentInteractionBar from '../components/RecipesAndPosts/RecipeContentInteractionBar';
-import RecipeReviews from '../components/RecipesAndPosts/RecipeReview';
+import RecipeReviews from '../components/RecipesAndPosts/RecipeReviews';
 
 const HEADER_EXPANDED_HEIGHT = 130;
 const HEADER_COLLAPSED_HEIGHT = 50;
@@ -92,7 +92,6 @@ const RecipePage = ({ route, navigation }: any) => {
                         </>
                         <Text style={styles.postTime}>post time</Text>
                         <Text>~~~~~~~~~~~~~~~~</Text>
-                        <Text>~~~~~~~fgkalshjgflk;qjafkldghbnsa;lkdhqjafkldghbnsa;lkdhqjafkldghbnsalkdhqjafkldghlkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsabnsalkdhqjafkldghbnsalkdhqjafkldghbnsalkdhqjafkldghbnsa;lkdhqjafkldghbnsa;lkdhfbnaldhbnak~~fgkalshjgflk;qjafkldghbnsa~fgkalshjgflk;qjafkldghbnsa;lkdhfbnaldhbnak~fgkalshjgflk;qjafkldghbnsa;lkdhfbnaldhbnak~fgkalshjgflk;qjafkldghbnsa;lkdhfbnaldhbnak~fgkalshjgflk;qjafkldghbnsa;lkdhfbnaldhbnak;lkdhfbnaldhbnak~~fgkalshjgflk;qjafkldghbnsa;lkdhfbnaldhbnak~~fgkalshjgflk;qjafkldghbnsa;lkdhfbnaldhbnak~~fgkalshjgflk;qjafkldghbnsa;lkdhfbnaldhbnak~~fgkalshjgflk;qjafkldghbnsa;lkdhfbnaldhbnak~~fgkalshjgflk;qjafkldghbnsa;lkdhfbnaldhbnak~fgkalshjgflk;qjafkldghbnsa;lkdhfbnaldhbnaklfdhbafdhnbadhfh~~~~~~~~~~</Text>
                         <RecipeReviews/>
                         </KeyboardAvoidingView>
                     </ScrollView>

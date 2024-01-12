@@ -1,5 +1,8 @@
 import React,{useState} from 'react';
 import { View, Text, TextInput, Button, FlatList, Image, TouchableOpacity } from "react-native";
+import StarRating from 'react-native-star-rating-widget';
+
+let userDidntWriteAReview =true; //placeholder 
 
 enum SortByOptions {
     RECENT = 'recent',
@@ -58,16 +61,17 @@ const RecipeReviews = () => {
     
           {/* Review Input Field */}
           <View>
-            <TextInput
-              placeholder="Write your review..."
+            {userDidntWriteAReview &&<TextInput
+              placeholder="Add a review"
               value={newReview}
               onChangeText={(text) => setNewReview(text)}
-            />
-            <TextInput
-              placeholder="Rating (0.5 - 5)"
-              keyboardType="numeric"
-              value={rating.toString()}
-              onChangeText={(text) => handleRatingChange(parseFloat(text))}
+            />}
+            
+            <StarRating
+                rating={rating}
+                onChange={setRating}
+                maxStars = {5}
+                starSize={21}
             />
             <Button title="Submit Review" onPress={handleReviewSubmit} />
           </View>
@@ -94,7 +98,7 @@ const RecipeReviews = () => {
     
           {/* Load More Reviews Button */}
           <TouchableOpacity onPress={loadMoreReviews}>
-            <Text>Load More Reviews</Text>
+            <Text>Load More Reviews...</Text>
           </TouchableOpacity>
         </View>
       );
