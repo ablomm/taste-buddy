@@ -21,7 +21,13 @@ const PostsGrid = () => {
                 method: 'GET',
             })
             .then((res) => { return res.json() })
-            .then((json) => {         
+            .then((json) => { 
+                console.log(json)
+                for (let post of json) {
+                    let imageName = post.image.split("/");
+                    imageName = imageName[imageName.length - 1]
+                    post.image = "https://d1e4ghceuocadg.cloudfront.net/" + imageName
+                }        
                 setData([...data, ...json])
             });
         } catch (error: any) {
