@@ -14,9 +14,19 @@ router.post("/", async (req: express.Request, res: express.Response) => {
             if (user) {
                 res.json({"id" : user.id, "username" : user.username});
             }
-        } 
+        }
     } else {
         res.sendStatus(401);
+    }
+});
+
+router.get("/logout", async (req: express.Request, res: express.Response) => {
+    try {
+        res.clearCookie("token");
+        res.sendStatus(200);
+    } catch(error) {
+        console.error(error);
+        res.sendStatus(500).send(error);
     }
 });
 
