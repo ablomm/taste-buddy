@@ -14,6 +14,7 @@ import {
     getReviewsByPage
 } from '../service/recipe';
 import { getUserByUsername, getProfilePhotoByUsername } from "../service/user";
+import jwt, {JwtPayload} from "jsonwebtoken";
 const router = express.Router();
 
 router.post("/save", async (req: express.Request, res: express.Response) => {
@@ -57,47 +58,57 @@ router.get("/get-all-recipes", async (req: express.Request, res: express.Respons
 });
 
 router.put("/edit-recipe", async (req: express.Request, res: express.Response) => {
-    console.log(req.body);
-    const {
-        username,
-        recipeId,
-        title,
-        description,
-        instructions,
-        cookTime,
-        calories,
-        servings,
-        ingredients,
-        tags,
-        image
-    } = req.body;
+    const { token } = req.cookies;
+    let verify = null;
 
-    try {
-        const user = await getUserByUsername(username)
-        const userId = user?.id;
+    if(token) {
+        verify  = jwt.verify(token, process.env.JWTSHARED as any) as JwtPayload;
+    }
 
-        console.log("Updating recipe ID: " + recipeId + " for user ID: " + userId);
-
-        await updateRecipe(
+    if(verify) {
+        const {
+            username,
             recipeId,
-            userId,
             title,
             description,
+            instructions,
             cookTime,
             calories,
             servings,
+            ingredients,
+            tags,
             image
-        );
+        } = req.body;
 
-        await updateIngredients(recipeId, ingredients);
-        await updateInstructions(recipeId, instructions);
+        try {
+            const user = await getUserByUsername(username)
+            const userId = user?.id;
 
-        console.log(`Successfully updated recipe ID: ${recipeId}`);
-    } catch (error) {
-        console.error(error);
+            console.log("Updating recipe ID: " + recipeId + " for user ID: " + userId);
+
+            await updateRecipe(
+                recipeId,
+                userId,
+                title,
+                description,
+                cookTime,
+                calories,
+                servings,
+                image
+            );
+
+            await updateIngredients(recipeId, ingredients);
+            await updateInstructions(recipeId, instructions);
+
+            console.log(`Successfully updated recipe ID: ${recipeId}`);
+        } catch (error) {
+            console.error(error);
+        }
+
+        return res.sendStatus(200).send('success');
     }
 
-    return res.send('success');
+    return res.sendStatus(403).send('Failed to authenticate user');
 });
 
 router.get("/getPosts", async (req: express.Request, res: express.Response) => {
@@ -127,11 +138,11 @@ router.post("/saveReview", async (req: express.Request, res: express.Response) =
 
 router.get("/reviews", async (req: express.Request, res: express.Response) => {
     const {
-        recipeID, 
+        recipeID,
         page,
-        orderBy   
+        orderBy
     } = req.body;
-    
+
     const reviews = await getReviewsByPage(recipeID, page, orderBy)
     res.send({reviews});
 });
