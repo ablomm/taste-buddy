@@ -26,12 +26,13 @@ router.post("/save", async (req: express.Request, res: express.Response) => {
         servings,
         ingredients: ingredients,
         tags: tags,
-        image
+        imageUrl,
+        imageName
     } = req.body;
     console.log("recipe /save username: " + username)
     const user = await getUserByUsername(username)
     const userId = user?.id;
-    await createRecipe(userId,title,description,instructions,cookTime,calories,servings,tags,image);
+    await createRecipe(userId,title,description,instructions,cookTime,calories,servings,tags,imageUrl,imageName);
 
     const recipeID = (await getRecipeByUserAndTitle(userId,title))?.id;
 
@@ -69,7 +70,8 @@ router.put("/edit-recipe", async (req: express.Request, res: express.Response) =
         servings,
         ingredients,
         tags,
-        image
+        imageUrl,
+        imageName
     } = req.body;
 
     try {
@@ -86,7 +88,8 @@ router.put("/edit-recipe", async (req: express.Request, res: express.Response) =
             cookTime,
             calories,
             servings,
-            image
+            imageUrl,
+            imageName
         );
 
         await updateIngredients(recipeId, ingredients);

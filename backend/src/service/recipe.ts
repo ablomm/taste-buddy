@@ -21,7 +21,7 @@ enum OrderBy {
     RatingDescending = "RatingDescending"
 }
 
-export async function createRecipe(userID: number|any, title: string,description: string,instructions: string,cookTime: number,calories: number,servings: number,tags: any,image: string) {
+export async function createRecipe(userID: number|any, title: string,description: string,instructions: string,cookTime: number,calories: number,servings: number,tags: any,imageUrl: string, imageName: string) {
 
     const cookTimeHours = Math.floor(cookTime/60);
     const cootTimeMinutes = cookTime%60;
@@ -35,7 +35,8 @@ export async function createRecipe(userID: number|any, title: string,description
             cootTimeMinutes: cootTimeMinutes,
             calories: calories/1,
             servings: servings/1,
-            recipeImage: image,
+            recipeImageUrl: imageUrl,
+            recipeImageName: imageName,
             averageRating: 0
         },
     })
@@ -97,7 +98,7 @@ export async function getAllRecipes(){
  * @param servings
  * @param image
  */
-export async function updateRecipe(recipeID:number, userID: number|any, title: string,description: string,cookTime: number,calories: number,servings: number,image: string) {
+export async function updateRecipe(recipeID:number, userID: number|any, title: string,description: string,cookTime: number,calories: number,servings: number,imageUrl: string, imageName: string) {
     const cookTimeHours = Math.floor(cookTime/60);
     const cootTimeMinutes = cookTime%60;
 
@@ -113,7 +114,8 @@ export async function updateRecipe(recipeID:number, userID: number|any, title: s
             cootTimeMinutes: cootTimeMinutes,
             calories: calories/1,
             servings: servings/1,
-            recipeImage: image
+            recipeImageUrl: imageUrl,
+            recipeImageName: imageName
         },
     });
 

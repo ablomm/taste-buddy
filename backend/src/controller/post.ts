@@ -8,7 +8,8 @@ router.post("/create", async (req: express.Request, res: express.Response) => {
     const { username,
         description,
         tags,
-        image,
+        imageUrl,
+        imageName,
         recipeURL
     } = req.body;
 
@@ -17,7 +18,7 @@ router.post("/create", async (req: express.Request, res: express.Response) => {
     const user = await getUserByUsername(username);
     const userId = user?.id;
 
-    await createPost(userId, description, tags, image, recipeURL);
+    await createPost(userId, description, tags, imageUrl, imageName, recipeURL);
 
     res.sendStatus(200);
 });
@@ -47,5 +48,9 @@ router.get("/s3Url", async (req: express.Request, res: express.Response) => {
     const imageURL = await generateUploadURL()
     return res.send({ imageURL });
 });
+
+const formatImageLinks = (data: any) => { 
+    
+}
 
 export default router;

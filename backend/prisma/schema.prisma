@@ -10,16 +10,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 model User {
-  id           Int                @id @default(autoincrement())
-  email        String             @unique
-  username     String             @unique
-  password     String
-  createDate   DateTime           @default(now())
-  isModerator Boolean @default(false)
-  savedRecipes UserSavedRecipes[]
-  recipes      Recipe[]
-  userPosts    UserPosts[]
-  profilePic   String             @default("")
+  id               Int                @id @default(autoincrement())
+  email            String             @unique
+  username         String             @unique
+  password         String
+  createDate       DateTime           @default(now())
+  isModerator      Boolean @default(false)
+  savedRecipes     UserSavedRecipes[]
+  recipes          Recipe[]
+  userPosts        UserPosts[]
+  profilePic       String             @default("")
+  profilePicName   String             @default("")
 }
 
 model Recipe {
@@ -33,9 +34,10 @@ model Recipe {
   cootTimeMinutes    Int
   calories           Int?
   servings           Int
-  recipeIngredients  RecipeIngredients[]
+  recipeIngredients  RecipeIngredients[]  
   recipeInstructions RecipeInstructions[]
-  recipeImage        String
+  recipeImageUrl     String               @default("")
+  recipeImageName    String               @default("")
   tags               RecipeTags[]
   usersSaved         UserSavedRecipes[]
   averageRating      Int                  @default(0)
@@ -77,7 +79,8 @@ model Posts {
   author        Int
   description   String
   tags          String
-  image         String
+  imageUrl      String      @default("")
+  imageName     String      @default("")
   recipeURL     String
   creationTime  DateTime    @default(now())
   userPosts     UserPosts[]

@@ -2,7 +2,7 @@ import {PrismaClient} from '@prisma/client';
 
 const prisma = new PrismaClient()
 
-export async function createPost(userID: number|any, description: string, tags: any, image: string, recipeURL: string) {
+export async function createPost(userID: number|any, description: string, tags: any, imageUrl: string, imageName: string, recipeURL: string) {
     const tags_list: string[] = tags.map((obj: any) => obj.value);
 
     const post = await prisma.posts.create({
@@ -10,7 +10,8 @@ export async function createPost(userID: number|any, description: string, tags: 
             author: userID,
             description: description,
             tags: tags_list.join(","),
-            image: image,
+            imageUrl: imageUrl,
+            imageName: imageName,
             recipeURL: recipeURL
         },
     });

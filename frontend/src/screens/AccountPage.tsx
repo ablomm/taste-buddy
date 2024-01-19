@@ -4,6 +4,7 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import {UserContext} from "../providers/UserProvider";
 import TBButton from '../components/TBButton';
+import Post from '../components/Post';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -29,7 +30,7 @@ const RecentPostsScreen: ({posts}: {
       <View style={styles.postsContainer}>
         {posts.map(post => (
           <View key={post.id} style={styles.postContainer}>
-            <Image source={{uri: post.image}} style={styles.postImage} />
+            <Post style={styles.postImage} key={post.id} imageName={post.imageName} />
           </View>
         ))}
       </View>

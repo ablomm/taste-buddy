@@ -21,13 +21,8 @@ const PostsGrid = () => {
                 method: 'GET',
             })
             .then((res) => { return res.json() })
-            .then((json) => { 
+            .then((json) => {        
                 console.log(json)
-                for (let post of json) {
-                    let imageName = post.image.split("/");
-                    imageName = imageName[imageName.length - 1]
-                    post.image = "https://d1e4ghceuocadg.cloudfront.net/" + imageName
-                }        
                 setData([...data, ...json])
             });
         } catch (error: any) {
@@ -65,12 +60,13 @@ const PostsGrid = () => {
         >
 
             {data.map((post: any) => {
-                return <Post key={post.id} imageUrl={post.image} />;
+                return <Post style={styles.post} key={post.id} imageName={post.imageName} />;
             })}
         </ScrollView>
     );
 };
 
+const squareDimension = Math.floor(Dimensions.get('window').width/3 - 2);
 
 const styles = StyleSheet.create({
 
@@ -91,6 +87,15 @@ const styles = StyleSheet.create({
         backgroundColor: "rgba(249, 180, 45, 0.25)",
         borderWidth: 1,
         borderColor: "#fff"
+    },
+    post: {
+        backgroundColor: 'gray',
+        margin: 1,
+        padding: 1,
+        height: squareDimension,
+        width: squareDimension,
+        borderWidth: 1, 
+        borderColor: 'white'
     }
 
 });

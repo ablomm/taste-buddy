@@ -13,6 +13,7 @@ import TagListItem from '../components/CreateRecipe/tags/TagListItem';
 import { UserContext } from "../providers/UserProvider";
 import { Buffer } from 'buffer';
 import getBase64 from '../functions/GetBase64FromURI';
+import FileSystem from 'expo-file-system';
 
 const CreatePostPage = ({ route, navigation }: any) => {
   const { pickedImage } = route.params;
@@ -52,7 +53,14 @@ const CreatePostPage = ({ route, navigation }: any) => {
     });
 
     if (!result.canceled) {
-      setImage(result.assets[0] as any);
+      const uri = result.assets[0].uri;
+      if (uri.includes("file")){
+        const type = uri.split(".")[1];
+        const imageData = `data:image/${type};base64,` + FileSystem.readAsStringAsync(uri)
+        setImage(imageData as any);
+      } else  {          
+        setImage(result.assets[0] as any);
+      }
     }
   };
 
@@ -161,7 +169,8 @@ const CreatePostPage = ({ route, navigation }: any) => {
                 username: userContext.state.username,
                 description: values.description,
                 tags: tags,
-                image: imageUrl,
+                imageUrl: imageUrl,
+                imageName: s3AccessUrl.imageURL[1],
                 recipeURL: values.recipeUrl
               }),
             });

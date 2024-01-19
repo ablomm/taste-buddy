@@ -19,6 +19,7 @@ import EditStepForm from '../components/CreateRecipe/steps/EditStepForm';
 import StepListItem from '../components/CreateRecipe/steps/StepListItem';
 import {Buffer} from 'buffer';
 import getBase64 from '../functions/GetBase64FromURI';
+import FileSystem from 'expo-file-system';
 
 const CreateRecipePage = ({ route, navigation }: any) => {
   const { pickedImage } = route.params;
@@ -83,7 +84,14 @@ const CreateRecipePage = ({ route, navigation }: any) => {
     });
 
     if (!result.canceled) {
-      setImage(result.assets[0] as any);
+      const uri = result.assets[0].uri;
+      if (uri.includes("file")){
+        const type = uri.split(".")[1];
+        const imageData = `data:image/${type};base64,` + FileSystem.readAsStringAsync(uri)
+        setImage(imageData as any);
+      } else  {          
+        setImage(result.assets[0] as any);
+      }
     }
   };
 
@@ -218,7 +226,8 @@ const CreateRecipePage = ({ route, navigation }: any) => {
           servings: data.servings,
           ingredients: ingredients,
           tags: tags,
-          image: imageUrl
+          imageUrl: imageUrl,
+          imageName: s3AccessUrl.imageURL[1]
         }),
       });
 
