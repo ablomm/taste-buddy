@@ -20,6 +20,14 @@ model User {
   recipes      Recipe[]
   userPosts    UserPosts[]
   profilePic   String             @default("")
+  dietaryPref  DietaryPref[]
+}
+
+model DietaryPref {
+  id                 Int                  @id @default(autoincrement())
+  author             User                 @relation(fields: [authorID], references: [id])
+  authorID           Int
+  dietaryPref        String               
 }
 
 model Recipe {

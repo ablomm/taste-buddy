@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import {UserContext} from "../providers/UserProvider";
 
 const dietaryOptions = ['Vegetarian', 'Vegan', 'Gluten-Free', 'Dairy-Free', 'Nut-Free'];
 const allergyOptions = ['Shellfish', 'Soy', 'Egg', 'Fish', 'Other'];
 
 const DietSelectionPage: React.FC = () => {
+  const userContext = React.useContext(UserContext) as any;
+  const username = userContext.state.username;
+
   const navigation = useNavigation();
   const [selectedDietaryOptions, setSelectedDietaryOptions] = useState<string[]>([]);
   const [selectedAllergyOptions, setSelectedAllergyOptions] = useState<string[]>([]);
@@ -30,8 +34,31 @@ const DietSelectionPage: React.FC = () => {
     navigation.navigate('AccountPage');
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     navigation.navigate('AccountPage');
+    let selectedOptions = selectedAllergyOptions.concat(selectedDietaryOptions);
+    let selectedOptionsString = selectedOptions.join(',');
+    try {
+      let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/user/add-dietary-preference/${username}`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          dietaryPref: selectedOptionsString
+        })
+      });
+
+      if (response.status !== 200) {
+          console.error("dietaryPref unsuccessful");
+      } else {
+        console.log("dietaryPref successful");
+      }
+    } catch (error: any) {
+      console.error(error.stack);
+    }
   };
 
   return (
