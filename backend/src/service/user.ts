@@ -72,3 +72,18 @@ export async function getProfilePhotoByUsername(username: string) {
 
     return userData?.profilePic;
 }
+
+export async function addDietaryPref(username: string, dietaryPref: string) {
+    const updateUser = await prisma.user.update({
+        where: {
+            username: username,
+        },
+        data: {
+            dietaryPref: {
+                create: {
+                    dietaryPref: dietaryPref,
+                },
+            },
+        },
+    });
+}
