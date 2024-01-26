@@ -23,6 +23,15 @@ model User {
   dietaryPref  DietaryPref[]
 }
 
+model UserSavedRecipes {
+  userID    Int
+  user      User     @relation(fields: [userID], references: [id])
+  recipeID  Int
+  recipe    Recipe   @relation(fields: [recipeID], references: [id])
+  timeSaved DateTime @default(now())
+  @@id([userID, recipeID])
+}
+
 model DietaryPref {
   id                 Int                  @id @default(autoincrement())
   author             User                 @relation(fields: [authorID], references: [id])
@@ -72,14 +81,6 @@ model RecipeTags {
   recipe Recipe[]
 }
 
-model UserSavedRecipes {
-  userID    Int
-  user      User     @relation(fields: [userID], references: [id])
-  recipeID  Int
-  recipe    Recipe   @relation(fields: [recipeID], references: [id])
-  timeSaved DateTime @default(now())
-  @@id([userID, recipeID])
-}
 model Posts {
   id            Int         @id @default(autoincrement())
   author        Int

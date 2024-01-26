@@ -87,3 +87,18 @@ export async function addDietaryPref(username: string, dietaryPref: string) {
         },
     });
 }
+
+export async function saveRecipe(username: string, recipeID: number) {
+    const updateUser = await prisma.user.update({
+        where: {
+            username: username,
+        },
+        data: {
+            savedRecipes: {
+                create: {
+                    recipeID: recipeID,
+                },
+            },
+        },
+    });
+}
