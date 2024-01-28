@@ -6,9 +6,9 @@ import {UserContext} from "../../providers/UserProvider";
 const ContentInteractionBar = ({savedStatus}:any) => {
     const userContext = React.useContext(UserContext) as any;
     const username = userContext.state.username;
+    let recipeID = 2;
 
     const handleSave = async () => {
-        let recipeID = 1;
         try {
           let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/user/save-recipe/${username}}`, {
             method: 'POST',
@@ -32,6 +32,30 @@ const ContentInteractionBar = ({savedStatus}:any) => {
         }
     };
 
+    const handleUnsave = async () => {
+      try {
+        let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/user/delete-saved-recipe/${username}}`, {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            recipeID: recipeID,
+          })
+        });
+  
+        if (response.status !== 200) {
+            console.error("unsave recipe unsuccessful");
+        } else {
+          console.log("unsave recipe successful");
+        }
+      } catch (error: any) {
+        console.error(error.stack);
+      }
+  };
+
     const [isSaved, setSaved] = useState(savedStatus);
     return(
         <View style={styles.container}>
@@ -40,7 +64,13 @@ const ContentInteractionBar = ({savedStatus}:any) => {
             </TouchableOpacity>
             <TouchableOpacity onPress={()=>{
                     isSaved? setSaved(false):setSaved(true);
-                    handleSave();
+
+                    if (isSaved==false) {
+                      handleSave();
+                    }
+                    else if (isSaved==true) {
+                      handleUnsave();
+                    }
                 }}>
                 <Icon name="bookmark" style={[styles.icon, {color: isSaved?"#00D387":"#d3d3d3"}]}/>
             </TouchableOpacity>
