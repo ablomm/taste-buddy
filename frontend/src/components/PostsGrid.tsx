@@ -66,7 +66,7 @@ const PostsGrid = () => {
     );
 };
 
-const squareDimension = Math.floor(Dimensions.get('window').width/3 - 2);
+//const squareDimension = Math.floor(Dimensions.get('window').width/3 - 2);
 
 const styles = StyleSheet.create({
 
@@ -92,8 +92,8 @@ const styles = StyleSheet.create({
         backgroundColor: 'gray',
         margin: 1,
         padding: 1,
-        height: squareDimension,
-        width: squareDimension,
+        height: 100,
+        width: 100,
         borderWidth: 1, 
         borderColor: 'white'
     }

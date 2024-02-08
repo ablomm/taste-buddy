@@ -49,8 +49,4 @@ router.get("/s3Url", async (req: express.Request, res: express.Response) => {
     return res.send({ imageURL });
 });
 
-const formatImageLinks = (data: any) => { 
-    
-}
-
 export default router;
