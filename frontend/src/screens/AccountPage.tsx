@@ -39,26 +39,43 @@ const RecentPostsScreen: ({posts}: {
 }
 
 interface SavedPostsScreenProps {
-  savedPosts: Post[];
+  id: number;
+  content: string;
 }
 
-const SavedPostsScreen: React.FC<SavedPostsScreenProps> = ({ savedPosts }) => (
-  <View style={styles.screen}>
-    <View style={styles.postsContainer}>
-      {savedPosts.map(post => (
-        <View key={post.id} style={styles.postContainer}>
-          <Image source={profilePicture} style={styles.postImage} />
-        </View>
-      ))}
+const SavedPostsScreen: ({savedPosts1}: {
+  savedPosts1: any
+}, refreshFunction, refreshing) => React.JSX.Element = ({ savedPosts1, refreshFunction, refreshing }) => {
+    return (
+    <ScrollView
+        refreshControl={
+          <RefreshControl
+              refreshing={refreshing}
+              onRefresh={refreshFunction}
+          />
+        }
+    >
+    <View style={styles.screen}>
+      <View style={styles.postsContainer}>
+        {savedPosts1
+          .filter(post => post.isShowing === true) // Filter only posts with isShowing set to true
+          .map(post => (
+            <View key={`${post.recipe.userID}-${post.recipe.recipeID}`} style={styles.postContainer}>
+              <Image source={{uri: post.recipe.recipeImage}} style={styles.postImage} />
+            </View>
+        ))}
+      </View>
     </View>
-  </View>
-);
+      </ScrollView>
+    );
+}
 
 const AccountPage = () => {
   const userContext = React.useContext(UserContext) as any;
   const username = userContext.state.username;
 
   const [posts, setPosts] = useState();
+  const [savedPosts1, setSavedPosts] = useState();
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
@@ -89,11 +106,31 @@ const AccountPage = () => {
       });
 
       await response.json().then(result => {
-        console.log(result);
         setPosts(result);
       });
     } catch (error) {
       console.error(error);
+    }
+
+    try {
+      const response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/user/get-saved-recipes/${username}`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });  
+
+      await response.json().then(result => {
+        let test = JSON.stringify(result);
+        let test1 = JSON.parse(test).savedRecipes;
+
+        setSavedPosts(test1);
+        console.log("log" + JSON.stringify(test1));
+      });
+    } catch (error) {
+      console.error(error); 
     }
   }
 
@@ -123,7 +160,7 @@ const AccountPage = () => {
             {()=> posts ? (<RecentPostsScreen posts={posts} refreshFunction={onRefresh} refreshing={refreshing} />) : (<Text>Loading ...</Text>)}
           </Tab.Screen>
           <Tab.Screen name="Saved Posts">
-            {() => <SavedPostsScreen savedPosts={savedPosts} />}
+            {() => savedPosts1 ? (<SavedPostsScreen savedPosts1={savedPosts1} refreshFunction={onRefresh} refreshing={refreshing} />) : (<Text>Loading ...</Text>)}
           </Tab.Screen>
         </Tab.Navigator>
       </NavigationContainer>
