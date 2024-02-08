@@ -29,12 +29,12 @@ const ViewPostPage = ({ route }) => {
                 </View>
             </View>
             <ScrollView style={{ padding: 10 }}>
-                <Image style={styles.image} source={{ uri: post.image }} />
-                <View style={styles.userBar}>
+            <View style={styles.userBar}>
                     <Image source={profilePicture} style={styles.profilePicture} />
                     <Text style={styles.username}>{user.username}</Text>
                 </View>
-                <Text>{post.description}</Text>
+                <Image style={styles.image} source={{ uri: post.image }} />
+                <Text style={styles.description}>{post.description}</Text>
             </ScrollView>
         </>
 
@@ -61,6 +61,7 @@ const styles = StyleSheet.create({
     },
     userBar: {
         display: "flex",
+        margin: 10,
         flexDirection: "row",
         alignItems: 'center'
     },
@@ -92,6 +93,10 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: "700",
     },
+    description: {
+        fontSize: 20,
+        margin: 10,
+    }
 });
 
 export default ViewPostPage;
