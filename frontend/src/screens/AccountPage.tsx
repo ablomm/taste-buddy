@@ -4,10 +4,12 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import {UserContext} from "../providers/UserProvider";
 import TBButton from '../components/TBButton';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import Header from '../components/header/Header';
 
 const Tab = createMaterialTopTabNavigator();
 
-const profilePicture = require("../../assets/profile.jpg");
+const profilePicture = require("../../assets/temp/tempfood.jpg");
 
 interface Post {
   id: number;
@@ -91,7 +93,7 @@ const AccountPage = () => {
 
   const navigateToSettings = () => {
     // Navigate to the settings page
-    navigation.navigate('DietaryPreference');
+    navigation.navigate('SettingsPage');
   };
 
   const fetchUserData = async () => {
@@ -148,10 +150,14 @@ const AccountPage = () => {
         <Image source={profilePicture} style={styles.profilePicture} />
         <View style={styles.userInfo}>
           <Text style={styles.username}>{username}</Text>
-          <TouchableOpacity style={styles.settingsButton} onPress={navigateToSettings}>
-            <Text style={styles.settingsButtonText}>Settings</Text>
-          </TouchableOpacity>
         </View>
+
+        <TouchableOpacity>
+          <Icon name="share-square" style={styles.icon}></Icon>
+        </TouchableOpacity>
+        <TouchableOpacity>
+          <Icon name="gear" style={styles.icon} onPress={navigateToSettings}/>
+        </TouchableOpacity>
       </View>
 
       <NavigationContainer independent={true}>
@@ -179,6 +185,13 @@ const styles = StyleSheet.create({
   //   alignItems: 'center',
   //   justifyContent: 'center',
   // },
+  icon:{
+    width: 30,
+    height: 30,
+    fontSize:27,
+    marginLeft:8,
+    color:"#00D387"
+  },
   profileHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -187,9 +200,9 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ccc',
   },
   profilePicture: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 75,
+    height: 75,
+    borderRadius: 50,
     marginRight: 15,
   },
   userInfo: {
@@ -206,6 +219,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 5,
     width: 110,
+    borderWidth:0
   },
   settingsButtonText: {
     color: '#fff',

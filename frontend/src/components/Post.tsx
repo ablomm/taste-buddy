@@ -1,6 +1,5 @@
 import React, {useState} from "react";
 import { StyleSheet, Text, TextInput, View, Keyboard, Button, Image } from "react-native";
-import { Feather, Entypo } from "@expo/vector-icons";
 
 const Post = ({ imageUrl }: any) => {    
     return (
