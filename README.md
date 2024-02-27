@@ -13,7 +13,8 @@ Installation Reference: https://www.elastic.co/guide/en/elasticsearch/reference/
 
 Ensure Docker is installed by typing `docker` into your CLI. If you are getting an error then install Docker as instructed on the website https://docs.docker.com/engine/install/
 
-### Step 1: Execute the following in your terminal to pull the images and run the containers.  
+### Step 1: 
+Execute the following in your terminal to pull the images and run the containers.  
 `docker network create elastic`  
 `docker pull docker.elastic.co/elasticsearch/elasticsearch:8.12.2`  
 `docker pull docker.elastic.co/kibana/kibana:8.12.2`  
