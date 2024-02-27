@@ -1,9 +1,9 @@
 import React from "react";
-import { StyleSheet, TextInput, View, Keyboard, Button } from "react-native";
+import { StyleSheet, TextInput, View, Keyboard } from "react-native";
 import { Feather, Entypo } from "@expo/vector-icons";
 import TBButton from "./TBButton"
 
-const SearchBar = ({ clicked, searchPhrase, setSearchPhrase, setClicked }: any) => {
+const SearchBar = ({ clicked, searchPhrase, setSearchPhrase, setClicked, handleSearch, cancelClick }: any) => {
     return (
         <View style={styles.container}>
             <View
@@ -29,6 +29,8 @@ const SearchBar = ({ clicked, searchPhrase, setSearchPhrase, setClicked }: any) 
                     onFocus={() => {
                         setClicked(true);
                     }}
+                    returnKeyType="search"
+                    onSubmitEditing={()=>handleSearch(searchPhrase)}
                 />
                 {/* cross icon */}
                 {clicked && (
@@ -42,10 +44,19 @@ const SearchBar = ({ clicked, searchPhrase, setSearchPhrase, setClicked }: any) 
                 <View>
                     <TBButton
                         title="Cancel"
-                        onPress={() => {
-                            Keyboard.dismiss();
-                            setClicked(false);
-                        }}
+                        onPress={cancelClick == undefined ?
+                            (): void => {
+                                Keyboard.dismiss();
+                                setClicked(false);
+                            }
+                        :
+                            () => {
+                                Keyboard.dismiss();
+                                setSearchPhrase("");
+                                cancelClick();
+                                setClicked(false);
+                            }
+                    }
                     ></TBButton>
                 </View>
             )}

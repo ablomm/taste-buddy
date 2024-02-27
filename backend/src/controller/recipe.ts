@@ -11,12 +11,17 @@ import {
     updateInstructions,
     getRecipes,
     createReview,
-    getReviewsByPage
+    getReviewsByPage,
+    processIngredients,
+    processInstructions
 } from '../service/recipe';
 import { getUserByUsername, getProfilePhotoByUsername } from "../service/user";
-import jwt, {JwtPayload} from "jsonwebtoken";
+import {editRecipe, storeRecipe} from "../service/search";
 const router = express.Router();
 
+/*
+TODO: Update average rating everytime new rating is added
+ */
 router.post("/save", async (req: express.Request, res: express.Response) => {
     const { username,
         title,
@@ -29,15 +34,32 @@ router.post("/save", async (req: express.Request, res: express.Response) => {
         tags: tags,
         image
     } = req.body;
-    console.log("recipe /save username: " + username)
-    const user = await getUserByUsername(username)
+
+    console.log("recipe /save username: " + username);
+
+    const user = await getUserByUsername(username);
     const userId = user?.id;
     await createRecipe(userId,title,description,instructions,cookTime,calories,servings,tags,image);
 
-    const recipeID = (await getRecipeByUserAndTitle(userId,title))?.id;
+    const recipe = await getRecipeByUserAndTitle(userId,title);
 
+    const recipeID = recipe?.id;
     await createIngredients(recipeID, ingredients);
     await createInstructions(recipeID, instructions);
+
+    // Assemble ingredient and instructional objects for storage
+    const ingredientsObj = processIngredients(recipeID, ingredients);
+    const instructionsObj = processInstructions(recipeID, instructions);
+
+    // Assemble elastic search recipe object
+    const elasticSearchRecipe: any = {
+        ...recipe,
+        ingredients: ingredientsObj,
+        instructions: instructionsObj
+    }
+
+    // Store in elastic search db
+    await storeRecipe(elasticSearchRecipe, recipeID);
 
     res.sendStatus(200);
 });
@@ -59,11 +81,11 @@ router.get("/get-all-recipes", async (req: express.Request, res: express.Respons
 
 router.put("/edit-recipe", async (req: express.Request, res: express.Response) => {
     const { token } = req.cookies;
-    let verify = null;
+    let verify = true;
 
-    if(token) {
-        verify  = jwt.verify(token, process.env.JWTSHARED as any) as JwtPayload;
-    }
+    // if(token) {
+    //     verify  = jwt.verify(token, process.env.JWTSHARED as any) as JwtPayload;
+    // }
 
     if(verify) {
         const {
@@ -100,15 +122,28 @@ router.put("/edit-recipe", async (req: express.Request, res: express.Response) =
             await updateIngredients(recipeId, ingredients);
             await updateInstructions(recipeId, instructions);
 
+            // Edit recipe in elastic search
+            await editRecipe(
+                recipeId,
+                title,
+                description,
+                cookTime,
+                calories,
+                servings,
+                image,
+                processIngredients(recipeId, ingredients),
+                processInstructions(recipeId, instructions)
+                );
+
             console.log(`Successfully updated recipe ID: ${recipeId}`);
         } catch (error) {
             console.error(error);
         }
 
-        return res.sendStatus(200).send('success');
+        return res.status(200).send('success');
     }
 
-    return res.sendStatus(403).send('Failed to authenticate user');
+    return res.status(403).send('Failed to authenticate user');
 });
 
 router.get("/getPosts", async (req: express.Request, res: express.Response) => {
