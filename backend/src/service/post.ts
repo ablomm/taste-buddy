@@ -42,6 +42,8 @@ export async function createPost(userID: number|any, description: string, tags: 
 
     console.log(`Successfully added post's tags to records ...`);
     console.log('COMPLETE POST CREATION ...');
+
+    return post.id;
 }
 
 export async function getPostsByUserAndID(userID: number|undefined) {

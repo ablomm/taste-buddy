@@ -2,24 +2,31 @@ import express from 'express';
 import { generateUploadURL } from '../service/s3';
 import { getUserByUsername } from "../service/user";
 import {createPost, getPostsByPage, getPostsByUserAndID} from "../service/post";
+import {storePost} from "../service/search";
 const router = express.Router();
 
 router.post("/create", async (req: express.Request, res: express.Response) => {
-    const { username,
-        description,
-        tags,
-        image,
-        recipeURL
-    } = req.body;
+    try {
+        const { username,
+            description,
+            tags,
+            image,
+            recipeURL
+        } = req.body;
 
-    console.log("post /post/create username: " + username);
+        console.log("post /create username: " + username)
 
-    const user = await getUserByUsername(username);
-    const userId = user?.id;
+        const user = await getUserByUsername(username);
+        const userId = user?.id;
+        const postID = await createPost(userId, description, tags, image, recipeURL);
 
-    await createPost(userId, description, tags, image, recipeURL);
+        // Store post in elastic search db
+        await storePost(userId, description, tags, image, recipeURL, postID);
 
-    res.sendStatus(200);
+        res.sendStatus(200);
+    } catch(error) {
+        console.error(error);
+    }
 });
 
 router.get("/get-posts/:username", async (req: express.Request, res: express.Response) => {
