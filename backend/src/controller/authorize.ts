@@ -26,7 +26,7 @@ router.get("/logout", async (req: express.Request, res: express.Response) => {
         res.sendStatus(200);
     } catch(error) {
         console.error(error);
-        res.sendStatus(500).send(error);
+        res.status(500).send(error);
     }
 });
 

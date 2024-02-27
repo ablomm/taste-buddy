@@ -50,9 +50,9 @@ export async function getUserById(id: number) {
     return user;
 }
 
-// Retrieve moderator status of user 
+// Retrieve moderator status of user
 export async function getModeratorStatus(username: string) {
-    // Retrieve mod status from db 
+    // Retrieve mod status from db
     const userData = await prisma.user.findFirst({
         where: {
             username: username
@@ -79,6 +79,7 @@ export async function addDietaryPref(username: string, dietaryPref: string) {
             username: username,
         },
         data: {
+            // @ts-ignore
             dietaryPref: {
                 create: {
                     dietaryPref: dietaryPref,
@@ -104,6 +105,7 @@ export async function saveRecipe(recipeID: number, userID: any) {
             data: {
                 recipeID: recipeID,
                 userID: userID,
+                // @ts-ignore
                 isShowing: true,
             }
         });
@@ -117,6 +119,7 @@ export async function saveRecipe(recipeID: number, userID: any) {
                 }
             },
             data: {
+                // @ts-ignore
                 isShowing: true,
             }
         });
@@ -133,6 +136,7 @@ export async function deleteSavedRecipe(recipeID: any, userID: any) {
             }
         },
         data: {
+            // @ts-ignore
             isShowing: false,
         }
     });
