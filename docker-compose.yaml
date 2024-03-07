@@ -1,39 +1,44 @@
 name: taste-buddy
 
 services:
-  # frontend:
-  #   image: tb-frontend
-  #   build:
-  #     context: frontend
+  frontend:
+    image: tb-frontend
+    build:
+      context: frontend
+    ports:
+      - 8081:8081
 
-  # backend:
-  #   image: tb-backend
-  #   build:
-  #     context: backend
-  #   links:
-  #     - database
-  #     - elasticsearch
-  #   volumes:
-  #     - es_certs:/opt/app/certs
-  #   depends_on:
-  #     database:
-  #       condition: service_healthy
+  backend:
+    image: tb-backend
+    build:
+      context: backend
+    links:
+      - database
+      - elasticsearch
+    ports:
+      - 8080:8080
+    environment:
+      DATABASE_URL: "mysql://root:0000@database:3306/tastebuddy"
+      ELASTICSEARCH_URL: "http://elasticsearch:9200"
+    depends_on:
+      database:
+        condition: service_healthy
 
-  # database:
-  #   image: mysql:8.0
-  #   environment:
-  #     MYSQL_ROOT_PASSWORD: 0000
-  #   ports:
-  #     - 3307:3306
-  #   expose:
-  #     - 3306
-  #   healthcheck:
-  #     test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-  #     interval: 10s
-  #     timeout: 10s
-  #     retries: 10
-  #   volumes:
-  #     - mysql-db:/var/lib/mysql
+  database:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: 0000
+    ports:
+      - 3307:3306
+    expose:
+      - 3306
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    volumes:
+      - mysql-db:/var/lib/mysql
 
   elasticsearch:
       image: docker.elastic.co/elasticsearch/elasticsearch:8.12.2
@@ -45,8 +50,6 @@ services:
         xpack.security.enrollment.enabled: false
       ports:
         - 9200:9200
-      networks:
-        - elastic
       ulimits:
         memlock:
           soft: -1
@@ -62,12 +65,9 @@ services:
       XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY: aaaaaaaa-c4d3-4a0a-8290-2abcb83ab3aa
     ports:
       - 5601:5601
-    networks:
-      - elastic
 
 volumes:
   mysql-db:
-  es_certs:
 
 networks:
   elastic:
