@@ -10,7 +10,7 @@
 
 # Docker
 1. Download [Docker Desktop](https://www.docker.com/products/docker-desktop/).
-2. After installing, you need to increase the wsl2 memory limit to increase performance, if you have 16gb of ram, do the following:
+2. If you are using windows, after installing, you need to increase the wsl2 memory limit to increase performance, if you have 16gb of ram, do the following:
 ```
 cd %UserProfile%
 notepad .wslconfig
