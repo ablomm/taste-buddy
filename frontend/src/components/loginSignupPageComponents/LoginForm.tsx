@@ -38,7 +38,8 @@ const LoginForm = () => {
             if (response.status !== 200) {
                 Alert.alert("Login failed please try again")
             } else {
-                userContext.login(data.username)
+                let json = await response.json();
+                userContext.login(data.username, json.id)
             }
         } catch (error: any) {
             Alert.alert("Login failed please try again")

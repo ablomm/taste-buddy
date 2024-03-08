@@ -4,25 +4,10 @@ import {TouchableRipple} from "react-native-paper";
 import StarRating from "react-native-star-rating-widget";
 import RelevantPostsGrid from "./ReleventPostsGrid";
 import {NoResultMessage} from "./NoResultMessage";
+import {Recipe} from "../../interfaces/RecipeInterface";
 
 
-interface Recipe {
-    id: number,
-    authorID: number,
-    creationTime: string,
-    recipeTitle: string,
-    description: string,
-    cookTimeHours: number,
-    cootTimeMinutes: number,
-    calories: number,
-    servings: number,
-    recipeImage: string,
-    averageRating: number,
-    ingredients: any[],
-    instructions: any[]
-}
-
-function SearchResultBody({ searchResults }) {
+function SearchResultBody({ navigation, searchResults }) {
     const [selectedTab, setSelectedTab] = useState<'recipes' | 'posts'>('recipes');
     const [relevantRecipes, setRelevantRecipes] = React.useState([]);
     const [relevantPosts, setRelevantPosts] = React.useState([]);
@@ -34,7 +19,9 @@ function SearchResultBody({ searchResults }) {
     }, [searchResults]);
 
     const Recipe = ({ item }: { item: Recipe }) => (
-        <TouchableRipple onPress={()=>console.log('CLICKED RECIPE')}>
+        <TouchableRipple onPress={()=> navigation.navigate('RecipePage', {
+            recipe: item
+        })}>
             <View style={styles.recipeContainer}>
                 <Image style={styles.image} source={{ uri:item.recipeImage}} />
                 <View style={styles.textContainer}>

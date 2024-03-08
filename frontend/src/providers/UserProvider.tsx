@@ -9,10 +9,10 @@ const UserProvider = ({ children }: any) => {
     const value = {
         state: state,
 
-        login: (username: string) => {
+        login: (username: string, userId: number) => {
             dispatch({
                 type: "LOGIN",
-                payload: { username }
+                payload: { username, userId }
             });
         },
 

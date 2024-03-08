@@ -21,6 +21,27 @@ const router = express.Router();
 /*
 TODO: Update average rating everytime new rating is added
  */
+
+router.get("/get-recipe", async (req: express.Request, res: express.Response) => {
+    let recipe = null;
+
+    try {
+        const { userId, title } : { userId?: number, title?: string } = req.query;
+
+        if(userId != undefined && title != undefined) {
+            recipe = await getRecipeByUserAndTitle(Number(userId), title);
+        }
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send("Something went wrong ...");
+    }
+    if(recipe == null) {
+        return res.status(404).send("Could not find this recipe ...");
+    } else {
+        return res.status(200).json(recipe);
+    }
+});
+
 router.post("/save", async (req: express.Request, res: express.Response) => {
     const { username,
         title,
