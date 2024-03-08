@@ -20,6 +20,7 @@ import ViewPostPage from "../screens/ViewPostPage";
 
 // react-native-vector-icons/Ionicons otherwise.
 import Ionicons from '@expo/vector-icons/Ionicons';
+import EditRecipePage from "../screens/EditRecipePage";
 
 const Stack = createStackNavigator();
 
@@ -116,6 +117,8 @@ const SearchPageStack = () => (
   <Stack.Navigator initialRouteName='SearchPage' screenOptions={stackOptions}>
     <Stack.Screen name='SearchPage' component={SearchPage} />
     <Stack.Screen name='ViewPostPage' component={ViewPostPage} />
+      <Stack.Screen name='RecipePage' component={RecipePage} />
+      <Stack.Screen name='EditRecipePage' component={EditRecipePage} />
   </Stack.Navigator>
 );
 export default Navigation;
