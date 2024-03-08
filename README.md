@@ -38,6 +38,12 @@ All the containers should be built and started, and the app should now be access
 ![alt text](readme_images/image.png)
 ![alt text](readme_images/image-1.png)
 
+after opening; the whole appliaction will start up; all contians were begin to run.
+it may take a while for the appliaction to become accessible because it has to install all node_modules
+
+You will not be able to use the git tab in vscode, as the container is not authenicated with github.
+Changes will, however persist to your local system, so you can commit it there.
+
 # Elasticsearch setup through Docker
 run:
 ```
