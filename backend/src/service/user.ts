@@ -72,3 +72,82 @@ export async function getProfilePhotoByUsername(username: string) {
 
     return userData?.profilePic;
 }
+
+export async function addDietaryPref(username: string, dietaryPref: string) {
+    const updateUser = await prisma.user.update({
+        where: {
+            username: username,
+        },
+        data: {
+            dietaryPref: {
+                create: {
+                    dietaryPref: dietaryPref,
+                },
+            },
+        },
+    });
+}
+
+export async function saveRecipe(recipeID: number, userID: any) {
+    //check if saved already
+    const existingRecord = await prisma.userSavedRecipes.findUnique({
+        where: {
+            userID_recipeID: {
+                userID: userID,
+                recipeID: recipeID
+            }
+        }
+    });
+    //create if doesnt exist
+    if (!existingRecord) {
+        const newUserSavedRecipe  = await prisma.userSavedRecipes.create({
+            data: {
+                recipeID: recipeID,
+                userID: userID,
+                isShowing: true,
+            }
+        });
+        return newUserSavedRecipe;
+    } else {
+        const newUserSavedRecipeAgain = await prisma.userSavedRecipes.update({
+            where: {
+                userID_recipeID: {
+                    userID: userID,
+                    recipeID: recipeID
+                }
+            },
+            data: {
+                isShowing: true,
+            }
+        });
+        return newUserSavedRecipeAgain;
+    }
+}
+
+export async function deleteSavedRecipe(recipeID: any, userID: any) {
+    const deleteSavedRecipe = await prisma.userSavedRecipes.update({
+        where: {
+            userID_recipeID: {
+                userID: userID,
+                recipeID: recipeID
+            }
+        },
+        data: {
+            isShowing: false,
+        }
+    });
+}
+
+export async function getSavedRecipes(userId: any) {
+    const user = await prisma.user.findFirst({
+        include: {
+            savedRecipes: {
+              include: {
+                recipe: true,
+              },
+            },
+          },
+    })
+
+    return user;
+}

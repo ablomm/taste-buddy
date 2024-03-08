@@ -20,6 +20,25 @@ model User {
   recipes      Recipe[]
   userPosts    UserPosts[]
   profilePic   String             @default("")
+  dietaryPref  DietaryPref[]
+}
+
+model UserSavedRecipes {
+  userID    Int
+  user      User     @relation(fields: [userID], references: [id])
+  recipeID  Int
+  recipe    Recipe   @relation(fields: [recipeID], references: [id])
+  timeSaved DateTime @default(now())
+  isShowing Boolean  @default(false)
+  @@id([userID, recipeID])
+  @@unique([userID, recipeID])
+}
+
+model DietaryPref {
+  id                 Int                  @id @default(autoincrement())
+  author             User                 @relation(fields: [authorID], references: [id])
+  authorID           Int
+  dietaryPref        String               
 }
 
 model Recipe {
@@ -64,14 +83,6 @@ model RecipeTags {
   recipe Recipe[]
 }
 
-model UserSavedRecipes {
-  userID    Int
-  user      User     @relation(fields: [userID], references: [id])
-  recipeID  Int
-  recipe    Recipe   @relation(fields: [recipeID], references: [id])
-  timeSaved DateTime @default(now())
-  @@id([userID, recipeID])
-}
 model Posts {
   id            Int         @id @default(autoincrement())
   author        Int

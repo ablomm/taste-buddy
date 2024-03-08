@@ -16,6 +16,8 @@ import RecommenderPage from "../screens/RecommenderPage";
 import DietaryPreference from "../screens/DietaryPreference";
 import CreatePostPage from "../screens/CreatePostPage";
 import RecipePage from "../screens/RecipePage";
+// react-native-vector-icons/Ionicons otherwise.
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 const Stack = createStackNavigator();
 
@@ -50,11 +52,19 @@ const SignedInNavigation = () => (
       <Tab.Screen
         name='ExplorePage'
         component={RecipePage}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="planet-outline" size={size} color={color} />),
+        }}
       />
 
       <Tab.Screen
         name='SearchPage'
         component={SearchPage}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="search-outline" size={size} color={color} />),
+        }}
       />
 
       <Tab.Screen
@@ -62,18 +72,26 @@ const SignedInNavigation = () => (
         component={CreatePostOrRecipeStack}
         options={{
           tabBarIcon: ({ color, size }) => (
-            <Image source={require("../../assets/NavBar/plus_btn.png")} style={{ width: size + 16, height: size + 16 }} />),
+            <Ionicons name="add-outline" size={size+20} color={color} />),
         }}
       />
 
       <Tab.Screen
         name='RecommenderPage'
         component={RecommenderPage}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="star-outline" size={size} color={color} />),
+        }}
       />
 
       <Tab.Screen
         name='AccountPageStack'
         component={AccountPageStack}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home-outline" size={size} color={color} />),
+        }}
       />
     </Tab.Navigator>
   </NavigationContainer>
