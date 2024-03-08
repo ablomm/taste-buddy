@@ -1,16 +1,13 @@
-import React, {useState} from "react";
-import { StyleSheet, Text, TextInput, View, Keyboard, Button, Image } from "react-native";
-import { Feather, Entypo } from "@expo/vector-icons";
+import React from "react";
+import { StyleSheet, View, Image } from "react-native";
 
-const Post = ({ imageUrl }: any) => {    
+const Post = ({ imageUrl }: any) => {
     return (
         <View >
             <Image style={styles.post} source={{ uri:imageUrl}}></Image>
         </View>
     );
 };
-
-const squareDimension = Math.floor(window.innerWidth/3 - 2);
 
 // styles
 const styles = StyleSheet.create({
@@ -20,7 +17,7 @@ const styles = StyleSheet.create({
         padding: 1,
         height: 100,
         width: 100,
-        borderWidth: 1, 
+        borderWidth: 1,
         borderColor: 'white'
     }
 });

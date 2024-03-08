@@ -1,13 +1,23 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image} from "react-native";
+import {IconButton} from "react-native-paper";
 
-const PosterHeader = () => {
+const PosterHeader = ({ owner, editFunction }) => {
     return(
         <View style={styles.container}>
             <View style={styles.subContainer}>
                 <Image source={require("../../../assets/no-image.png")} style={styles.profileImage}/>
                 <Text style={styles.profileUsername}>username</Text>
             </View>
+            { owner ?
+                <View>
+                    <IconButton icon="pencil"
+                                size={16}
+                                onPress={editFunction} />
+                </View>
+                :
+                null
+            }
         </View>
     );
 }

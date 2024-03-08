@@ -45,29 +45,40 @@ export async function createRecipe(userID: number|any, title: string,description
 
 export async function createIngredients(recipeID: number|any, ingredients: any) {
 
+    const data = processIngredients(recipeID, ingredients);
+
+    await prisma.recipeIngredients.createMany({
+        data: data,
+    });
+}
+
+export function processIngredients(recipeID: any, ingredients: any) {
     let data = []
 
     for (let id in ingredients) {
         data.push({recipeID: recipeID, ingredient: ingredients[id].title, amount: Number(ingredients[id].amount), measurementType: ingredients[id].unit});
     }
 
-    await prisma.recipeIngredients.createMany({
-        data: data,
-    })
+    return data;
 }
 
 export async function createInstructions(recipeID: number|any, instructions: any) {
 
+    const data = processInstructions(recipeID, instructions);
+
+    await prisma.recipeInstructions.createMany({
+        data: data,
+    });
+}
+
+export function processInstructions(recipeID: any, instructions: any) {
     let data = [];
 
     for (let i = 0; i < instructions.length; i++ ) {
         data.push({recipeID: recipeID, step: i+1, instruction: instructions[i].step});
     }
 
-    await prisma.recipeInstructions.createMany({
-        data: data,
-    })
-
+    return data;
 }
 
 export async function getRecipeByUserAndTitle(userID: number|undefined, title: string) {
@@ -214,7 +225,7 @@ export async function updateIngredients(recipeId: number, newIngredients: Ingred
     // Add new ingredients
     if(ingredientsToAdd.length > 0) {
         await prisma.recipeIngredients.createMany({
-            data: ingredientsToAdd
+            data: processIngredients(recipeId, ingredientsToAdd)
         });
 
         console.log("Added: " + JSON.stringify(ingredientsToAdd));
@@ -298,19 +309,19 @@ export async function createReview(recipeID:number ,reviewText:string, rating:nu
 
     await prisma.review.create({
         data: {
-            recipeID,      
-            reviewText,    
-            rating,    
-            userID,        
+            recipeID,
+            reviewText,
+            rating,
+            userID,
             username,
-            profilePic      
+            profilePic
         },
     })
 }
 
 /**
- * This function retrieves the reviews per the page given the recipeID, page number, 
- * and the order. If an OrderBy is given, then the query will be ordered, otherwise 
+ * This function retrieves the reviews per the page given the recipeID, page number,
+ * and the order. If an OrderBy is given, then the query will be ordered, otherwise
  * it will retrieve in the same order inserted in the database.
  *
  * @param recipeID
@@ -351,7 +362,7 @@ export async function getReviewsByPage(recipeID: number, page: number, order:Ord
             },
         })
         break;
-        } 
+        }
 
         return await prisma.review.findMany({
             skip: reviewsPerPage * page,
@@ -361,10 +372,10 @@ export async function getReviewsByPage(recipeID: number, page: number, order:Ord
             },
             orderBy:orderBy
         })
-    
-         
-    
-    
+
+
+
+
 }
 
 export async function getRecipes() {
