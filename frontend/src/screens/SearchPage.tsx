@@ -4,7 +4,8 @@ import SearchBar from '../components/SearchBar';
 import PostsGrid from '../components/PostsGrid';
 import SearchResultBody from "../components/SearchPageComponents/SearchResultBody";
 
-const SearchPage = () => {
+
+const SearchPage = ({navigation}: any) => {
     const [searchPhrase, setSearchPhrase] = React.useState("");
     const [clicked, setClicked] = React.useState(false);
     const [searchResults, setSearchResults] = React.useState({});
@@ -50,7 +51,10 @@ const SearchPage = () => {
             />
             {searchStatus ?
                 /* When searching */
-                <SearchResultBody searchResults={searchResults}/>
+                <SearchResultBody
+                    navigation={navigation}
+                    searchResults={searchResults}
+                />
                 :
                 /* When not searching display recommendations */
                 <PostsGrid />
