@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {FlatList, View, Text, StyleSheet, Image, TouchableOpacity} from "react-native";
+import {FlatList, View, Text, StyleSheet, Image, TouchableOpacity, RefreshControl} from "react-native";
 import {TouchableRipple} from "react-native-paper";
 import StarRating from "react-native-star-rating-widget";
 import RelevantPostsGrid from "./ReleventPostsGrid";
@@ -11,12 +11,20 @@ function SearchResultBody({ navigation, searchResults }) {
     const [selectedTab, setSelectedTab] = useState<'recipes' | 'posts'>('recipes');
     const [relevantRecipes, setRelevantRecipes] = React.useState([]);
     const [relevantPosts, setRelevantPosts] = React.useState([]);
+    const [refreshing, setRefreshing] = useState(false);
 
     useEffect(() => {
         // Update these states everytime a new search result exists
         setRelevantRecipes(searchResults['recipes']);
         setRelevantPosts(searchResults['posts']);
     }, [searchResults]);
+
+    const truncateText = (text: string, maxLength: number): string => {
+        if (text.length > maxLength) {
+            return text.substring(0, maxLength) + '...';
+        }
+        return text;
+    };
 
     const Recipe = ({ item }: { item: Recipe }) => (
         <TouchableRipple onPress={()=> navigation.navigate('RecipePage', {
@@ -25,7 +33,7 @@ function SearchResultBody({ navigation, searchResults }) {
             <View style={styles.recipeContainer}>
                 <Image style={styles.image} source={{ uri:item.recipeImage}} />
                 <View style={styles.textContainer}>
-                    <Text style={{fontSize: 20, fontWeight: "bold"}}>{item.recipeTitle}</Text>
+                    <Text style={{fontSize: 20, fontWeight: "bold"}}>{truncateText(item.recipeTitle, 20)}</Text>
                     <StarRating
                         rating={item.averageRating}
                         onChange={()=>{}}
@@ -49,12 +57,26 @@ function SearchResultBody({ navigation, searchResults }) {
         }
     }
 
+    const onRefresh = () => {
+        setRefreshing(true);
+        setTimeout(() => {
+            // TODO: Update component with new data in recipe list
+            setRefreshing(false);
+        }, 2000);
+    };
+
     function displayRecipesTab() {
         if (relevantRecipes.length != 0) {
             return <FlatList
                 data={relevantRecipes}
                 renderItem={Recipe}
                 keyExtractor={item => item.id.toString()}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                    />
+                }
             />
         } else {
             return <NoResultMessage message='No relevant recipes found.'/>
@@ -79,14 +101,16 @@ function SearchResultBody({ navigation, searchResults }) {
               </TouchableOpacity>
           </View>
 
-          {
-              selectedTab == 'recipes' ?
-                  /* Recipes */
-                  displayRecipesTab()
-                  :
-                  /* Posts */
-                  displayPostsTab()
-          }
+          <>
+              {
+                  selectedTab == 'recipes' ?
+                      /* Recipes */
+                      displayRecipesTab()
+                      :
+                      /* Posts */
+                      displayPostsTab()
+              }
+          </>
       </View>
     );
 }
