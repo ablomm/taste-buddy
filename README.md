@@ -45,4 +45,8 @@ docker-compose up elasticsearch
 ```
 
 # Kibana
-Go to http://localhost:5601 after running the kibana container
+run:
+```
+docker-compose up kibana
+```
+Go to http://localhost:5601
