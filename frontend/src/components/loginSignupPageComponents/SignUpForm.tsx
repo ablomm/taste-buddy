@@ -58,12 +58,13 @@ const SignUpForm = () => {
                             password: values.password
                           })
                         });
-                 
+
                         if (response.status !== 200) {
                             console.error("account creation unsuccessful");
                         } else {
+                            let json = await response.json();
                           console.log("account creation successful");
-                          userContext.login(values.username);
+                          userContext.login(values.username, json.id);
                         }
                       } catch (error: any) {
                         console.error(error.stack);

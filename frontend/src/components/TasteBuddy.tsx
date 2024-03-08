@@ -15,7 +15,7 @@ const TasteBuddy = () => {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                 },
-                credentials: 'include', 
+                credentials: 'include',
             });
 
             if (response.status !== 200) {
@@ -23,7 +23,7 @@ const TasteBuddy = () => {
             } else {
                 console.log("account authenication successful");
                 const json = await response.json()
-                userContext.login(json.username);
+                userContext.login(json.username, json.id);
             }
         } catch (error: any) {
             console.error(error.stack);
