@@ -37,7 +37,9 @@ You can access the docker DB in mysql workbench from localhost:3307. Password is
 # Dev Containers
 1. Install the dev containers vscode extension
 2. click the bottom left and then "re-open in container"
+
 ![alt text](readme_images/image.png)
+
 ![alt text](readme_images/image-1.png)
 
 after opening; the whole appliaction will start up; all contians were begin to run.
