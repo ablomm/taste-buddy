@@ -43,7 +43,7 @@ const SettingsPage = ({navigation}:any) => {
           let s3Response: any;
 
           try {
-            s3AccessUrl = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/user/s3Url`, {  //get secure s3 access url
+            s3AccessUrl = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/s3/s3GenerateUrl`, {  //get secure s3 access url
               method: 'GET',
             }).then(res => res.json());
           } catch (error: any) {
