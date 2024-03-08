@@ -32,6 +32,10 @@ docker-compose up --build
 from the taste-buddy directory.
 All the containers should be built and started, and the app should now be accessible.
 
+# Dev Containers
+1. Install the dev containers vscode extension
+2. click the bottom left and then "re-open in container"
+
 # Elasticsearch setup through Docker
 run:
 ```
