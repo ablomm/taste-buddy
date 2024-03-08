@@ -35,9 +35,14 @@ All the containers should be built and started, and the app should now be access
 # Dev Containers
 1. Install the dev containers vscode extension
 2. click the bottom left and then "re-open in container"
+![alt text](readme_images/image.png)
+![alt text](readme_images/image-1.png)
 
 # Elasticsearch setup through Docker
 run:
 ```
 docker-compose up elasticsearch
 ```
+
+# Kibana
+Go to http://localhost:5601 after running the kibana container

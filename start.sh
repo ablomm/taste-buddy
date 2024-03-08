@@ -1,1 +1,1 @@
-$(./frontend/start.sh) & $(./backend/start.sh)
+{ ./frontend/start.sh & ./backend/start.sh; }
