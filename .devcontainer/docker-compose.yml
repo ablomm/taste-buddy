@@ -1,11 +1,30 @@
 version: '3.8'
 services:
   backend:
-    volumes:
-      - ..:/workspaces:cached
-    command: /bin/sh -c "while sleep 1000; do :; done"
+    profiles:
+      - donotstart
+    
   frontend:
+    profiles:
+      - donotstart
+        
+  tastebuddy:
+    image: tb
+    build:
+      context: .
+    links:
+      - database
+      - elasticsearch
+    ports:
+      - 8080:8080
+      - 8081:8081
+    environment:
+      DATABASE_URL: "mysql://root:0000@database:3306/tastebuddy"
+      ELASTICSEARCH_URL: "http://elasticsearch:9200"
+    depends_on:
+      database:
+        condition: service_healthy
     volumes:
-      - ..:/workspaces:cached
-    command: /bin/sh -c "while sleep 1000; do :; done"
- 
+      - ./:/opt/app/
+      - /opt/app/frontend/node_modules
+      - /opt/app/backend/node_modules
