@@ -12,6 +12,7 @@ import EditTagForm from '../components/CreateRecipe/tags/EditTagForm';
 import TagListItem from '../components/CreateRecipe/tags/TagListItem';
 import { UserContext } from "../providers/UserProvider";
 import { Buffer } from 'buffer';
+import getBase64 from '../functions/GetBase64FromURI';
 
 const CreatePostPage = ({ route, navigation }: any) => {
   const { pickedImage } = route.params;
@@ -116,6 +117,9 @@ const CreatePostPage = ({ route, navigation }: any) => {
           }
 
           if (s3AccessUrl) {
+            if(!image.base64){
+              image.base64 = await getBase64(image.uri);
+            }
             const buf = Buffer.from(image.base64, 'base64') //isolate the base64 buffer
             let type = image.uri.substring(image.uri.lastIndexOf('.') + 1, image.uri.length);
 

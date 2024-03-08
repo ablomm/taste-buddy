@@ -1,9 +1,13 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, Image, StyleSheet, TouchableOpacity, RefreshControl, ScrollView} from 'react-native';
+import {View, Text, TextInput, Image, StyleSheet, TouchableOpacity, RefreshControl, ScrollView} from 'react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import {UserContext} from "../providers/UserProvider";
+import Modal from 'react-native-modal';
 import TBButton from '../components/TBButton';
+import { FontAwesome } from '@expo/vector-icons'; // or 'react-native-vector-icons/MaterialIcons'
+import { black } from 'react-native-paper/lib/typescript/styles/themes/v2/colors';
+let randomNo = 1;
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -29,7 +33,7 @@ const RecentPostsScreen: ({posts}: {
       <View style={styles.postsContainer}>
         {posts.map(post => (
           <View key={post.id} style={styles.postContainer}>
-            <Image source={profilePicture} style={styles.postImage} />
+            <Image source={{uri: post.image}} style={styles.postImage} />
           </View>
         ))}
       </View>
@@ -39,36 +43,102 @@ const RecentPostsScreen: ({posts}: {
 }
 
 interface SavedPostsScreenProps {
-  savedPosts: Post[];
+  id: number;
+  content: string;
 }
 
-const SavedPostsScreen: React.FC<SavedPostsScreenProps> = ({ savedPosts }) => (
-  <View style={styles.screen}>
-    <View style={styles.postsContainer}>
-      {savedPosts.map(post => (
-        <View key={post.id} style={styles.postContainer}>
-          <Image source={profilePicture} style={styles.postImage} />
+const SavedPostsScreen = ({ savedPosts1, refreshFunction, refreshing }) => {
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [folders, setFolders] = useState([{ id: 1, name: 'Folder 1', recipes: [] }]);
+  const [folderName, setFolderName] = useState('');
+
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
+    setFolderName(''); // Reset folderName when the modal is closed
+  };
+
+  const addFolder = (folderName) => {
+    const newFolder = { id: folders.length + 1, name: folderName, recipes: [] };
+    setFolders((prevFolders) => [...prevFolders, newFolder]);
+    console.log("Updated folders:", [...folders, newFolder]);
+    toggleModal();
+  };
+
+  const longPressRecipe = (postID: any) => {
+    console.log("LONG press", postID);
+  }
+  
+  return (
+    <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={refreshFunction} />
+      }
+    >
+      <View style={styles.screen}>
+        <View style={styles.postsContainer}>
+          <TouchableOpacity onPress={toggleModal} style={styles.addButton}>
+            <FontAwesome name="plus" size={40} color="white" style={styles.plusIcon} />
+          </TouchableOpacity>
+          <Modal isVisible={isModalVisible} style= {styles.modalCenter} onBackdropPress={toggleModal}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Add New Folder</Text>
+              <TextInput
+              style={styles.inputField}
+              placeholderTextColor="#808080"  // Set placeholder text color
+              placeholder="Folder Name"
+              value={folderName}
+              onChangeText={(text) => setFolderName(text)}
+            />
+            <TouchableOpacity style={styles.addFolderButton} onPress={() => addFolder(folderName)}>
+              <Text style={styles.addButtonLabel}>Add Folder</Text>
+            </TouchableOpacity>
+            </View>
+          </Modal>
+          {folders
+            .map(folder => {
+              return (
+                <TouchableOpacity style={styles.postContainer}>
+                  <View style={styles.folders}>
+                    <Text style={styles.addButtonLabel}>{folder.name}</Text>
+                  </View>
+                </TouchableOpacity>
+              )
+            }
+          )}
+          {savedPosts1
+            .filter(post => post.isShowing === true) // Filter only posts with isShowing set to true
+            .map(post => {
+              randomNo++;
+              return (
+                <TouchableOpacity 
+                style={styles.postContainer}
+                onLongPress={() => {
+                longPressRecipe(post.recipe.id);
+                }}>
+                  <View key={`${post.recipe.userID}-${randomNo}`} style={styles.postContainer} >
+                    <Image source={{uri: post.recipe.recipeImage}} style={styles.postImage} />
+                  </View>
+                </TouchableOpacity>
+              )
+            }
+          )}
         </View>
-      ))}
-    </View>
-  </View>
-);
+      </View>
+    </ScrollView>
+  );
+};
 
 const AccountPage = () => {
   const userContext = React.useContext(UserContext) as any;
   const username = userContext.state.username;
 
   const [posts, setPosts] = useState();
+  const [savedPosts1, setSavedPosts] = useState();
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     fetchUserData();
   }, []);
-
-  const savedPosts = [
-    { id: 5, content: '' },
-    { id: 6, content: '' },
-  ];
 
   const navigation = useNavigation();
 
@@ -89,11 +159,31 @@ const AccountPage = () => {
       });
 
       await response.json().then(result => {
-        console.log(result);
         setPosts(result);
       });
     } catch (error) {
       console.error(error);
+    }
+
+    try {
+      const response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/user/get-saved-recipes/${username}`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });  
+
+      await response.json().then(result => {
+        let test = JSON.stringify(result);
+        let test1 = JSON.parse(test).savedRecipes;
+
+        setSavedPosts(test1);
+        console.log("log" + JSON.stringify(test1));
+      });
+    } catch (error) {
+      console.error(error); 
     }
   }
 
@@ -123,7 +213,7 @@ const AccountPage = () => {
             {()=> posts ? (<RecentPostsScreen posts={posts} refreshFunction={onRefresh} refreshing={refreshing} />) : (<Text>Loading ...</Text>)}
           </Tab.Screen>
           <Tab.Screen name="Saved Posts">
-            {() => <SavedPostsScreen savedPosts={savedPosts} />}
+            {() => savedPosts1 ? (<SavedPostsScreen savedPosts1={savedPosts1} refreshFunction={onRefresh} refreshing={refreshing} />) : (<Text>Loading ...</Text>)}
           </Tab.Screen>
         </Tab.Navigator>
       </NavigationContainer>
@@ -168,7 +258,7 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     paddingHorizontal: 10,
     borderRadius: 5,
-    width: 85,
+    width: 110,
   },
   settingsButtonText: {
     color: '#fff',
@@ -198,13 +288,93 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   postImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 100,
+    height: 100,
+    borderRadius: 10,
     marginRight: 15,
   },
   postContent: {
     flex: 1,
+    fontSize: 16,
+  },
+  addButton: {
+    marginLeft: 50,
+    marginTop: 30,
+    borderRadius: 5,
+    backgroundColor: '#8CC84B',
+    alignItems: 'center', // Center items horizontally
+    justifyContent: 'center',
+    width: 50,
+    height: 55
+  },
+  folders: {
+    marginRight: 15,
+    marginTop: 10,
+    borderRadius: 5,
+    backgroundColor: '#8CC84B',
+    alignItems: 'center', // Center items horizontally
+    justifyContent: 'center',
+    width: 75,
+    height: 75
+  },
+  foldersLabel: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  addFolderButton: {
+    borderRadius: 5,
+    backgroundColor: '#8CC84B',
+    alignItems: 'center', // Center items horizontally
+    justifyContent: 'center',
+    width: 150,
+    height: 50,
+    marginLeft: 17,
+    
+  },
+  modalCenter: {
+    alignItems: 'center', // Center items horizontally
+    justifyContent: 'center',
+  },
+  addButtonLabel: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
+    textAlign: 'center'
+  },
+  plusIcon: {    
+    padding: 10,
+  },
+  inputField: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginBottom: 10,
+    fontSize: 14,  // Set the font size for the input field
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    padding: 30,
+    borderRadius: 10,
+    width: 250
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 15,
+  },
+  folderItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  folderItemText: {
+    marginLeft: 10,
     fontSize: 16,
   },
 });
