@@ -1,5 +1,6 @@
-name: taste-buddy
+version: '3.8'
 
+name: taste-buddy
 services:
   frontend:
     image: tb-frontend
