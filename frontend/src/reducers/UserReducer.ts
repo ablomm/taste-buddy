@@ -1,6 +1,7 @@
 export type UserState = {
     isSignedIn: boolean,
     username: string | null,
+    userId: number | null
 }
 
 export type UserAction = {
@@ -11,6 +12,7 @@ export type UserAction = {
 export const initialState = {
     isSignedIn: false,
     username: null,
+    userId: null
 }
 
 const userReducer = (state: UserState, action: UserAction) => {
