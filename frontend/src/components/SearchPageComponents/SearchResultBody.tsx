@@ -55,7 +55,7 @@ function SearchResultBody({ searchResults }) {
     );
 
     function displayPostsTab() {
-        if (relevantPosts.length != 0) {
+        if (relevantPosts != null && relevantPosts.length != 0) {
             return <RelevantPostsGrid posts={relevantPosts} />
         } else {
             return <NoResultMessage message='No relevant posts found.'/>
@@ -63,7 +63,7 @@ function SearchResultBody({ searchResults }) {
     }
 
     function displayRecipesTab() {
-        if (relevantRecipes.length != 0) {
+        if (relevantPosts != null && relevantRecipes.length != 0) {
             return <FlatList
                 data={relevantRecipes}
                 renderItem={Recipe}
