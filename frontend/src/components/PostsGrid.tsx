@@ -20,7 +20,7 @@ const PostsGrid = () => {
     const retrievePosts = async () => {
         setPage(page + 1);
         try {
-            const response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/post/page/${page}`, {  //get secure s3 access url 
+            const response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/post/page/${page}`, {  //get secure s3 access url
                 method: 'GET',
             })
                 .then((res) => { return res.json() })
@@ -63,7 +63,9 @@ const PostsGrid = () => {
 
             {data.map((post: any) => {
                 return (
-                    <TouchableRipple onPress={() => {
+                    <TouchableRipple
+                        key={post.id}
+                        onPress={() => {
                         navigation.push("ViewPostPage", post);
                     }}>
                         <Post key={post.id} imageUrl={post.image} />

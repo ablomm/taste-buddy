@@ -54,6 +54,21 @@ const exampleRecipe: Recipe = {
             recipeID: 2,
             step: 3,
             instruction: "Step3"
+        },
+        {
+            recipeID: 2,
+            step: 4,
+            instruction: "Step4"
+        },
+        {
+            recipeID: 2,
+            step: 5,
+            instruction: "Step5"
+        },
+        {
+            recipeID: 2,
+            step: 6,
+            instruction: "Step6"
         }
     ]
 };
@@ -181,7 +196,8 @@ const RecipePage = ({ route, navigation }: any) => {
                                y: scrollY
                              }
                            }
-                        }])}
+                        }],
+                        { useNativeDriver: true })}
                       scrollEventThrottle={16}>
 
                         <RecipeContentInteractionBar stars={recipe?.averageRating}/>
