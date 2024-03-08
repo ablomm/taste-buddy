@@ -1,5 +1,6 @@
 import express from 'express';
-import {createUser, getModeratorStatus, addDietaryPref, getUserById, saveRecipe, getSavedRecipes, getUserByUsername, deleteSavedRecipe} from '../service/user';
+import {createUser, setProfilePicOfUser, getModeratorStatus, addDietaryPref, getUserById, saveRecipe, getSavedRecipes, getUserByUsername, deleteSavedRecipe} from '../service/user';
+import { generateUploadURL } from '../service/s3';
 const router = express.Router();
 
 export interface addUserRequest extends express.Request {
@@ -57,6 +58,27 @@ router.post("/save-recipe/:username", async (req: saveRecipe, res: express.Respo
 
   await saveRecipe(recipeID, userID);
   res.sendStatus(200);
+});
+
+router.post("/update-profile/profilePic", async (req: express.Request, res: express.Response) => {
+  try {
+    const { username,
+      profilePic
+    } = req.body;
+
+    console.log("update profile pic userid : " + username);
+
+    await setProfilePicOfUser(username, profilePic)
+
+    res.sendStatus(200);
+  } catch(error) {
+    console.error(error);
+  }
+});
+
+router.get("/s3Url", async (req: express.Request, res: express.Response) => {
+  const imageURL = await generateUploadURL()
+  return res.send({ imageURL });
 });
 
 router.post("/delete-saved-recipe/:username", async (req: express.Request, res: express.Response) => {
