@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, NativeScrollEvent, RefreshControl, Dimensions } from 'react-native';
-import Post from './Post';
+import { StyleSheet, ScrollView, NativeScrollEvent, RefreshControl } from 'react-native';
+import Post from '../Post';
 import { TouchableRipple } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 
-const PostsGrid = () => {
-    const [data, setData] = useState<any[]>([]);
-    const [page, setPage] = useState(0);
+const RelevantPostsGrid = ({posts}) => {
+    const [currentPosts, setCurrentPosts] = useState<any[]>([]);
     const [refreshing, setRefresh] = useState(false);
     const navigation: any = useNavigation();
 
@@ -17,51 +16,36 @@ const PostsGrid = () => {
             nativeEvent.contentSize.height - paddingToBottom;
     };
 
-    const retrievePosts = async () => {
-        setPage(page + 1);
-        try {
-            const response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/post/page/${page}`, {  //get secure s3 access url 
-                method: 'GET',
-            })
-                .then((res) => { return res.json() })
-                .then((json) => {
-                    setData([...data, ...json])
-                });
-        } catch (error: any) {
-            console.log("posts retrieving error")
-            console.log(error)
-        }
-    };
-
-    useEffect(() => {
-        retrievePosts();
-    }, []);
-
     const _onRefresh = React.useCallback(() => {
         setRefresh(true);
-        console.log("refreshing")
-        retrievePosts().then(() => {
+        console.log("Refreshing");
+        setTimeout(()=>{
             setRefresh(false);
-        });
-    }, [])
+            console.log("Done Refreshing")
+        }, 3000)
+    }, []);
+
+    useEffect(() => {
+        setCurrentPosts(posts);
+    }, []);
 
     return (
         <ScrollView contentContainerStyle={styles.app}
-            onScroll={({ nativeEvent }) => {
-                if (isCloseToBottom(nativeEvent)) {
-                    retrievePosts();
-                }
-            }}
-            scrollEventThrottle={400}
-            refreshControl={
-                <RefreshControl
-                    refreshing={refreshing}
-                    onRefresh={_onRefresh}
-                />
-            }
+                    onScroll={({ nativeEvent }) => {
+                        if (isCloseToBottom(nativeEvent)) {
+                            console.log("Reached the bottom");
+                        }
+                    }}
+                    scrollEventThrottle={400}
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={refreshing}
+                            onRefresh={_onRefresh}
+                        />
+                    }
         >
 
-            {data.map((post: any) => {
+            {currentPosts.map((post: any) => {
                 return (
                     <TouchableRipple onPress={() => {
                         navigation.push("ViewPostPage", post);
@@ -98,4 +82,4 @@ const styles = StyleSheet.create({
 
 });
 
-export default PostsGrid;
+export default RelevantPostsGrid;

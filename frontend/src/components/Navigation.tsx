@@ -16,8 +16,11 @@ import RecommenderPage from "../screens/RecommenderPage";
 import DietaryPreference from "../screens/DietaryPreference";
 import CreatePostPage from "../screens/CreatePostPage";
 import RecipePage from "../screens/RecipePage";
+import ViewPostPage from "../screens/ViewPostPage";
+
 // react-native-vector-icons/Ionicons otherwise.
 import Ionicons from '@expo/vector-icons/Ionicons';
+import EditRecipePage from "../screens/EditRecipePage";
 
 const Stack = createStackNavigator();
 
@@ -59,8 +62,8 @@ const SignedInNavigation = () => (
       />
 
       <Tab.Screen
-        name='SearchPage'
-        component={SearchPage}
+        name='SearchPageStack'
+        component={SearchPageStack}
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="search-outline" size={size} color={color} />),
@@ -72,7 +75,7 @@ const SignedInNavigation = () => (
         component={CreatePostOrRecipeStack}
         options={{
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="add-outline" size={size+20} color={color} />),
+            <Ionicons name="add-outline" size={size + 20} color={color} />),
         }}
       />
 
@@ -107,6 +110,15 @@ const AccountPageStack = () => (
   <Stack.Navigator initialRouteName='AccountPage' screenOptions={stackOptions}>
     <Stack.Screen name='AccountPage' component={AccountPage} />
     <Stack.Screen name='DietaryPreference' component={DietaryPreference} />
+  </Stack.Navigator>
+);
+
+const SearchPageStack = () => (
+  <Stack.Navigator initialRouteName='SearchPage' screenOptions={stackOptions}>
+    <Stack.Screen name='SearchPage' component={SearchPage} />
+    <Stack.Screen name='ViewPostPage' component={ViewPostPage} />
+      <Stack.Screen name='RecipePage' component={RecipePage} />
+      <Stack.Screen name='EditRecipePage' component={EditRecipePage} />
   </Stack.Navigator>
 );
 export default Navigation;
