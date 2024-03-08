@@ -5,15 +5,7 @@ import 'dotenv/config';
 
 // Elastic search db configurations
 const client = new Client({
-    node: 'https://localhost:9200',
-    auth: {
-        username: process.env.ELASTIC_SEARCH_USERNAME as string,
-        password: process.env.ELASTIC_SEARCH_PASSWORD as string
-    },
-    tls: {
-        ca: fs.readFileSync(process.env.ELASTIC_SEARCH_CERTIFICATE_DIR as string),
-        rejectUnauthorized: false
-    }
+    node: process.env.ELASTICSEARCH_URL,
 });
 
 /**
