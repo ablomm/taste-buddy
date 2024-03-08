@@ -32,6 +32,8 @@ docker-compose up --build
 from the taste-buddy directory.
 All the containers should be built and started, and the app should now be accessible.
 
+You can access the docker DB in mysql workbench from localhost:3307. Password is "0000"
+
 # Dev Containers
 1. Install the dev containers vscode extension
 2. click the bottom left and then "re-open in container"
