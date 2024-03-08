@@ -70,12 +70,35 @@ const RecommenderPage = () => {
 
   const rejectRecipe = async (recipeID: number) => {
     setDisplayRecipeNumber(displayRecipeNumber - 1);
+    checkRecipeList();
   };
 
   const saveRecipe = async (recipeID: number, username: any) => {
     try {
       // const;
       setDisplayRecipeNumber(displayRecipeNumber - 1);
+      let response = await fetch(
+        `${
+          process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
+        }/user/save-recipe/${username}}`,
+        {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            recipeID: recipeID,
+          }),
+        }
+      );
+
+      if (response.status !== 200) {
+        console.error("save recipe unsuccessful", username);
+    } else {
+      console.log("save recipe successful");
+    }
     } catch (error) {
       console.error(error);
     }
@@ -110,15 +133,15 @@ const RecommenderPage = () => {
                   cardStyle={styles.card}
                   // disableTopSwipe={true}
                   onSwipedRight={() => {
-                    saveRecipe(item.id, username);
+                    // saveRecipe(item.id, username);
                   }}
                   onSwipedLeft={() => {
-                   rejectRecipe(item.id);
+                    rejectRecipe(item.id);
                   }}
                   onSwipedBottom={() => {
                     Alert.alert("Swiped Bottom");
                   }}
-                  onSwipedTop={() =>{
+                  onSwipedTop={() => {
                     Alert.alert("Swiped Top");
                   }}
                 >
@@ -158,9 +181,9 @@ const RecommenderPage = () => {
         <TBButton
           style={{ width: "30%" }}
           title="Full Recipe"
-          onPress={fetchRecipeList}
+          onPress={() => fetchRecipeList}
         />
-        <TBButton style={{ width: "25%" }} title="Save" />
+        <TBButton style={{ width: "25%" }} title="Save" onPress={() => saveRecipe(2,username)} />
       </View>
     </View>
   );
