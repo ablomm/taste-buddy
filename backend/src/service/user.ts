@@ -98,13 +98,40 @@ export async function saveRecipe(recipeID: number, userID: any) {
             }
         }
     });
+
+    //check if folder 0 exists already
+    const existingFolder0 = await prisma.folder.findUnique({
+        where: {
+            userID: userID,
+            id: 1
+        }
+    });
+
     //create if doesnt exist
     if (!existingRecord) {
+        //first check if folder 0 exists (all saved recipes folder)
+
+        if (!existingFolder0) { //if it doesnt exist then create it
+            const newFolder0  = await prisma.folder.create({
+                data: {
+                    userID: userID,
+                    folderName: 'All',
+                }
+            });
+
+            console.log("folder 1 doesn't exist");
+            return newFolder0;
+
+        } else {
+            console.log("folder 1 exists");
+        }
+
         const newUserSavedRecipe  = await prisma.userSavedRecipes.create({
             data: {
                 recipeID: recipeID,
                 userID: userID,
                 isShowing: true,
+                folderID: 1,
             }
         });
         return newUserSavedRecipe;
@@ -140,6 +167,9 @@ export async function deleteSavedRecipe(recipeID: any, userID: any) {
 
 export async function getSavedRecipes(userId: any) {
     const user = await prisma.user.findFirst({
+        where: {
+            id: userId,
+        },
         include: {
             savedRecipes: {
               include: {
@@ -147,6 +177,64 @@ export async function getSavedRecipes(userId: any) {
               },
             },
           },
+    })
+
+    return user;
+}
+
+export async function createFolder(userID: any, folderName: any) {
+    const newFolder  = await prisma.folder.create({
+        data: {
+            userID: userID,
+            folderName: folderName,
+        }
+    });
+
+    console.log("created new folder " + folderName);
+    return newFolder;
+}
+
+export async function getUserFolders(userId: any) {
+    const user = await prisma.user.findFirst({
+        where: {
+            id: userId,
+        },
+        include: {
+            folder: true
+          },
+    })
+
+    return user;
+}
+
+export async function deleteFolder(folderID: any) {
+    const user = await prisma.folder.delete({
+        where: {
+            id: folderID,
+        },
+    })
+
+    return user;
+}
+
+export async function getRecipesInFolder(userID: any, folderName: any) {
+    const user = await prisma.user.findMany({
+        where: {
+            id: userID,
+        },
+        include: {
+            savedRecipes: {
+                include: {
+                    recipe: true,
+                    folder: true, // Include the folder information
+                },
+                where: {
+                    folder: {
+                        folderName: folderName,
+                    },
+                },
+            },
+        },
     })
 
     return user;
