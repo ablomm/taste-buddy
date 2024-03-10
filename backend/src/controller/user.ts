@@ -1,5 +1,5 @@
 import express from 'express';
-import {createUser, getModeratorStatus, addDietaryPref, getUserById, saveRecipe, getSavedRecipes, getUserByUsername, deleteSavedRecipe, createFolder, getUserFolders, deleteFolder, getRecipesInFolder} from '../service/user';
+import {createUser, getModeratorStatus, addDietaryPref, getUserById, saveRecipe, getSavedRecipes, getUserByUsername, deleteSavedRecipe} from '../service/user';
 const router = express.Router();
 
 export interface addUserRequest extends express.Request {
@@ -59,32 +59,6 @@ router.post("/save-recipe/:username", async (req: saveRecipe, res: express.Respo
   res.sendStatus(200);
 });
 
-router.post("/create-folder/:username", async (req: express.Request, res: express.Response) => {
-  const username: string = req.params["username"]
-  const folderName: string = req.body.folderName;
-  const resultString: string = username.endsWith('}') ? username.slice(0, -1) : username; //remove the curly brackets thats at the end for some reason
-
-  const user = await getUserByUsername(resultString);
-  const userID = user?.id;
-
-  await createFolder(userID, folderName);
-  res.sendStatus(200);
-});
-
-router.get("/get-folders/:username", async (req: express.Request, res: express.Response) => {
-  const username: string = req.params["username"]
-  const user = await getUserByUsername(username);
-  const userId = user?.id;
-  return res.send(await getUserFolders(userId));
-});
-
-router.delete("/delete-folder/:username", async (req: express.Request, res: express.Response) => {
-
-  const folderID: string = req.body.folderId;
-
-  return res.send(await deleteFolder(folderID));
-});
-
 router.post("/delete-saved-recipe/:username", async (req: express.Request, res: express.Response) => {
   const username: string = req.params["username"]
   const recipeID: number = req.body.recipeID;
@@ -110,16 +84,5 @@ router.get("/get-mod-status/:username", async (req: express.Request, res: expres
   return res.send(await getModeratorStatus(username));
 });
 
-// get recipes from a folder
-router.get("/get-recipes-in-folder/:username", async (req: express.Request, res: express.Response) => {
-  const username: string = req.params["username"]
-  const folderName: string = req.params.folderName;
-  const resultString: string = username.endsWith('}') ? username.slice(0, -1) : username; //remove the curly brackets thats at the end for some reason
-
-  const user = await getUserByUsername(resultString);
-  const userID = user?.id;
-
-  return res.send(await getRecipesInFolder(userID, folderName));
-});
 
 export default router;
