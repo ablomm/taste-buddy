@@ -1,6 +1,8 @@
+import 'react-native-gesture-handler';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import UserProvider from './src/providers/UserProvider';
 import TasteBuddy from './src/components/TasteBuddy'
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+
 
 const App = () => {
   return (
