@@ -395,3 +395,11 @@ export async function getRecipes() {
 
     return user;
 }
+
+export async function getRecipesByUserID(userID: number|undefined) {
+    return await prisma.recipe.findMany({
+        where: {
+            authorID: userID
+        },
+    }); 
+}
