@@ -89,6 +89,35 @@ export async function addDietaryPref(username: string, dietaryPref: string) {
     });
 }
 
+export async function saveRecipeToFolder(recipeID: number, userID: any, folderID: any) {
+    //check if saved already
+    
+    for (let i=0; i<folderID.length;i++) {
+
+        const existingFolder = await prisma.folder.findUnique({ //check if folder exists first
+            where: {
+                id: folderID[i],
+            },
+        });
+        if (existingFolder) {
+            const newUserSavedRecipe = await prisma.userSavedRecipes.update({
+                where: {
+                    userID_recipeID: {
+                        userID: userID,
+                        recipeID: recipeID
+                    }
+                }, data: {
+                    folders: {
+                        connect: [{ id: folderID[i] }] // Assuming you have 'id' properties in your Folder type
+                    }
+                }
+            });
+        } else if (!existingFolder){
+            console.log("Folder doesn't exist!")
+        }
+    }
+} 
+
 export async function saveRecipe(recipeID: number, userID: any) {
     //check if saved already
     const existingRecord = await prisma.userSavedRecipes.findUnique({
@@ -99,35 +128,128 @@ export async function saveRecipe(recipeID: number, userID: any) {
             }
         }
     });
+
+    //check if folder 0 exists already
+    const existingFolder0 = await prisma.folder.findUnique({
+        where: {
+            userID: userID,
+            folderName: 'All'
+        }
+    });
+
     //create if doesnt exist
     if (!existingRecord) {
-        const newUserSavedRecipe  = await prisma.userSavedRecipes.create({
-            data: {
-                recipeID: recipeID,
-                userID: userID,
-                // @ts-ignore
-                isShowing: true,
-            }
-        });
-        return newUserSavedRecipe;
-    } else {
-        const newUserSavedRecipeAgain = await prisma.userSavedRecipes.update({
-            where: {
-                userID_recipeID: {
+        //first check if folder 0 exists (all saved recipes folder)
+
+        if (!existingFolder0) { //if it doesnt exist then create it
+            const newFolder0  = await prisma.folder.create({
+                data: {
                     userID: userID,
-                    recipeID: recipeID
+                    folderName: 'All',
                 }
-            },
-            data: {
-                // @ts-ignore
-                isShowing: true,
+            });
+
+            console.log("folder 1 doesn't exist, recipe doesnt exist");
+            const newUserSavedRecipe  = await prisma.userSavedRecipes.create({
+                data: {
+                    recipeID: recipeID,
+                    userID: userID,
+                    isShowing: true,
+                    folders: {
+                        connect: [{ id: newFolder0.id }] // Assuming you have 'id' properties in your Folder type
+                    }
+                }
+            });
+            return newUserSavedRecipe;
+
+        } else {
+            console.log("folder 1 exists, recipe doesnt exist");
+            const newUserSavedRecipe  = await prisma.userSavedRecipes.create({
+                data: {
+                    recipeID: recipeID,
+                    userID: userID,
+                    isShowing: true,
+                    folders: {
+                        connect: [{ id: existingFolder0.id }] // Assuming you have 'id' properties in your Folder type
+                    }
+                }
+            });
+            return newUserSavedRecipe;
+        }
+
+    } else {
+        try {
+            if (!existingFolder0) { //if it doesnt exist then create it, ahhh?
+                const newFolder0  = await prisma.folder.create({
+                    data: {
+                        userID: userID,
+                        folderName: 'All',
+                    }
+                });
+                console.log("folder 1 doesn't exist, recipe exists");
+                const newUserSavedRecipeAgain = await prisma.userSavedRecipes.update({
+                    where: {
+                        userID_recipeID: {
+                            userID: userID,
+                            recipeID: recipeID
+                        }
+                    },
+                    data: {
+                        isShowing: true,
+                        folders: {
+                            connect: [{ id: newFolder0.id }] // Assuming you have 'id' properties in your Folder type
+                        }
+                    }
+                });
+                return newUserSavedRecipeAgain;
             }
-        });
-        return newUserSavedRecipeAgain;
+            else {
+                console.log("folder 1 exists, recipe exists");
+                const newUserSavedRecipeAgain = await prisma.userSavedRecipes.update({
+                    where: {
+                        userID_recipeID: {
+                            userID: userID,
+                            recipeID: recipeID
+                        }
+                    },
+                    data: {
+                        isShowing: true,
+                        folders: {
+                            connect: [{ id: existingFolder0.id }] // Assuming you have 'id' properties in your Folder type
+                        }
+                    }
+                });
+                return newUserSavedRecipeAgain;
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            // Handle the error as needed
+        }
     }
 }
 
 export async function deleteSavedRecipe(recipeID: any, userID: any) {
+    const userSavedRecipe = await prisma.userSavedRecipes.findUnique({
+        where: {
+            userID_recipeID: {
+                userID: userID,
+                recipeID: recipeID
+            }
+        },
+        include: {
+            folders: true, // Include the folder information
+        },
+    });
+
+    if (!userSavedRecipe) {
+        // Handle case where userSavedRecipe is not found
+        return;
+    }
+
+    const foldersToDisconnect = userSavedRecipe.folders.map((folder) => ({
+        id: folder.id,
+    }));
+
     const deleteSavedRecipe = await prisma.userSavedRecipes.update({
         where: {
             userID_recipeID: {
@@ -138,7 +260,10 @@ export async function deleteSavedRecipe(recipeID: any, userID: any) {
         data: {
             // @ts-ignore
             isShowing: false,
-        }
+            folders: {
+                disconnect: foldersToDisconnect,
+            },
+        },
     });
 }
 
@@ -151,6 +276,63 @@ export async function getSavedRecipes(userId: any) {
               },
             },
           },
+    })
+
+    return user;
+}
+
+export async function createFolder(userID: any, folderName: any) {
+    const newFolder  = await prisma.folder.create({
+        data: {
+            userID: userID,
+            folderName: folderName,
+        }
+    });
+
+    console.log("created new folder " + folderName);
+    return newFolder;
+}
+
+export async function getUserFolders(userId: any) {
+    const user = await prisma.user.findFirst({
+        where: {
+            id: userId,
+        },
+        include: {
+            folder: true
+          },
+    })
+
+    return user;
+}
+
+export async function deleteFolder(folderID: any) {
+    const user = await prisma.folder.delete({
+        where: {
+            id: folderID,
+        },
+    })
+
+    return user;
+}
+
+export async function getRecipesInFolder(userID: any, folderName: any) {
+    const user = await prisma.user.findMany({
+        where: {
+            id: userID,
+        },
+        include: {
+            savedRecipes: {
+                include: {
+                    recipe: true,
+                    folders: {
+                        where: {
+                            folderName: folderName,
+                        },
+                    },
+                },
+            },
+        },
     })
 
     return user;
