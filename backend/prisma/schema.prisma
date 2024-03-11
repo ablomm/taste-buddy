@@ -21,6 +21,7 @@ model User {
   userPosts    UserPosts[]
   profilePic   String             @default("")
   dietaryPref  DietaryPref[]
+  folder       Folder[]
 }
 
 model UserSavedRecipes {
