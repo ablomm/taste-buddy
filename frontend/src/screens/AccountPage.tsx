@@ -16,7 +16,6 @@ import Modal from "react-native-modal";
 import TBButton from "../components/TBButton";
 import { FontAwesome } from "@expo/vector-icons"; // or 'react-native-vector-icons/MaterialIcons'
 import { black } from "react-native-paper/lib/typescript/styles/themes/v2/colors";
-let randomNo = 1;
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -34,7 +33,12 @@ const RecentPostsScreen: (
   },
   refreshFunction,
   refreshing
-) => React.JSX.Element = ({ posts, refreshFunction, refreshing }) => {
+) => React.JSX.Element = ({
+  posts,
+  refreshFunction,
+  refreshing,
+  userRecipes,
+}) => {
   return (
     <ScrollView
       refreshControl={
@@ -43,11 +47,21 @@ const RecentPostsScreen: (
     >
       <View style={styles.screen}>
         <View style={styles.postsContainer}>
-          {posts.map((post) => (
-            <View key={post.id} style={styles.postContainer}>
-              <Image source={{ uri: post.image }} style={styles.postImage} />
-            </View>
-          ))}
+          {posts &&
+            posts.slice(-3).map((post) => (
+              <View key={post.id} style={styles.postContainer}>
+                <Image source={{ uri: post.image }} style={styles.postImage} />
+              </View>
+            ))}
+          {userRecipes &&
+            userRecipes.slice(-3).map((recipe) => (
+              <View key={recipe.id} style={styles.postContainer}>
+                <Image
+                  source={{ uri: recipe.image }}
+                  style={styles.postImage}
+                />
+              </View>
+            ))}
         </View>
       </View>
     </ScrollView>
@@ -225,14 +239,12 @@ const SavedPostsScreen = ({
             {recipesInFolder &&
               recipesInFolder.map((post) => {
                 return (
-                  <TouchableOpacity style={styles.postContainer}>
-                    <View
-                      key={`${post.id}-${randomNo}`}
-                      style={styles.postContainer}
-                    >
+                  <TouchableOpacity style={styles.postContainer} key={post.id}>
+                    <View key={post.id} style={styles.postContainer}>
                       <Image
                         source={{ uri: post.recipe.recipeImage }}
                         style={styles.postImage}
+                        key={post.id}
                       />
                     </View>
                   </TouchableOpacity>
@@ -278,10 +290,10 @@ const SavedPostsScreen = ({
               </View>
             </Modal>
             {userFolders.map((folder) => {
-              randomNo++;
               return (
                 <TouchableOpacity
                   style={styles.postContainer}
+                  key={`${folder.id}-${Math.random()}`}
                   onPress={() => {
                     getRecipesInFolder(folder.folderName);
                   }}
@@ -291,8 +303,14 @@ const SavedPostsScreen = ({
                     }
                   }}
                 >
-                  <View key={`${folder.id}`} style={styles.folders}>
-                    <Text style={styles.addButtonLabel}>
+                  <View
+                    key={`${folder.id}-${Math.random()}`}
+                    style={styles.folders}
+                  >
+                    <Text
+                      style={styles.addButtonLabel}
+                      key={`${folder.id}-${Math.random()}`}
+                    >
                       {folder.folderName}
                     </Text>
                   </View>
@@ -300,20 +318,39 @@ const SavedPostsScreen = ({
                     isVisible={isModalVisible1}
                     style={styles.modalCenter}
                     onBackdropPress={toggleModal1}
+                    key={`${folder.id}-${Math.random()}`}
                   >
-                    <View style={styles.modalContent}>
-                      <Text style={styles.modalTitle}>Delete Folder?</Text>
-                      <View style={styles.deleteContainer}>
+                    <View
+                      style={styles.modalContent}
+                      key={`${folder.id}-${Math.random()}`}
+                    >
+                      <Text
+                        style={styles.modalTitle}
+                        key={`${folder.id}-${Math.random()}`}
+                      >
+                        Delete Folder?
+                      </Text>
+                      <View
+                        style={styles.deleteContainer}
+                        key={`${folder.id}-${Math.random()}`}
+                      >
                         <TouchableOpacity
                           style={styles.addFolderButton1}
+                          key={`${folder.id}-${Math.random()}`}
                           onPress={() => {
                             deleteFolder(folder.id);
                           }}
                         >
-                          <Text style={styles.addButtonLabel}>Yes</Text>
+                          <Text
+                            style={styles.addButtonLabel}
+                            key={`${folder.id}-${Math.random()}`}
+                          >
+                            Yes
+                          </Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                           style={styles.addFolderButton2}
+                          key={`${folder.id}-${Math.random()}`}
                           onPress={() => toggleModal1()}
                         >
                           <Text style={styles.addButtonLabel}>No</Text>
@@ -336,6 +373,7 @@ const AccountPage = () => {
   const username = userContext.state.username;
 
   const [posts, setPosts] = useState();
+  const [userRecipes, setUserRecipes] = useState();
   const [savedPosts1, setSavedPosts] = useState();
   const [userFolders, setUserFolders] = useState();
   const [refreshing, setRefreshing] = useState(false);
@@ -370,6 +408,31 @@ const AccountPage = () => {
 
       await response.json().then((result) => {
         setPosts(result);
+        console.log("recent posts: ", result);
+      });
+    } catch (error) {
+      console.error(error);
+    }
+
+    try {
+      //get posts
+      const response = await fetch(
+        `${
+          process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
+        }/recipe/get-recipes-for-user/${username}`,
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+
+      await response.json().then((result) => {
+        setUserRecipes(result);
+        console.log("recent recipes: ", result);
       });
     } catch (error) {
       console.error(error);
@@ -460,6 +523,7 @@ const AccountPage = () => {
               posts ? (
                 <RecentPostsScreen
                   posts={posts}
+                  userRecipes={userRecipes}
                   refreshFunction={onRefresh}
                   refreshing={refreshing}
                 />
