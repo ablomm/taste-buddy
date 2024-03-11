@@ -12,16 +12,17 @@ const RecommenderPage = () => {
   const PAGE_WIDTH = window.width;
   const PAGE_HEIGHT = window.height;
 
-  const [recipes, setRecipes] = useState<any | null>(null); //recipes to display to user
+  const [recipes, setRecipes]: [any[], any] = useState([]); //recipes to display to user
+  const [batchNum, setBatchNum] = useState(0) // how many batches of recipes have you gone through (each batch is an http call)
   const [loading, setLoading] = useState(false); //to display loading signal
-  const [displayRecipeNumber, setDisplayRecipeNumber] = useState(0); //for how many recipes have been shown to determine refresh
+  const [recipesLeft, setRecipesLeft] = useState(0); //for how many recipes have been shown to determine refresh
 
-  const fetchRecipeList = async () => {
+  const fetchRecipeBatch = async (num: number) => {
     try {
       const response = await fetch(
         `${
           process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
-        }/recipe/get-all-recipes`,
+        }/recipe/batch/${num}`,
         {
           method: "GET",
           headers: {
@@ -32,51 +33,30 @@ const RecommenderPage = () => {
         }
       );
 
-      await response.json().then((result) => {
-        // setRecipes([...recipes, result]);
-        setRecipes(result);
-        setDisplayRecipeNumber(result.length - 1);
-      });
+      return await response.json();
     } catch (error) {
       console.error(error);
     }
   };
 
-  const updateRecipeList = async () => {
-    try {
-      const response = await fetch(
-        `${
-          process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
-        }/recipe/get-all-recipes`,
-        {
-          method: "GET",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        }
-      );
+  // call this whenever you need to add more recipes to the end of the list
+  const loadNextBatch = async() => {
+    console.log(`loading next batch, num = ${batchNum}`)
+    let newRecipes = await fetchRecipeBatch(batchNum) as any;
+    setRecipes([...recipes, ...newRecipes]);
+    setBatchNum(batchNum + 1)
+    setRecipesLeft(recipesLeft + newRecipes.length - 1);
+  }
 
-      await response.json().then((result) => {
-        // setRecipes([...recipes, result]);
-        setRecipes(result);
-        setDisplayRecipeNumber(result.length - 1);
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   const rejectRecipe = async (recipeID: number) => {
-    setDisplayRecipeNumber(displayRecipeNumber - 1);
+    setRecipesLeft(recipesLeft - 1);
     checkRecipeList();
   };
 
   const saveRecipe = async (recipeID: number, username: any) => {
     try {
-      // const;
-      setDisplayRecipeNumber(displayRecipeNumber - 1);
+      setRecipesLeft(recipesLeft - 1);
       let response = await fetch(
         `${
           process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
@@ -106,25 +86,26 @@ const RecommenderPage = () => {
   };
 
   const checkRecipeList = async () => {
-    if (displayRecipeNumber == 1) {
-      console.log("test append");
-      updateRecipeList();
+    console.log(`recipes left: ${recipesLeft}`)
+
+    if (recipesLeft == 1) {
+      loadNextBatch();
     }
   };
 
   useEffect(() => {
-    fetchRecipeList();
+    loadNextBatch();
   }, []);
 
   return (
     <View style={styles.wrapper}>
       <View style={{ flex: 1, height: PAGE_HEIGHT }}>
-        {recipes?.map((item, index) => {
+        {recipes.map((item, index) => {
           return (
             (
               <View
                 key={index}
-                style={styles.cardContainer}
+                style={[styles.cardContainer, {zIndex: -index}]} // need zindex because by default the last item in the list was displaying first
                 pointerEvents="box-none"
               >
                 <TinderCard
@@ -133,7 +114,7 @@ const RecommenderPage = () => {
                   cardStyle={styles.card}
                   // disableTopSwipe={true}
                   onSwipedRight={() => {
-                    // saveRecipe(item.id, username);
+                    saveRecipe(item.id, username);
                   }}
                   onSwipedLeft={() => {
                     rejectRecipe(item.id);
@@ -181,7 +162,7 @@ const RecommenderPage = () => {
         <TBButton
           style={{ width: "30%" }}
           title="Full Recipe"
-          onPress={() => fetchRecipeList}
+          onPress={() => loadNextBatch}
         />
         <TBButton style={{ width: "25%" }} title="Save" onPress={() => saveRecipe(2,username)} />
       </View>
