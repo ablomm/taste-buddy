@@ -95,6 +95,16 @@ export async function getAllRecipes(){
     return await prisma.recipe.findMany();
 }
 
+// placeholder, use the algorithm when it is finished. Currently just displays it sequentually
+export async function getRecipeBatch(batchNum: number) {
+    const batchSize = 2;
+
+    return await prisma.recipe.findMany({
+        skip: batchSize * batchNum,
+        take: batchSize,
+    })
+}
+
 /**
  * This function updates the recipe table using the recipe and user ID.
  * Any general information changes will be updated in the database.
