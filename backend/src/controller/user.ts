@@ -1,6 +1,6 @@
 import express, {Response, Request} from 'express';
 import { PrismaClient } from '@prisma/client';
-import {createUser, getModeratorStatus, addDietaryPref, saveRecipe, getSavedRecipes, getUserByUsername, deleteSavedRecipe, createFolder, getUserFolders, deleteFolder, getRecipesInFolder} from '../service/user';
+import {createUser, getModeratorStatus, addDietaryPref, saveRecipe, getSavedRecipes, getUserByUsername, deleteSavedRecipe, createFolder, getUserFolders, deleteFolder, getRecipesInFolder, saveRecipeToFolder} from '../service/user';
 const prisma = new PrismaClient();
 const router = express.Router();
 
@@ -48,6 +48,19 @@ router.post("/save-recipe/:username", async (req: saveRecipe, res: express.Respo
   const userID = user?.id;
 
   await saveRecipe(recipeID, userID);
+  res.sendStatus(200);
+});
+
+router.post("/save-recipe-to-folder/:username", async (req: express.Request, res: express.Response) => {
+  const username: string = req.params["username"]
+  const recipeID: number = req.body.recipeID;
+  const folderID: number = req.body.folderID;
+  const resultString: string = username.endsWith('}') ? username.slice(0, -1) : username; //remove the curly brackets thats at the end for some reason
+
+  const user = await getUserByUsername(resultString);
+  const userID = user?.id;
+
+  await saveRecipeToFolder(recipeID, userID, folderID);
   res.sendStatus(200);
 });
 

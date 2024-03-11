@@ -178,14 +178,17 @@ const SavedPostsScreen = ({
 
           setRecipesInFolder(
             test1[0].savedRecipes.filter(
-              (recipe) => recipe.folder.folderName === folderName
+              (recipe) =>
+                recipe.folders.some(
+                  (folder) => folder.folderName === folderName
+                ) && recipe.isShowing === true
             ) || []
           );
           console.log(
             "recipes in folder " +
               folderName +
               ": " +
-              JSON.stringify(recipesInFolder)
+              JSON.stringify(test1[0].savedRecipes)
           );
         });
         console.log("got recipes in folder successfully");
@@ -224,7 +227,7 @@ const SavedPostsScreen = ({
                 return (
                   <TouchableOpacity style={styles.postContainer}>
                     <View
-                      key={`${post.recipe.userID}-${randomNo}`}
+                      key={`${post.id}-${randomNo}`}
                       style={styles.postContainer}
                     >
                       <Image
@@ -235,6 +238,11 @@ const SavedPostsScreen = ({
                   </TouchableOpacity>
                 );
               })}
+            {recipesInFolder.length === 0 && (
+              <View style={styles.noRecipesText}>
+                <Text>No recipes in folder</Text>
+              </View>
+            )}
           </View>
         </View>
         <View style={{ display: isModalVisible2 ? "flex" : "none" }}>
@@ -278,7 +286,9 @@ const SavedPostsScreen = ({
                     getRecipesInFolder(folder.folderName);
                   }}
                   onLongPress={() => {
-                    toggleModal1();
+                    if (folder.id !== 1) {
+                      toggleModal1();
+                    }
                   }}
                 >
                   <View key={`${folder.id}`} style={styles.folders}>
@@ -386,7 +396,7 @@ const AccountPage = () => {
         let test1 = JSON.parse(test).folder;
 
         setUserFolders(test1);
-        console.log("logFolders" + JSON.stringify(test1));
+        //console.log("logFolders" + JSON.stringify(test1));
       });
     } catch (error) {
       console.error(error);
@@ -413,7 +423,7 @@ const AccountPage = () => {
         let test1 = JSON.parse(test).savedRecipes;
 
         setSavedPosts(test1);
-        console.log("logSavedRecipes" + JSON.stringify(test1));
+        //console.log("logSavedRecipes" + JSON.stringify(test1));
       });
     } catch (error) {
       console.error(error);
@@ -458,7 +468,7 @@ const AccountPage = () => {
               )
             }
           </Tab.Screen>
-          <Tab.Screen name="Saved Posts">
+          <Tab.Screen name="Saved Recipes">
             {() =>
               savedPosts1 ? (
                 <SavedPostsScreen
@@ -661,6 +671,11 @@ const styles = StyleSheet.create({
   folderItemText: {
     marginLeft: 10,
     fontSize: 16,
+  },
+  noRecipesText: {
+    alignItems: "center", // Center items horizontally
+    justifyContent: "center",
+    flex: 1,
   },
 });
 

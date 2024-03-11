@@ -25,15 +25,14 @@ model User {
 }
 
 model UserSavedRecipes {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   userID    Int
-  user      User     @relation(fields: [userID], references: [id])
+  user      User      @relation(fields: [userID], references: [id])
   recipeID  Int
-  recipe    Recipe   @relation(fields: [recipeID], references: [id])
-  timeSaved DateTime @default(now())
-  isShowing Boolean  @default(false)
-  folderID  Int      @default(1)
-  folder    Folder   @relation(fields: [folderID], references: [id])
+  recipe    Recipe    @relation(fields: [recipeID], references: [id])
+  timeSaved DateTime  @default(now())
+  isShowing Boolean   @default(false)
+  folders   Folder[]  @relation("UserSavedRecipesToFolders")
   @@unique([userID, recipeID])
 }
 
@@ -42,7 +41,7 @@ model Folder {
   folderName   String             @unique
   userID       Int
   user         User               @relation(fields: [userID], references: [id])
-  savedRecipes UserSavedRecipes[]
+  savedRecipes UserSavedRecipes[] @relation("UserSavedRecipesToFolders")
 }
 
 model DietaryPref {
