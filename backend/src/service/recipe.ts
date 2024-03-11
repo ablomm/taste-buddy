@@ -1,5 +1,6 @@
 import {PrismaClient} from '@prisma/client';
 
+
 const prisma = new PrismaClient();
 
 type Ingredient = {
@@ -382,10 +383,6 @@ export async function getReviewsByPage(recipeID: number, page: number, order:Ord
             },
             orderBy:orderBy
         })
-
-
-
-
 }
 
 export async function getRecipes() {

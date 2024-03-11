@@ -15,7 +15,7 @@ import {
     processIngredients,
     processInstructions,
     getRecipeBatch,
-    getRecipesByUserID 
+    getRecipesByUserID
 } from '../service/recipe';
 import { getUserByUsername, getProfilePhotoByUsername } from "../service/user";
 import {editRecipe, storeRecipe} from "../service/search";
