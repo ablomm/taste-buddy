@@ -13,7 +13,8 @@ import {
     createReview,
     getReviewsByPage,
     processIngredients,
-    processInstructions
+    processInstructions,
+    getRecipeBatch,
     getRecipesByUserID 
 } from '../service/recipe';
 import { getUserByUsername, getProfilePhotoByUsername } from "../service/user";
@@ -98,7 +99,16 @@ router.get("/get-all-recipes", async (req: express.Request, res: express.Respons
     }catch (error){
         console.error(error);
     }
+});
 
+router.get("/batch/:num", async (req: express.Request, res: express.Response) => {
+    const num: number = parseInt(req.params["num"]); // how many batches the client has seen in it's session. Increments every batch (on frontend)
+    try{
+        const recipes = await getRecipeBatch(num);
+        return res.json(recipes);
+    }catch (error){
+        console.error(error);
+    }
 });
 
 router.put("/edit-recipe", async (req: express.Request, res: express.Response) => {
