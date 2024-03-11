@@ -13,13 +13,9 @@ import {
     createReview,
     getReviewsByPage,
     processIngredients,
-<<<<<<< HEAD
-    processInstructions
-    getRecipesByUserID 
-=======
     processInstructions,
-    getRecipeBatch
->>>>>>> TB-34-Display-Recipe-Card
+    getRecipeBatch,
+    getRecipesByUserID 
 } from '../service/recipe';
 import { getUserByUsername, getProfilePhotoByUsername } from "../service/user";
 import {editRecipe, storeRecipe} from "../service/search";
