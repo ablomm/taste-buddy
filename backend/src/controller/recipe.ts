@@ -15,7 +15,8 @@ import {
     processIngredients,
     processInstructions,
     getRecipeBatch,
-    getRecipesByUserID
+    getRecipesByUserID,
+    getPersonalizedRecipes
 } from '../service/recipe';
 import { getUserByUsername, getProfilePhotoByUsername } from "../service/user";
 import {editRecipe, storeRecipe} from "../service/search";
@@ -108,6 +109,18 @@ router.get("/batch/:num", async (req: express.Request, res: express.Response) =>
         return res.json(recipes);
     }catch (error){
         console.error(error);
+    }
+});
+
+router.post("/api/personalized-recommendations", async (req: express.Request, res: express.Response) => {
+    try {
+        // Call the service function, passing the request body
+        const result = await getPersonalizedRecipes(req.body);
+        // Send the result back to the client
+        res.json(result);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
     }
 });
 
