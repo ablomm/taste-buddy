@@ -17,9 +17,10 @@ import { UserContext } from '../providers/UserProvider';
 import AddStepForm, { Step } from '../components/CreateRecipe/steps/AddStepForm';
 import EditStepForm from '../components/CreateRecipe/steps/EditStepForm';
 import StepListItem from '../components/CreateRecipe/steps/StepListItem';
-import {Buffer} from 'buffer';
+import { Buffer } from 'buffer';
 import getBase64 from '../functions/GetBase64FromURI';
 import { LoadingContext } from '../providers/LoadingProvider';
+import { putImage, saveRecipe } from '../functions/HTTPRequests';
 
 const CreateRecipePage = ({ route, navigation }: any) => {
   const { pickedImage } = route.params;
@@ -157,91 +158,39 @@ const CreateRecipePage = ({ route, navigation }: any) => {
 
   const onSubmit = async (data: any) => {
     loadingContext.enable();
-    let imageUrl;
-    let s3AccessUrl;
-    let s3Response;
-    //const username = "";
-    try {
-      s3AccessUrl = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/recipe/s3Url`, {  //get secure s3 access url 
-        method: 'GET',
-      }).then(res => res.json());
-    } catch (error: any) {
-      console.log("image link generation error")
-      Alert.alert("image link generation error");
-      console.log(error)
-    }
 
-    if (s3AccessUrl) {
-      if(!image.base64){
+    try {
+      if (!image.base64) {
         image.base64 = await getBase64(image.uri);
       }
       const buf = Buffer.from(image.base64, 'base64') //isolate the base64 buffer
       let type = image.uri.substring(image.uri.lastIndexOf('.') + 1, image.uri.length);
-      
-      try {
-        s3Response = await fetch(s3AccessUrl.imageURL[0], {  //put the image on the bucket
-          method: 'PUT',
-          headers: {
-            'ContentEncoding': 'base64',
-            'Content-Type': `image/${type}`,
-          },
-          body: buf
-        });
+      let imageUrl = await putImage(buf, type)
 
-        if (s3Response.status !== 200) {
-          console.log(s3Response);
-          console.log("s3Response, s3 error")
-        } else {
-          imageUrl = s3AccessUrl.imageURL[0].split('?')[0];
-          console.log("uploaded image url: " + imageUrl);
-        }
-      } catch (error: any) {
-        console.log("image put failed")
-        Alert.alert("image put failed");
-        console.log(error)
-      }
-    } else {
-      console.log("imageURL is null")
-    }
+      await saveRecipe(
+        userContext.state.username,
+        data.title,
+        data.description,
+        steps,
+        data.cookTime,
+        data.calories,
+        data.servings,
+        ingredients,
+        tags,
+        imageUrl
+      );
 
+      console.log("upload successful")
+      navigation.navigate('AccountPageStack');
 
-    try {
-      let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/recipe/save`, {  //save the recipe
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          username: userContext.state.username,
-          title: data.title,
-          description: data.description,
-          instructions: steps,
-          cookTime: data.cookTime,
-          calories: data.calories,
-          servings: data.servings,
-          ingredients: ingredients,
-          tags: tags,
-          image: imageUrl
-        }),
-      });
-
-      if (response.status !== 200) {
-        console.log("upload failed")
-        console.log(response)
-        Alert.alert("Upload failed");
-      } else {
-        console.log("upload successful")
-        console.log(ingredients)
-        navigation.navigate('AccountPageStack');
-      }
     } catch (error: any) {
-      console.log("upload error")
-      Alert.alert("Upload error");
-      console.error(error.stack);
+      console.error("Error saving recipe");
+      console.error(error);
+      Alert.alert("Error saving recipe")
+      
+    } finally {
+      loadingContext.disable();
     }
-    loadingContext.disable()
   };
 
   return (
@@ -288,7 +237,7 @@ const CreateRecipePage = ({ route, navigation }: any) => {
 
       <Formik
         initialValues={{
-          image:null,
+          image: null,
           title: '',
           description: '',
           instructions: '',
