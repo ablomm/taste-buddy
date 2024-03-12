@@ -12,7 +12,9 @@ import {
     createReview,
     getReviewsByPage,
     processIngredients,
-    processInstructions
+    processInstructions,
+    getRecipeBatch,
+    getRecipesByUserID
 } from '../service/recipe';
 import { getUserByUsername, getProfilePhotoByUsername } from "../service/user";
 import {editRecipe, storeRecipe} from "../service/search";
@@ -91,7 +93,16 @@ router.get("/get-all-recipes", async (req: express.Request, res: express.Respons
     }catch (error){
         console.error(error);
     }
+});
 
+router.get("/batch/:num", async (req: express.Request, res: express.Response) => {
+    const num: number = parseInt(req.params["num"]); // how many batches the client has seen in it's session. Increments every batch (on frontend)
+    try{
+        const recipes = await getRecipeBatch(num);
+        return res.json(recipes);
+    }catch (error){
+        console.error(error);
+    }
 });
 
 router.put("/edit-recipe", async (req: express.Request, res: express.Response) => {
@@ -197,3 +208,20 @@ router.get("/reviews", async (req: express.Request, res: express.Response) => {
     res.send({reviews});
 });
 export default router;
+
+
+router.get("/get-recipes-for-user/:username", async (req: express.Request, res: express.Response) => {
+    try {
+        const username: string = req.params["username"]
+
+        const user = await getUserByUsername(username);
+        const userId = user?.id;
+
+        const recipes = await getRecipesByUserID(userId); 
+
+        res.json(recipes);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send(error);
+    }
+});

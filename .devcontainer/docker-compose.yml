@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  backend:
+    profiles:
+      - donotstart
+    
+  frontend:
+    profiles:
+      - donotstart
+        
+  tastebuddy:
+    image: tb
+    build: .
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    networks:
+      - tastebuddy-net
+    environment:
+      DATABASE_URL: "mysql://root:0000@database:3306/tastebuddy"
+      ELASTICSEARCH_URL: "http://elasticsearch:9200"
+    depends_on:
+      database:
+        condition: service_healthy
+    volumes:
+      - ./:/opt/app/
+      - /opt/app/frontend/node_modules
+      - /opt/app/backend/node_modules

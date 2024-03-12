@@ -3,6 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, SafeAreaView } from 'react-native';
 import Navigation from "../components/Navigation";
 import UserProvider, { UserContext } from '../providers/UserProvider';
+import LoadingIcon from './LoadingIcon';
 
 const TasteBuddy = () => {
     const userContext = React.useContext(UserContext) as any;
@@ -35,10 +36,13 @@ const TasteBuddy = () => {
     }, [])
 
     return (
-        <SafeAreaView style={styles.container}>
-            <Navigation />
-            <StatusBar style="auto" />
-        </SafeAreaView>
+        <>
+            <LoadingIcon />
+            <SafeAreaView style={styles.container}>
+                <Navigation />
+                <StatusBar style="auto" />
+            </SafeAreaView>
+        </>
     );
 }
 

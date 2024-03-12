@@ -1,6 +1,8 @@
-import express from 'express';
-import {createUser, setProfilePicOfUser, getModeratorStatus, addDietaryPref, getUserById, saveRecipe, getSavedRecipes, getUserByUsername, deleteSavedRecipe} from '../service/user';
+import express, {Response, Request} from 'express';
+import { PrismaClient } from '@prisma/client';
+import {createUser, setProfilePicOfUser, getModeratorStatus, addDietaryPref, getUserById, saveRecipe, getSavedRecipes, getUserByUsername, deleteSavedRecipe, createFolder, getUserFolders, deleteFolder, getRecipesInFolder, saveRecipeToFolder} from '../service/user';
 import { generateUploadURL } from '../service/s3';
+const prisma = new PrismaClient();
 const router = express.Router();
 
 export interface addUserRequest extends express.Request {
@@ -79,6 +81,45 @@ router.post("/update-profile/profilePic", async (req: express.Request, res: expr
 router.get("/s3Url", async (req: express.Request, res: express.Response) => {
   const imageURL = await generateUploadURL()
   return res.send({ imageURL });
+});
+
+router.post("/save-recipe-to-folder/:username", async (req: express.Request, res: express.Response) => {
+  const username: string = req.params["username"]
+  const recipeID: number = req.body.recipeID;
+  const folderID: number = req.body.folderID;
+  const resultString: string = username.endsWith('}') ? username.slice(0, -1) : username; //remove the curly brackets thats at the end for some reason
+
+  const user = await getUserByUsername(resultString);
+  const userID = user?.id;
+
+  await saveRecipeToFolder(recipeID, userID, folderID);
+  res.sendStatus(200);
+});
+
+router.post("/create-folder/:username", async (req: express.Request, res: express.Response) => {
+  const username: string = req.params["username"]
+  const folderName: string = req.body.folderName;
+  const resultString: string = username.endsWith('}') ? username.slice(0, -1) : username; //remove the curly brackets thats at the end for some reason
+
+  const user = await getUserByUsername(resultString);
+  const userID = user?.id;
+
+  await createFolder(userID, folderName);
+  res.sendStatus(200);
+});
+
+router.get("/get-folders/:username", async (req: express.Request, res: express.Response) => {
+  const username: string = req.params["username"]
+  const user = await getUserByUsername(username);
+  const userId = user?.id;
+  return res.send(await getUserFolders(userId));
+});
+
+router.delete("/delete-folder/:username", async (req: express.Request, res: express.Response) => {
+
+  const folderID: string = req.body.folderId;
+
+  return res.send(await deleteFolder(folderID));
 });
 
 router.post("/delete-saved-recipe/:username", async (req: express.Request, res: express.Response) => {

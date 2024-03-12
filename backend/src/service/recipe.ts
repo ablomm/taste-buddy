@@ -1,5 +1,6 @@
 import {PrismaClient} from '@prisma/client';
 
+
 const prisma = new PrismaClient();
 
 type Ingredient = {
@@ -93,6 +94,16 @@ export async function getRecipeByUserAndTitle(userID: number|undefined, title: s
 
 export async function getAllRecipes(){
     return await prisma.recipe.findMany();
+}
+
+// placeholder, use the algorithm when it is finished. Currently just displays it sequentually
+export async function getRecipeBatch(batchNum: number) {
+    const batchSize = 2;
+
+    return await prisma.recipe.findMany({
+        skip: batchSize * batchNum,
+        take: batchSize,
+    })
 }
 
 /**
@@ -372,10 +383,6 @@ export async function getReviewsByPage(recipeID: number, page: number, order:Ord
             },
             orderBy:orderBy
         })
-
-
-
-
 }
 
 export async function getRecipes() {
@@ -384,4 +391,12 @@ export async function getRecipes() {
     })
 
     return user;
+}
+
+export async function getRecipesByUserID(userID: number|undefined) {
+    return await prisma.recipe.findMany({
+        where: {
+            authorID: userID
+        },
+    }); 
 }
