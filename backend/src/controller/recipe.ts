@@ -16,7 +16,8 @@ import {
     processInstructions,
     getRecipeBatch,
     getRecipesByUserID,
-    getPersonalizedRecipes
+    getPersonalizedRecipes,
+    getTopRatedRecipes
 } from '../service/recipe';
 import { getUserByUsername, getProfilePhotoByUsername } from "../service/user";
 import {editRecipe, storeRecipe} from "../service/search";
@@ -112,12 +113,15 @@ router.get("/batch/:num", async (req: express.Request, res: express.Response) =>
     }
 });
 
-router.post("/api/personalized-recommendations", async (req: express.Request, res: express.Response) => {
+router.post("/api/recommendations", async (req: express.Request, res: express.Response) => {
     try {
         // Call the service function, passing the request body
-        const result = await getPersonalizedRecipes(req.body);
+        const personalizedResult = await getPersonalizedRecipes(req.body);
+        const topRatedResult = await getTopRatedRecipes(req.body);
+        // insert logic to combine list of top rated and personalized recipes
+
         // Send the result back to the client
-        res.json(result);
+        res.json(personalizedResult);
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');
