@@ -13,10 +13,13 @@ import TagListItem from '../components/CreateRecipe/tags/TagListItem';
 import { UserContext } from "../providers/UserProvider";
 import { Buffer } from 'buffer';
 import getBase64 from '../functions/GetBase64FromURI';
+import { LoadingContext } from '../providers/LoadingProvider';
 
 const CreatePostPage = ({ route, navigation }: any) => {
   const { pickedImage } = route.params;
   const userContext = React.useContext(UserContext) as any;
+  const loadingContext = React.useContext(LoadingContext) as any;
+
   // define validation rules for each field
   const recipeSchema = yup.object().shape({
     description: yup
@@ -102,6 +105,7 @@ const CreatePostPage = ({ route, navigation }: any) => {
 
         validationSchema={recipeSchema}
         onSubmit={async values => {
+          loadingContext.enable();
           console.log(values);
           let imageUrl: string = "";
           let s3AccessUrl: any;
@@ -179,6 +183,7 @@ const CreatePostPage = ({ route, navigation }: any) => {
             console.log("upload error")
             console.error(error.stack);
           }
+          loadingContext.disable();
         }}>
 
         {({ errors, handleChange, handleBlur, handleSubmit, values }) => (
