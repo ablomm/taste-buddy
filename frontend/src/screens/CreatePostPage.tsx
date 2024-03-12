@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, KeyboardAvoidingView, Platform } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Image, KeyboardAvoidingView, Platform, Alert } from "react-native";
 import * as yup from 'yup';
 import { Formik } from 'formik';
 import BackButton from '../components/BackButton';
@@ -13,10 +13,14 @@ import TagListItem from '../components/CreateRecipe/tags/TagListItem';
 import { UserContext } from "../providers/UserProvider";
 import { Buffer } from 'buffer';
 import getBase64 from '../functions/GetBase64FromURI';
+import { LoadingContext } from '../providers/LoadingProvider';
+import { putImage, savePost } from '../functions/HTTPRequests';
 
 const CreatePostPage = ({ route, navigation }: any) => {
   const { pickedImage } = route.params;
   const userContext = React.useContext(UserContext) as any;
+  const loadingContext = React.useContext(LoadingContext) as any;
+
   // define validation rules for each field
   const recipeSchema = yup.object().shape({
     description: yup
@@ -101,83 +105,31 @@ const CreatePostPage = ({ route, navigation }: any) => {
         }}
 
         validationSchema={recipeSchema}
+
         onSubmit={async values => {
-          console.log(values);
-          let imageUrl: string = "";
-          let s3AccessUrl: any;
-          let s3Response: any;
+          loadingContext.enable();
 
           try {
-            s3AccessUrl = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/post/s3Url`, {  //get secure s3 access url
-              method: 'GET',
-            }).then(res => res.json());
-          } catch (error: any) {
-            console.log("image link generation error")
-            console.log(error)
-          }
-
-          if (s3AccessUrl) {
-            if(!image.base64){
+            if (!image.base64) {
               image.base64 = await getBase64(image.uri);
             }
             const buf = Buffer.from(image.base64, 'base64') //isolate the base64 buffer
             let type = image.uri.substring(image.uri.lastIndexOf('.') + 1, image.uri.length);
-
-            try {
-              s3Response = await fetch(s3AccessUrl.imageURL[0], {  //put the image on the bucket
-                method: 'PUT',
-                headers: {
-                  'ContentEncoding': 'base64',
-                  'Content-Type': `image/${type}`,
-                },
-                body: buf
-              });
-
-              if (s3Response.status !== 200) {
-                console.log("s3Response, s3 error")
-                console.log(s3Response);
-              } else {
-                imageUrl = s3AccessUrl.imageURL[0].split('?')[0];
-                console.log("uploaded image url: " + imageUrl);
-              }
-            } catch (error: any) {
-              console.log("image put failed")
-              console.log(error)
-            }
-          } else {
-            console.log("imageURL is null")
-          }
-
-          try {
-            // Save the post
-            let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/post/create`, {
-              method: 'POST',
-              headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-              },
-              credentials: 'include',
-              body: JSON.stringify({
-                username: userContext.state.username,
-                description: values.description,
-                tags: tags,
-                image: imageUrl,
-                recipeURL: values.recipeUrl
-              }),
-            });
-
-            if (response.status !== 200) {
-              console.log("upload failed")
-              console.log(response)
-            } else {
-              console.log("upload successful")
-              console.log(values)
-            }
-
+  
+            let imageUrl = await putImage(buf, type)
+  
+            await savePost(userContext.state.username, values.description, tags, imageUrl, values.recipeUrl)
+  
+            console.log("Save post successful")
             navigation.navigate('AccountPageStack');
+
           } catch (error: any) {
-            console.log("upload error")
-            console.error(error.stack);
+            console.error("Error saving post");
+            console.error(error);
+            Alert.alert("Error saving post")
+
+          } finally {
+            loadingContext.disable();
           }
         }}>
 
