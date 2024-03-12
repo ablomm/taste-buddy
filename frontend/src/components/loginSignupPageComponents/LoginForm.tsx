@@ -5,9 +5,12 @@ import { Formik } from 'formik';
 import ValidatedInput from '../ValidatedInput';
 import { UserContext } from '../../providers/UserProvider';
 import TBButton from '../TBButton';
+import { login } from '../../functions/HTTPRequests';
+import { LoadingContext } from '../../providers/LoadingProvider';
 
 const LoginForm = () => {
     const userContext = React.useContext(UserContext) as any;
+    const loadingContext = React.useContext(LoadingContext) as any;
 
     // define validation rules for each field
     const LoginFormSchema = yup.object().shape({
@@ -21,29 +24,18 @@ const LoginForm = () => {
             .min(10, 'Password must contain at least 10 characters')
     });
     const onSubmit = async (data: any) => {
-        try {
-            let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/login`, {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include',
-                body: JSON.stringify({
-                    username: data.username,
-                    password: data.password,
-                }),
-            });
+        loadingContext.enable();
 
-            if (response.status !== 200) {
-                Alert.alert("Login failed please try again")
-            } else {
-                let json = await response.json();
-                userContext.login(data.username, json.id)
-            }
+        try {
+            let result = await login(data.username, data.password);
+            userContext.login(data.username, result.id)
+
         } catch (error: any) {
+            console.error(error);
             Alert.alert("Login failed please try again")
-            console.error(error.stack);
+
+        } finally {
+            loadingContext.disable();
         }
     };
     return (
@@ -74,7 +66,7 @@ const LoginForm = () => {
                         value={values.password}
                         error={errors.password}
                     />
-                    <TBButton onPress={handleSubmit} title="Login"/>
+                    <TBButton onPress={handleSubmit} title="Login" />
                 </View>
             )}
         </Formik>

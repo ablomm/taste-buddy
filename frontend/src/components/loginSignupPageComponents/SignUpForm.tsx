@@ -1,14 +1,17 @@
 import React from 'react';
-import { View, Text, StyleSheet, TextInput, Button, Pressable } from "react-native";
+import { View, Text, StyleSheet, TextInput, Button, Pressable, Alert } from "react-native";
 import * as yup from 'yup';
 import { Formik, Form, Field } from 'formik';
 import ValidatedInput from '../ValidatedInput';
 import { UserContext } from '../../providers/UserProvider';
 import TBButton from '../TBButton';
+import { login, signUp } from '../../functions/HTTPRequests';
+import { LoadingContext } from '../../providers/LoadingProvider';
 
 const SignUpForm = () => {
 
     const userContext = React.useContext(UserContext) as any;
+    const loadingContext = React.useContext(LoadingContext) as any;
 
     // define validation rules for each field
     const schema = yup.object().shape({
@@ -43,32 +46,20 @@ const SignUpForm = () => {
                 validateOnBlur={false}
                 validationSchema={schema}
                 onSubmit={async values => {
-                    console.log(values);
+                    loadingContext.enable();
                     try {
-                        let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/user`, {
-                          method: 'POST',
-                          headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json',
-                          },
-                          credentials: 'include',
-                          body: JSON.stringify({
-                            username: values.username,
-                            email: values.email,
-                            password: values.password
-                          })
-                        });
+                        await signUp(values.username, values.email, values.password);
+                        let loginResponse = await login(values.username, values.password);
+                        console.log("account creation successful");
+                        userContext.login(values.username, loginResponse.id);
 
-                        if (response.status !== 200) {
-                            console.error("account creation unsuccessful");
-                        } else {
-                            let json = await response.json();
-                          console.log("account creation successful");
-                          userContext.login(values.username, json.id);
-                        }
-                      } catch (error: any) {
-                        console.error(error.stack);
-                      }
+                    } catch (error: any) {
+                        console.error(error);
+                        Alert.alert("Account creation failed, please try again");
+
+                    } finally {
+                        loadingContext.disable();
+                    }
                 }}
 
 
@@ -81,14 +72,14 @@ const SignUpForm = () => {
                             onChangeText={handleChange('username')}
                             onBlur={handleBlur('username')}
                             textContentType='username'
-                            secureTextEntry = {false}
+                            secureTextEntry={false}
                             value={values.username}
                             error={errors.username}
                         />
                         <ValidatedInput
                             placeholder="Email"
                             textContentType='emailAddress'
-                            secureTextEntry = {false}
+                            secureTextEntry={false}
                             onChangeText={handleChange('email')}
                             onBlur={handleBlur('email')}
                             value={values.email}
@@ -96,7 +87,7 @@ const SignUpForm = () => {
                         />
                         <ValidatedInput
                             placeholder="Password"
-                            secureTextEntry = {true}
+                            secureTextEntry={true}
                             textContentType='password'
                             onChangeText={handleChange('password')}
                             onBlur={handleBlur('password')}
@@ -105,7 +96,7 @@ const SignUpForm = () => {
                         />
                         <ValidatedInput
                             placeholder="Confirm Password"
-                            secureTextEntry = {true}
+                            secureTextEntry={true}
                             textContentType='password'
                             onChangeText={handleChange('confirmPassword')}
                             onBlur={handleBlur('passwordConfirm')}
@@ -114,7 +105,7 @@ const SignUpForm = () => {
                         />
 
                         {/* <Button title="Sign Up" color={"black"}></Button> */}
-                        <TBButton onPress={handleSubmit} title="Sign Up"/>
+                        <TBButton onPress={handleSubmit} title="Sign Up" />
                     </View>)}
             </Formik>
         </>);
