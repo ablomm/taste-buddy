@@ -1,7 +1,9 @@
 import {PrismaClient} from '@prisma/client';
+import {RequestOptions, IncomingMessage} from 'http';
 
 
 const prisma = new PrismaClient();
+const http = require('http');
 
 type Ingredient = {
     id: number,
@@ -104,6 +106,54 @@ export async function getRecipeBatch(batchNum: number) {
         skip: batchSize * batchNum,
         take: batchSize,
     })
+}
+
+
+export async function getPersonalizedRecipes(data: any): Promise<any>{
+    return new Promise((resolve, reject) => {
+        
+        const temp = [39,41,43,51,52,54,60]
+        // Convert the data to a JSON string
+        const postData = JSON.stringify(temp);
+
+        // Options for the HTTP request
+        const options: RequestOptions = {
+            // hostname: 'localhost', 
+            hostname: '127.0.0.1', 
+            port: 5000, 
+            path: '/api/personalized-recommendations', 
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': Buffer.byteLength(postData),
+            },
+        };
+
+        // Set up the request
+        const req = http.request(options, (res: IncomingMessage) => {
+            // Handle incoming data
+            let body = '';
+            res.on('data', (chunk: Buffer) => {
+                body += chunk;
+            });
+            res.on('end', () => {
+                try {
+                    // Try to parse the JSON data
+                    // resolve(JSON.parse(body));
+                    resolve((body));
+                } catch (error) {
+                    reject(error);
+                }
+            });
+        });
+        req.on('error', (error: Error) => {
+            reject(error);
+        });
+
+        // Write data to request body and end the request
+        req.write(postData);
+        req.end();
+    });
 }
 
 /**
@@ -400,3 +450,4 @@ export async function getRecipesByUserID(userID: number|undefined) {
         },
     }); 
 }
+

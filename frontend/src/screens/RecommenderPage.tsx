@@ -39,6 +39,31 @@ const RecommenderPage = () => {
     }
   };
 
+  const testFetch = async (data: any) => {
+    try {
+      const response = await fetch(
+        `${
+          process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
+        }/recipe/api/personalized-recommendations`,
+        {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            data: data,
+          }),
+        }
+      );
+
+      return await response.json();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   // call this whenever you need to add more recipes to the end of the list
   const loadNextBatch = async() => {
     console.log(`loading next batch, num = ${batchNum}`)
@@ -158,7 +183,7 @@ const RecommenderPage = () => {
       </View>
       {/* <Button title="fetch recipes list" onPress={fetchRecipeList}/> */}
       <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-        <TBButton style={{ width: "25%" }} title="X" />
+        <TBButton style={{ width: "25%" }} title="X" onPress={()=> testFetch(username)}/>
         <TBButton
           style={{ width: "30%" }}
           title="Full Recipe"
