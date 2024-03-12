@@ -1,88 +1,100 @@
 import React, {useEffect, useState} from "react";
-import {FlatList, View, Text, StyleSheet, Image, TouchableOpacity, RefreshControl} from "react-native";
-import {TouchableRipple} from "react-native-paper";
-import StarRating from "react-native-star-rating-widget";
-import RelevantPostsGrid from "./ReleventPostsGrid";
-import {NoResultMessage} from "./NoResultMessage";
+import {View, Text, StyleSheet, TouchableOpacity} from "react-native";
+import {FilterBar} from "./FilterBar";
+import {RecipeTab} from "./RecipeTab";
 import {Recipe} from "../../interfaces/RecipeInterface";
+import {PostTab} from "./PostTab";
 
-
-function SearchResultBody({ navigation, searchResults }) {
+function SearchResultBody({ navigation, searchResults, search }) {
     const [selectedTab, setSelectedTab] = useState<'recipes' | 'posts'>('recipes');
     const [relevantRecipes, setRelevantRecipes] = React.useState([]);
     const [relevantPosts, setRelevantPosts] = React.useState([]);
-    const [refreshing, setRefreshing] = useState(false);
+    const [selectedOption, setSelectedOption] = useState('Relevancy');
+    const [selectedTags, setSelectedTags] = useState<string[]>([]);
+    const [sortedRecipes, setSortedRecipes] = useState<Recipe[]>([]);
+    const [allUniqueTags, setAllUniqueTags] = useState<string[]>([]);
+    const [filterStatus, setFilterStatus] = useState<boolean>(false);
 
     useEffect(() => {
         // Update these states everytime a new search result exists
+        collectTags(searchResults['recipes']);
         setRelevantRecipes(searchResults['recipes']);
         setRelevantPosts(searchResults['posts']);
     }, [searchResults]);
 
-    const truncateText = (text: string, maxLength: number): string => {
-        if (text.length > maxLength) {
-            return text.substring(0, maxLength) + '...';
-        }
-        return text;
-    };
-
-    const Recipe = ({ item }: { item: Recipe }) => (
-        <TouchableRipple onPress={()=> navigation.navigate('RecipePage', {
-            recipe: item
-        })}>
-            <View style={styles.recipeContainer}>
-                <Image style={styles.image} source={{ uri:item.recipeImage}} />
-                <View style={styles.textContainer}>
-                    <Text style={{fontSize: 20, fontWeight: "bold"}}>{truncateText(item.recipeTitle, 20)}</Text>
-                    <StarRating
-                        rating={item.averageRating}
-                        onChange={()=>{}}
-                        maxStars = {5}
-                        starSize={24}
-                    />
-                    <Text>Tags</Text>
-                    <Text>{item.calories} Calories</Text>
-                    <Text>Cook Time: {item.cookTimeHours}h {item.cootTimeMinutes}m</Text>
-                    <Text>{item.servings} {item.servings == 1 ? 'Serving' : 'Servings'}</Text>
-                </View>
-            </View>
-        </TouchableRipple>
-    );
-
-    function displayPostsTab() {
-        if (relevantPosts != null && relevantPosts.length != 0) {
-            return <RelevantPostsGrid posts={relevantPosts} />
-        } else {
-            return <NoResultMessage message='No relevant posts found.'/>
-        }
-    }
-
-    const onRefresh = () => {
-        setRefreshing(true);
-        setTimeout(() => {
-            // TODO: Update component with new data in recipe list
-            setRefreshing(false);
-        }, 2000);
-    };
-
-    function displayRecipesTab() {
-        if (relevantPosts != null && relevantRecipes.length != 0) {
-            return <FlatList
-                data={relevantRecipes}
-                renderItem={Recipe}
-                keyExtractor={item => item.id.toString()}
-                refreshControl={
-                    <RefreshControl
-                        refreshing={refreshing}
-                        onRefresh={onRefresh}
-                    />
+    function collectTags(recipes: Recipe[]) {
+        const uniqueTagsSet = new Set<string>();
+        if(recipes != undefined) {
+            recipes.forEach(recipe => {
+                if(recipe.tags != undefined) {
+                    recipe.tags.forEach(tag => {
+                        uniqueTagsSet.add(tag);
+                    });
                 }
-            />
-        } else {
-            return <NoResultMessage message='No relevant recipes found.'/>
+            });
+
+            setAllUniqueTags(Array.from(uniqueTagsSet));
         }
     }
 
+    function applyRecipeSortingAndFiltering() {
+        if(relevantRecipes.length != 0) {
+            let processedArray:Recipe[] = [... relevantRecipes];
+
+            if(selectedOption != 'Relevancy') {
+                sortRecipes(processedArray, selectedOption)
+            }
+
+            if(selectedTags.length != 0) {
+                processedArray = filterRecipes(processedArray, selectedTags);
+            }
+
+            setSortedRecipes(processedArray);
+        }
+    }
+
+    function filterRecipes(recipes: Recipe[], selectedTags: string[]) {
+        return recipes.filter((recipe: Recipe) => {
+            return selectedTags.some(tag => recipe.tags && recipe.tags.includes(tag));
+        });
+    }
+
+
+    function sortRecipes(recipes: Recipe[], sortingOption: string) {
+        switch (sortingOption) {
+            case 'Calories':
+                recipes.sort((a, b) => a.calories - b.calories);
+                break;
+            case 'Cook Time':
+                recipes.sort((a, b) => (a.cookTimeHours * 60 + a.cootTimeMinutes) - (b.cookTimeHours * 60 + b.cootTimeMinutes));
+                break;
+            case 'Servings':
+                recipes.sort((a, b) => a.servings - b.servings);
+                break;
+            case 'Rating':
+                recipes.sort((a, b) => b.averageRating - a.averageRating); // Assuming higher ratings should come first
+                break;
+            default:
+                console.log('Invalid sorting option');
+        }
+    }
+
+    function applyFilteringAndSorting (){
+        if(selectedTags.length == 0 && selectedOption == 'Relevancy') {
+            setFilterStatus(false);
+        } else {
+            setFilterStatus(true);
+            applyRecipeSortingAndFiltering();
+        }
+    }
+
+    function selectSortedOption(option: string) {
+        setSelectedOption(option);
+    }
+
+    function selectedFilter(filters: string[]){
+        setSelectedTags(filters);
+    }
 
     return (
       <View>
@@ -102,14 +114,15 @@ function SearchResultBody({ navigation, searchResults }) {
           </View>
 
           <>
-              {
-                  selectedTab == 'recipes' ?
-                      /* Recipes */
-                      displayRecipesTab()
-                      :
-                      /* Posts */
-                      displayPostsTab()
-              }
+              {selectedTab === 'recipes' && (
+                  <FilterBar
+                      onSelectFilter={selectedFilter}
+                      onSelectOption={selectSortedOption}
+                      tags={allUniqueTags}
+                      onChange={applyFilteringAndSorting}
+                  />
+              )}
+              {selectedTab === 'recipes' ? <RecipeTab navigation={navigation} search={search} recipes={filterStatus ? sortedRecipes : relevantRecipes} /> : <PostTab relevantPosts={relevantPosts} /> }
           </>
       </View>
     );

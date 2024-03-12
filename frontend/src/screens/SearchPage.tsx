@@ -24,7 +24,6 @@ const SearchPage = ({navigation}: any) => {
         if (response.ok) {
             // If the response is successful (status code in the range 200-299)
             const jsonResponse = await response.json(); // Extract JSON data from the response
-            console.log(jsonResponse);
             setSearchResults(jsonResponse);
         } else {
             // If the response is not successful, handle the error accordingly
@@ -36,7 +35,6 @@ const SearchPage = ({navigation}: any) => {
 
     function cancel() {
         setSearchStatus(false);
-        console.log("NO SEARCH");
     }
 
     return (
@@ -54,6 +52,7 @@ const SearchPage = ({navigation}: any) => {
                 <SearchResultBody
                     navigation={navigation}
                     searchResults={searchResults}
+                    search={()=>search(searchPhrase)}
                 />
                 :
                 /* When not searching display recommendations */

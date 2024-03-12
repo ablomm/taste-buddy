@@ -12,4 +12,5 @@ export interface Recipe {
     averageRating: number,
     ingredients: any[],
     instructions: any[]
+    tags: any[]
 }
