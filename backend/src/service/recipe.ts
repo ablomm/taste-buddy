@@ -1,33 +1,41 @@
-import {PrismaClient} from '@prisma/client';
-import {RequestOptions, IncomingMessage} from 'http';
-
+import { PrismaClient } from "@prisma/client";
+import { RequestOptions, IncomingMessage } from "http";
 
 const prisma = new PrismaClient();
-const http = require('http');
+const http = require("http");
 
 type Ingredient = {
-    id: number,
-    recipeID: number,
-    ingredient: string,
-    amount: number,
-    measurementType: string
-}
+    id: number;
+    recipeID: number;
+    ingredient: string;
+    amount: number;
+    measurementType: string;
+};
 
 type Instruction = {
-    step: string
-}
+    step: string;
+};
 
 enum OrderBy {
     DateAscending = "DateAscending",
     DateDescending = "DateDescending",
     RatingAscending = "RatingAscending",
-    RatingDescending = "RatingDescending"
+    RatingDescending = "RatingDescending",
 }
 
-export async function createRecipe(userID: number|any, title: string,description: string,instructions: string,cookTime: number,calories: number,servings: number,tags: any,image: string) {
-
-    const cookTimeHours = Math.floor(cookTime/60);
-    const cootTimeMinutes = cookTime%60;
+export async function createRecipe(
+    userID: number | any,
+    title: string,
+    description: string,
+    instructions: string,
+    cookTime: number,
+    calories: number,
+    servings: number,
+    tags: any,
+    image: string
+) {
+    const cookTimeHours = Math.floor(cookTime / 60);
+    const cootTimeMinutes = cookTime % 60;
 
     await prisma.recipe.create({
         data: {
@@ -36,18 +44,18 @@ export async function createRecipe(userID: number|any, title: string,description
             description: description,
             cookTimeHours: cookTimeHours,
             cootTimeMinutes: cootTimeMinutes,
-            calories: calories/1,
-            servings: servings/1,
+            calories: calories / 1,
+            servings: servings / 1,
             recipeImage: image,
-            averageRating: 0
+            averageRating: 0,
         },
-    })
-
-
+    });
 }
 
-export async function createIngredients(recipeID: number|any, ingredients: any) {
-
+export async function createIngredients(
+    recipeID: number | any,
+    ingredients: any
+) {
     const data = processIngredients(recipeID, ingredients);
 
     await prisma.recipeIngredients.createMany({
@@ -56,17 +64,24 @@ export async function createIngredients(recipeID: number|any, ingredients: any) 
 }
 
 export function processIngredients(recipeID: any, ingredients: any) {
-    let data = []
+    let data = [];
 
     for (let id in ingredients) {
-        data.push({recipeID: recipeID, ingredient: ingredients[id].title, amount: Number(ingredients[id].amount), measurementType: ingredients[id].unit});
+        data.push({
+            recipeID: recipeID,
+            ingredient: ingredients[id].title,
+            amount: Number(ingredients[id].amount),
+            measurementType: ingredients[id].unit,
+        });
     }
 
     return data;
 }
 
-export async function createInstructions(recipeID: number|any, instructions: any) {
-
+export async function createInstructions(
+    recipeID: number | any,
+    instructions: any
+) {
     const data = processInstructions(recipeID, instructions);
 
     await prisma.recipeInstructions.createMany({
@@ -77,24 +92,30 @@ export async function createInstructions(recipeID: number|any, instructions: any
 export function processInstructions(recipeID: any, instructions: any) {
     let data = [];
 
-    for (let i = 0; i < instructions.length; i++ ) {
-        data.push({recipeID: recipeID, step: i+1, instruction: instructions[i].step});
+    for (let i = 0; i < instructions.length; i++) {
+        data.push({
+            recipeID: recipeID,
+            step: i + 1,
+            instruction: instructions[i].step,
+        });
     }
 
     return data;
 }
 
-export async function getRecipeByUserAndTitle(userID: number|undefined, title: string) {
-
+export async function getRecipeByUserAndTitle(
+    userID: number | undefined,
+    title: string
+) {
     return await prisma.recipe.findFirst({
         where: {
             authorID: userID,
-            recipeTitle: title
+            recipeTitle: title,
         },
     });
 }
 
-export async function getAllRecipes(){
+export async function getAllRecipes() {
     return await prisma.recipe.findMany();
 }
 
@@ -105,48 +126,90 @@ export async function getRecipeBatch(batchNum: number) {
     return await prisma.recipe.findMany({
         skip: batchSize * batchNum,
         take: batchSize,
-    })
+    });
 }
 
-
-export async function getPersonalizedRecipes(data: any): Promise<any>{
+export async function getPersonalizedRecipes(data: any): Promise<any> {
     return new Promise((resolve, reject) => {
-        
-        const temp = [39,41,43,51,52,54,60]
+        const temp = [39, 41, 43, 51, 52, 54, 60];
         // Convert the data to a JSON string
         const postData = JSON.stringify(temp);
 
-        // Options for the HTTP request
+        // Options for the HTTP request personalized
         const options: RequestOptions = {
-            // hostname: 'localhost', 
-            hostname: '127.0.0.1', 
-            port: 5000, 
-            path: '/api/personalized-recommendations', 
-            method: 'POST',
+            // hostname: 'localhost',
+            hostname: "127.0.0.1",
+            port: 5000,
+            path: "/api/personalized-recommendations",
+            method: "POST",
             headers: {
-                'Content-Type': 'application/json',
-                'Content-Length': Buffer.byteLength(postData),
+                "Content-Type": "application/json",
+                "Content-Length": Buffer.byteLength(postData),
             },
         };
 
         // Set up the request
         const req = http.request(options, (res: IncomingMessage) => {
             // Handle incoming data
-            let body = '';
-            res.on('data', (chunk: Buffer) => {
+            let body = "";
+            res.on("data", (chunk: Buffer) => {
                 body += chunk;
             });
-            res.on('end', () => {
+            res.on("end", () => {
                 try {
                     // Try to parse the JSON data
                     // resolve(JSON.parse(body));
-                    resolve((body));
+                    resolve(body);
                 } catch (error) {
                     reject(error);
                 }
             });
         });
-        req.on('error', (error: Error) => {
+        req.on("error", (error: Error) => {
+            reject(error);
+        });
+
+        // Write data to request body and end the request
+        req.write(postData);
+        req.end();
+    });
+}
+
+export async function getTopRatedRecipes(data: any): Promise<any> {
+    return new Promise((resolve, reject) => {
+        // Convert the data to a JSON string
+        const postData = JSON.stringify(data);
+
+        // Options for the HTTP request top rated
+        const options: RequestOptions = {
+            // hostname: 'localhost',
+            hostname: "127.0.0.1",
+            port: 5000,
+            path: "/api/top-rated-recommendations",
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Content-Length": Buffer.byteLength(postData),
+            },
+        };
+        // Set up the request
+        const req = http.request(options, (res: IncomingMessage) => {
+            // Handle incoming data
+            let body = "";
+            res.on("data", (chunk: Buffer) => {
+                body += chunk;
+            });
+            res.on("end", () => {
+                try {
+                    // Try to parse the JSON data
+                    // resolve(JSON.parse(body));
+                    resolve(body);
+                } catch (error) {
+                    reject(error);
+                }
+            });
+        });
+        req.on("error", (error: Error) => {
             reject(error);
         });
 
@@ -169,23 +232,32 @@ export async function getPersonalizedRecipes(data: any): Promise<any>{
  * @param servings
  * @param image
  */
-export async function updateRecipe(recipeID:number, userID: number|any, title: string,description: string,cookTime: number,calories: number,servings: number,image: string) {
-    const cookTimeHours = Math.floor(cookTime/60);
-    const cootTimeMinutes = cookTime%60;
+export async function updateRecipe(
+    recipeID: number,
+    userID: number | any,
+    title: string,
+    description: string,
+    cookTime: number,
+    calories: number,
+    servings: number,
+    image: string
+) {
+    const cookTimeHours = Math.floor(cookTime / 60);
+    const cootTimeMinutes = cookTime % 60;
 
     await prisma.recipe.update({
         where: {
-          id: recipeID,
-          authorID: userID
+            id: recipeID,
+            authorID: userID,
         },
         data: {
             recipeTitle: title,
             description: description,
             cookTimeHours: cookTimeHours,
             cootTimeMinutes: cootTimeMinutes,
-            calories: calories/1,
-            servings: servings/1,
-            recipeImage: image
+            calories: calories / 1,
+            servings: servings / 1,
+            recipeImage: image,
         },
     });
 
@@ -204,12 +276,15 @@ export async function updateRecipe(recipeID:number, userID: number|any, title: s
  * @param recipeId
  * @param newIngredients
  */
-export async function updateIngredients(recipeId: number, newIngredients: Ingredient[]) {
+export async function updateIngredients(
+    recipeId: number,
+    newIngredients: Ingredient[]
+) {
     // Retrieve all existing ingredients
     const ingredients: Ingredient[] = await prisma.recipeIngredients.findMany({
         where: {
-            recipeID: recipeId
-        }
+            recipeID: recipeId,
+        },
     });
 
     console.log("Retrieved old ingredients: " + JSON.stringify(ingredients));
@@ -220,73 +295,77 @@ export async function updateIngredients(recipeId: number, newIngredients: Ingred
     let ingredientsToRemove: number[] = [];
 
     // Check for ingredients to update and add
-    for(const newIngredient of newIngredients) {
+    for (const newIngredient of newIngredients) {
         let found = false;
 
-        for(const oldIngredient of ingredients) {
+        for (const oldIngredient of ingredients) {
             // If ingredient is found then check for differences
-            if(newIngredient.ingredient == oldIngredient.ingredient) {
+            if (newIngredient.ingredient == oldIngredient.ingredient) {
                 found = true;
 
                 // If new ingredient details are different to old then update
-                if(
-                  newIngredient.amount != oldIngredient.amount ||
-                  !newIngredient.measurementType.includes(oldIngredient.measurementType)
+                if (
+                    newIngredient.amount != oldIngredient.amount ||
+                    !newIngredient.measurementType.includes(oldIngredient.measurementType)
                 ) {
                     await prisma.recipeIngredients.update({
                         where: {
-                            id: oldIngredient.id
+                            id: oldIngredient.id,
                         },
-                        data: newIngredient
+                        data: newIngredient,
                     });
-                    console.log("Updated " + oldIngredient.id + " with " + JSON.stringify(newIngredient));
+                    console.log(
+                        "Updated " +
+                        oldIngredient.id +
+                        " with " +
+                        JSON.stringify(newIngredient)
+                    );
                 }
                 break;
             }
         }
 
         // If new ingredient doesn't exist in old then add to db
-        if(!found) {
+        if (!found) {
             newIngredient.recipeID = recipeId;
             ingredientsToAdd.push(newIngredient);
         }
-
     }
 
     // Check for ingredients to remove
-    for(const oldIngredient of ingredients) {
+    for (const oldIngredient of ingredients) {
         let found = false;
-        for(const newIngredient of newIngredients){
+        for (const newIngredient of newIngredients) {
             // If found then don't remove
-            if(oldIngredient.ingredient == newIngredient.ingredient) {
-               found = true;
-               break;
+            if (oldIngredient.ingredient == newIngredient.ingredient) {
+                found = true;
+                break;
             }
         }
 
         // If old ingredient no longer in new ingredient list then remove it
-        if(!found) {
+        if (!found) {
             ingredientsToRemove.push(oldIngredient.id);
         }
     }
 
     // Remove all ingredients no longer needed
-    if(ingredientsToRemove.length > 0) {
+    if (ingredientsToRemove.length > 0) {
         await prisma.recipeIngredients.deleteMany({
             where: {
                 id: {
-                    in: ingredientsToRemove
-                }
-            }
+                    in: ingredientsToRemove,
+                },
+            },
         });
 
         console.log("Removed Ingredient IDs: " + ingredientsToRemove);
     }
 
     // Add new ingredients
-    if(ingredientsToAdd.length > 0) {
+    if (ingredientsToAdd.length > 0) {
         await prisma.recipeIngredients.createMany({
-            data: processIngredients(recipeId, ingredientsToAdd)
+            data: processIngredients(recipeId, ingredientsToAdd),
         });
 
         console.log("Added: " + JSON.stringify(ingredientsToAdd));
@@ -304,13 +383,16 @@ export async function updateIngredients(recipeId: number, newIngredients: Ingred
  * @param recipeId
  * @param newInstructions
  */
-export async function updateInstructions(recipeId: number, newInstructions: Instruction[]) {
+export async function updateInstructions(
+    recipeId: number,
+    newInstructions: Instruction[]
+) {
     try {
         // Retrieve existing instructions
         const instructions = await prisma.recipeInstructions.findMany({
             where: {
-                recipeID: recipeId
-            }
+                recipeID: recipeId,
+            },
         });
         // Compare existing to new instructions
         console.log("Old instructions: " + JSON.stringify(instructions));
@@ -319,26 +401,29 @@ export async function updateInstructions(recipeId: number, newInstructions: Inst
         let containSameInstructions: boolean = true;
 
         // Check if all old instruction steps are in the new instructions
-        for(const instruction of instructions) {
-            for(const newInstruction of newInstructions) {
-                if(instruction.instruction != newInstruction.step) {
+        for (const instruction of instructions) {
+            for (const newInstruction of newInstructions) {
+                if (instruction.instruction != newInstruction.step) {
                     containSameInstructions = true;
                     break;
                 }
             }
 
-            if(!containSameInstructions) {
+            if (!containSameInstructions) {
                 break;
             }
         }
 
         // If some change occurred then reinsert new instructions
-        if(instructions.length != newInstructions.length || !containSameInstructions) {
+        if (
+            instructions.length != newInstructions.length ||
+            !containSameInstructions
+        ) {
             // If so then delete all and insert new instructions
             await prisma.recipeInstructions.deleteMany({
                 where: {
-                    recipeID: recipeId
-                }
+                    recipeID: recipeId,
+                },
             });
 
             // insert new instructions
@@ -348,7 +433,10 @@ export async function updateInstructions(recipeId: number, newInstructions: Inst
 
         console.log("Instruction update complete ...");
     } catch (error) {
-        console.error("The following issue occurred during recipe instruction retrieval: \n" + error);
+        console.error(
+            "The following issue occurred during recipe instruction retrieval: \n" +
+            error
+        );
     }
 }
 
@@ -366,8 +454,14 @@ export async function updateRecipeTags(recipeId: number, newTags: []) {
  * @param username
  * @param profilePic
  */
-export async function createReview(recipeID:number ,reviewText:string, rating:number, userID:number|any, username:string, profilePic:string ) {
-
+export async function createReview(
+    recipeID: number,
+    reviewText: string,
+    rating: number,
+    userID: number | any,
+    username: string,
+    profilePic: string
+) {
     await prisma.review.create({
         data: {
             recipeID,
@@ -375,9 +469,9 @@ export async function createReview(recipeID:number ,reviewText:string, rating:nu
             rating,
             userID,
             username,
-            profilePic
+            profilePic,
         },
-    })
+    });
 }
 
 /**
@@ -389,65 +483,58 @@ export async function createReview(recipeID:number ,reviewText:string, rating:nu
  * @param page
  * @param order
  */
-export async function getReviewsByPage(recipeID: number, page: number, order:OrderBy) {
+export async function getReviewsByPage(
+    recipeID: number,
+    page: number,
+    order: OrderBy
+) {
     const reviewsPerPage = 15;
     let orderBy = [{}];
     switch (order) {
-        case OrderBy.DateAscending :
-            orderBy = [
-                {timePosted : 'asc'}
-            ]
+        case OrderBy.DateAscending:
+            orderBy = [{ timePosted: "asc" }];
             break;
-        case OrderBy.DateDescending :
-            orderBy = [
-                {timePosted : 'desc'}
-            ]
+        case OrderBy.DateDescending:
+            orderBy = [{ timePosted: "desc" }];
             break;
-        case OrderBy.RatingAscending :
-            orderBy = [
-                {rating : 'asc'}
-            ]
+        case OrderBy.RatingAscending:
+            orderBy = [{ rating: "asc" }];
             break;
-        case OrderBy.RatingDescending :
-            orderBy = [
-                {rating : 'desc'}
-            ]
+        case OrderBy.RatingDescending:
+            orderBy = [{ rating: "desc" }];
             break;
 
-        default :
-        return await prisma.review.findMany({
-            skip: reviewsPerPage * page,
-            take: reviewsPerPage,
-            where: {
-                recipeID: recipeID
-            },
-        })
-        break;
-        }
+        default:
+            return await prisma.review.findMany({
+                skip: reviewsPerPage * page,
+                take: reviewsPerPage,
+                where: {
+                    recipeID: recipeID,
+                },
+            });
+            break;
+    }
 
-        return await prisma.review.findMany({
-            skip: reviewsPerPage * page,
-            take: reviewsPerPage,
-            where: {
-                recipeID: recipeID
-            },
-            orderBy:orderBy
-        })
+    return await prisma.review.findMany({
+        skip: reviewsPerPage * page,
+        take: reviewsPerPage,
+        where: {
+            recipeID: recipeID,
+        },
+        orderBy: orderBy,
+    });
 }
 
 export async function getRecipes() {
-
-    const user = await prisma.recipe.findMany({
-    })
+    const user = await prisma.recipe.findMany({});
 
     return user;
 }
 
-export async function getRecipesByUserID(userID: number|undefined) {
+export async function getRecipesByUserID(userID: number | undefined) {
     return await prisma.recipe.findMany({
         where: {
-            authorID: userID
+            authorID: userID,
         },
-    }); 
+    });
 }
-
