@@ -5,13 +5,10 @@ import BackButton from '../components/BackButton';
 import { useNavigation } from '@react-navigation/native';
 import { getUserDetails } from '../functions/HTTPRequests';
 
-const emptyProfilePicture = require("../../assets/profile.jpg");
-
-
 const ViewPostPage = ({ route }) => {
     let post = route.params;
     let navigation = useNavigation();
-    let [user, setUser] = React.useState({ username: "Unknown", profilePic: emptyProfilePicture });
+    let [user, setUser] = React.useState({ username: "Unknown", profilePic: "" });
 
     useEffect(() => {
         async function setUserDetails() {
