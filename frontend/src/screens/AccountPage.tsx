@@ -15,13 +15,11 @@ import { UserContext } from "../providers/UserProvider";
 import Modal from "react-native-modal";
 import TBButton from "../components/TBButton";
 import { FontAwesome } from "@expo/vector-icons"; // or 'react-native-vector-icons/MaterialIcons'
-import { black } from "react-native-paper/lib/typescript/styles/themes/v2/colors";
 import Icon from 'react-native-vector-icons/FontAwesome';
-import Header from '../components/header/Header';
+import { getUserDetails } from '../functions/HTTPRequests';
 
 const Tab = createMaterialTopTabNavigator();
 
-const profilePicture = require("../../assets/profile.jpg");
 
 interface Post {
   id: number;
@@ -379,6 +377,7 @@ const AccountPage = () => {
   const [savedPosts1, setSavedPosts] = useState();
   const [userFolders, setUserFolders] = useState();
   const [refreshing, setRefreshing] = useState(false);
+  const [userDetails, setUserDetails] = useState({ username: "Unknown", profilePic: "" });
 
   useEffect(() => {
     fetchUserData();
@@ -392,6 +391,7 @@ const AccountPage = () => {
   };
 
   const fetchUserData = async () => {
+    setUserDetails(await getUserDetails(userContext.state.userId))
     try {
       //get posts
       const response = await fetch(
@@ -506,7 +506,7 @@ const AccountPage = () => {
   return (
     <View style={styles.container}>
       <View style={styles.profileHeader}>
-        <Image source={profilePicture} style={styles.profilePicture} />
+        <Image source={{uri: userDetails.profilePic}} style={styles.profilePicture} />
         <View style={styles.userInfo}>
           <Text style={styles.username}>{username}</Text>
         </View>

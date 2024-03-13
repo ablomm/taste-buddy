@@ -1,3 +1,4 @@
+import { defaultProfilePicture } from "../constants/DefaultImages";
 
 const localHostURL="http://localhost:8080";
 
@@ -11,6 +12,9 @@ const getS3URL = async () => {
 
 export const getUserDetails = async (userId) => {
     let user = await (await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || localHostURL}/user/id/${userId}`)).json();
+    if(!user.profilePic){
+        user.profilePic = defaultProfilePicture;
+    }
     return user;
 }
 
