@@ -157,21 +157,10 @@ const CreateRecipePage = ({ route, navigation }: any) => {
   }
 
   const onSubmit = async (data: any) => {
-    let imageUrl;
-    let s3AccessUrl;
-    let s3Response;
-    //const username = "";
-    try {
-      s3AccessUrl = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/s3/s3GenerateUrl`, {  //get secure s3 access url 
-        method: 'GET',
-      }).then(res => res.json());
-    } catch (error: any) {
-      console.log("image link generation error")
-      console.log(error)
-    }
+    loadingContext.enable();
 
-    if (s3AccessUrl) {
-      if(!image.base64){
+    try {
+      if (!image.base64) {
         image.base64 = await getBase64(image.uri);
       }
       const buf = Buffer.from(image.base64, 'base64') //isolate the base64 buffer
