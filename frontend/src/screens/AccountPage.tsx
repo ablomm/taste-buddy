@@ -21,7 +21,7 @@ import Header from '../components/header/Header';
 
 const Tab = createMaterialTopTabNavigator();
 
-const profilePicture = require("../../assets/temp/tempfood.jpg");
+const profilePicture = require("../../assets/profile.jpg");
 
 interface Post {
   id: number;
@@ -509,12 +509,6 @@ const AccountPage = () => {
         <Image source={profilePicture} style={styles.profilePicture} />
         <View style={styles.userInfo}>
           <Text style={styles.username}>{username}</Text>
-          <TouchableOpacity
-            style={styles.settingsButton}
-            onPress={navigateToSettings}
-          >
-            <Text style={styles.settingsButtonText}>Settings</Text>
-          </TouchableOpacity>
         </View>
 
         <TouchableOpacity>
