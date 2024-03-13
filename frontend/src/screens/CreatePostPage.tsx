@@ -107,22 +107,10 @@ const CreatePostPage = ({ route, navigation }: any) => {
         validationSchema={recipeSchema}
 
         onSubmit={async values => {
-          console.log(values);
-          let imageUrl: string = "";
-          let s3AccessUrl: any;
-          let s3Response: any;
+          loadingContext.enable();
 
           try {
-            s3AccessUrl = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/s3/s3GenerateUrl`, {  //get secure s3 access url
-              method: 'GET',
-            }).then(res => res.json());
-          } catch (error: any) {
-            console.log("image link generation error")
-            console.log(error)
-          }
-
-          if (s3AccessUrl) {
-            if(!image.base64){
+            if (!image.base64) {
               image.base64 = await getBase64(image.uri);
             }
             const buf = Buffer.from(image.base64, 'base64') //isolate the base64 buffer
