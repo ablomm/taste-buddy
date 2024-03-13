@@ -1,7 +1,7 @@
 import { Alert } from "react-native";
 
 const getS3URL = async () => {
-    let result = await (await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/recipe/s3Url`)).json();
+    let result = await (await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/s3/s3GenerateUrl`)).json();
     if (!result) {
         throw new Error("image link generation error")
     }
@@ -73,6 +73,25 @@ export const savePost = async (username, description, tags, image, recipeURL) =>
 
     if (response.status !== 200) {
         throw new Error("Save Post Failure")
+    }
+}
+
+export const saveProfilePicture = async (username, image) => {
+    let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/user/update-profile/profilePic`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+            username: username,
+            profilePic: image
+            }),
+    });
+
+    if (response.status !== 200) {
+        throw new Error("Save Profile Picture Failure")
     }
 }
 

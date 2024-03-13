@@ -78,11 +78,6 @@ router.post("/update-profile/profilePic", async (req: express.Request, res: expr
   }
 });
 
-router.get("/s3Url", async (req: express.Request, res: express.Response) => {
-  const imageURL = await generateUploadURL()
-  return res.send({ imageURL });
-});
-
 router.post("/save-recipe-to-folder/:username", async (req: express.Request, res: express.Response) => {
   const username: string = req.params["username"]
   const recipeID: number = req.body.recipeID;

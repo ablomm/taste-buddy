@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import DietSelectionPage from './DietaryPreference';
-import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image, Platform, Alert  } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { TouchableRipple } from 'react-native-paper';
 import BackButton from '../components/BackButton';
@@ -9,12 +9,15 @@ import { Formik } from 'formik';
 import getBase64 from '../functions/GetBase64FromURI';
 import { UserContext } from "../providers/UserProvider";
 import { Buffer } from 'buffer';
+import { LoadingContext } from '../providers/LoadingProvider';
+import { putImage, saveProfilePicture } from '../functions/HTTPRequests';
 
 const SettingsPage = ({navigation}:any) => {
     let currentProfilePicture;
     const [image, setImage] = React.useState<any>(currentProfilePicture ? currentProfilePicture : null);
     const userContext = React.useContext(UserContext) as any;
-    
+    const loadingContext = React.useContext(LoadingContext) as any;
+
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -38,79 +41,31 @@ const SettingsPage = ({navigation}:any) => {
         }}
 
         onSubmit={async () => {
-          let imageUrl: string = "";
-          let s3AccessUrl: any;
-          let s3Response: any;
+          loadingContext.enable();
 
           try {
-            s3AccessUrl = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/s3/s3GenerateUrl`, {  //get secure s3 access url
-              method: 'GET',
-            }).then(res => res.json());
-          } catch (error: any) {
-            console.log("image link generation error")
-            console.log(error)
-          }
-
-          if (s3AccessUrl) {
-            if(!image.base64){
+            if (!image.base64) {
               image.base64 = await getBase64(image.uri);
             }
             const buf = Buffer.from(image.base64, 'base64') //isolate the base64 buffer
             let type = image.uri.substring(image.uri.lastIndexOf('.') + 1, image.uri.length);
-
-            try {
-              s3Response = await fetch(s3AccessUrl.imageURL[0], {  //put the image on the bucket
-                method: 'PUT',
-                headers: {
-                  'ContentEncoding': 'base64',
-                  'Content-Type': `image/${type}`,
-                },
-                body: buf
-              });
-
-              if (s3Response.status !== 200) {
-                console.log("s3Response, s3 error")
-                console.log(s3Response);
-              } else {
-                imageUrl = s3AccessUrl.imageURL[0].split('?')[0];
-                console.log("uploaded image url: " + imageUrl);
-              }
-            } catch (error: any) {
-              console.log("image put failed")
-              console.log(error)
-            }
-          } else {
-            console.log("imageURL is null")
-          }
-          try {
-            // Save Profile changes
-            let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/user/update-profile/profilePic`, {
-              method: 'POST',
-              headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-              },
-              credentials: 'include',
-              body: JSON.stringify({
-                username: userContext.state.username,
-                profilePic: imageUrl
-              }),
-            });
-
-            if (response.status !== 200) {
-              console.log("upload failed")
-              console.log(response)
-            } else {
-              console.log("upload successful")
-            }
-
+  
+            let imageUrl = await putImage(buf, type)
+  
+            await saveProfilePicture(userContext.state.username, imageUrl)
+  
+            console.log("Save Profile Picture successful")
             navigation.navigate('AccountPageStack');
+
           } catch (error: any) {
-            console.log("upload error")
-            console.error(error.stack);
+            console.error("Error saving profile picture");
+            console.error(error);
+            Alert.alert("Error saving profile picture")
+
+          } finally {
+            loadingContext.disable();
           }
         }}>
-
         {({ handleSubmit, values }) => (
             <>
             <View style={styles.headerWrapper}>
