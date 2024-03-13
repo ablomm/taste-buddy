@@ -16,7 +16,7 @@ import RecommenderPage from "../screens/RecommenderPage";
 import CreatePostPage from "../screens/CreatePostPage";
 import RecipePage from "../screens/RecipePage";
 import ViewPostPage from "../screens/ViewPostPage";
-
+import DietaryPreference from "../screens/DietaryPreference";
 // react-native-vector-icons/Ionicons otherwise.
 import Ionicons from '@expo/vector-icons/Ionicons';
 import EditRecipePage from "../screens/EditRecipePage";
@@ -110,6 +110,7 @@ const AccountPageStack = () => (
   <Stack.Navigator initialRouteName='AccountPage' screenOptions={stackOptions}>
     <Stack.Screen name='AccountPage' component={AccountPage} />
     <Stack.Screen name='SettingsPage' component={SettingsPage} />
+    <Stack.Screen name='DietaryPreference' component={DietaryPreference} />
   </Stack.Navigator>
 );
 

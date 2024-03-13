@@ -36,8 +36,6 @@ const SettingsPage = ({navigation}:any) => {
         <View style={styles.container}>
         <Formik
         initialValues={{
-          //description: '',
-          //recipeUrl: '',
         }}
 
         onSubmit={async () => {
@@ -82,6 +80,12 @@ const SettingsPage = ({navigation}:any) => {
                     <Image source={image ? { uri: image.uri } : require("../../assets/profile.jpg") as any} style={{ width: "100%", height: "100%" }} />
                 </TouchableRipple>
                 <TouchableOpacity onPress={pickImage}><Text style={styles.imageButton}>Select Image</Text></TouchableOpacity>
+                <TouchableOpacity
+                    style={styles.dietButton}
+                    onPress={() => {navigation.navigate('DietaryPreference');}}
+                >
+                  <Text style={styles.dietButtonText}>Dietary Preferences</Text>
+              </TouchableOpacity>
             </View>
             </>
             )}
@@ -96,6 +100,19 @@ const styles = StyleSheet.create({
         flex: 1,
         padding:10,
         backgroundColor: '#fff',
+    },
+    dietButton: {
+      backgroundColor: "#8CC84B", // Light green color
+      paddingVertical: 5,
+      paddingHorizontal: 10,
+      borderRadius: 5,
+      width: 110,
+      borderWidth:0
+    },
+    dietButtonText: {
+      color: "#fff",
+      fontSize: 16,
+      fontWeight: "bold",
     },
     imageUpdateContainer:{
         alignSelf: "center",

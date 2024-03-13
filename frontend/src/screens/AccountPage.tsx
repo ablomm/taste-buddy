@@ -594,19 +594,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 5,
   },
-  settingsButton: {
-    backgroundColor: "#8CC84B", // Light green color
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    borderRadius: 5,
-    width: 110,
-    borderWidth:0
-  },
-  settingsButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
   screen: {
     flex: 1,
     backgroundColor: "#fff",
