@@ -1,5 +1,4 @@
 import express from 'express';
-import { generateUploadURL } from '../service/s3';
 import {
     createRecipe,
     createIngredients,
@@ -85,11 +84,6 @@ router.post("/save", async (req: express.Request, res: express.Response) => {
     await storeRecipe(elasticSearchRecipe, recipeID);
 
     res.sendStatus(200);
-});
-
-router.get("/s3Url", async (req: express.Request, res: express.Response) => {
-    const imageURL = await generateUploadURL()
-    return res.send({ imageURL });
 });
 
 router.get("/get-all-recipes", async (req: express.Request, res: express.Response) => {

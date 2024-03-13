@@ -1,4 +1,3 @@
-import Icon from 'react-native-vector-icons/FontAwesome';
 import React,{useState} from 'react';
 import { View,  StyleSheet, TouchableOpacity } from "react-native";
 import StarRating from 'react-native-star-rating-widget';

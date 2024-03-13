@@ -10,6 +10,7 @@ import authController from "./controller/authorize"
 import recipeController from "./controller/recipe"
 import postController from "./controller/post"
 import searchController from "./controller/search";
+import s3Controller from "./controller/s3"
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use('/authorize', authController);
 app.use('/recipe', recipeController);
 app.use('/post', postController);
 app.use('/search', searchController);
+app.use('/s3', s3Controller);
 
 //error handler; must be last
 app.use((err: Error, req: express.Request, res: express.Response, next: express.RequestHandler) => {

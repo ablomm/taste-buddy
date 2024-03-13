@@ -1,6 +1,7 @@
 import express, {Response, Request} from 'express';
 import { PrismaClient } from '@prisma/client';
-import {createUser, getModeratorStatus, addDietaryPref, getUserById, saveRecipe, getSavedRecipes, getUserByUsername, deleteSavedRecipe, createFolder, getUserFolders, deleteFolder, getRecipesInFolder, saveRecipeToFolder} from '../service/user';
+import {createUser, setProfilePicOfUser, getModeratorStatus, addDietaryPref, getUserById, saveRecipe, getSavedRecipes, getUserByUsername, deleteSavedRecipe, createFolder, getUserFolders, deleteFolder, getRecipesInFolder, saveRecipeToFolder} from '../service/user';
+import { generateUploadURL } from '../service/s3';
 const prisma = new PrismaClient();
 const router = express.Router();
 
@@ -38,7 +39,7 @@ router.get("/id/:id", async (req: express.Request, res: express.Response) => {
 
   return res.send({
     username: user?.username,
-    porfilePic: user?.profilePic
+    profilePic: user?.profilePic
   })
 })
 
@@ -59,6 +60,22 @@ router.post("/save-recipe/:username", async (req: saveRecipe, res: express.Respo
 
   await saveRecipe(recipeID, userID);
   res.sendStatus(200);
+});
+
+router.post("/update-profile/profilePic", async (req: express.Request, res: express.Response) => {
+  try {
+    const { username,
+      profilePic
+    } = req.body;
+
+    console.log("update profile pic userid : " + username);
+
+    await setProfilePicOfUser(username, profilePic)
+
+    res.sendStatus(200);
+  } catch(error) {
+    console.error(error);
+  }
 });
 
 router.post("/save-recipe-to-folder/:username", async (req: express.Request, res: express.Response) => {

@@ -5,7 +5,7 @@ import BackButton from "../BackButton";
 const Header = ({navigation}:any) =>{
     return(
         <View style={styles.container}>
-            <BackButton navigation = {navigation}/>
+            {navigation && <BackButton navigation = {navigation}/>}
             
             <View style={styles.logoContainer}>
                 <Image source={require("../../../assets/logo/Logo.png")} style={styles.logoImage}/>

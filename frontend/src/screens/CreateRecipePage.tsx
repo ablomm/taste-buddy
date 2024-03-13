@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TextInput, StyleSheet, KeyboardAvoidingView, ScrollView, Image, Platform, Alert, ActivityIndicator } from "react-native";
 import * as yup from 'yup';
-import { Formik, Form, Field } from 'formik';
+import { Formik} from 'formik';
 import ValidatedInput from '../components/ValidatedInput';
 import AddIngredientForm, { Ingredient } from '../components/CreateRecipe/ingredients/AddIngredientForm';
 import TBButton from '../components/TBButton';
@@ -255,7 +255,7 @@ const CreateRecipePage = ({ route, navigation }: any) => {
           <>
             <View style={styles.headerWrapper}>
               <View style={styles.headerLeftWrapper}>
-                <View><BackButton navigation={navigation} /></View>
+                <BackButton navigation={navigation} />
                 <View style={styles.headerTiltleWrapper}><Text style={styles.headerTiltle}>Create Recipe {`<_<`}</Text></View>
               </View>
               <View>

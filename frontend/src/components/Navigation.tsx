@@ -13,14 +13,14 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import AccountPage from "../screens/AccountPage";
 import SearchPage from "../screens/SearchPage";
 import RecommenderPage from "../screens/RecommenderPage";
-import DietaryPreference from "../screens/DietaryPreference";
 import CreatePostPage from "../screens/CreatePostPage";
 import RecipePage from "../screens/RecipePage";
 import ViewPostPage from "../screens/ViewPostPage";
-
+import DietaryPreference from "../screens/DietaryPreference";
 // react-native-vector-icons/Ionicons otherwise.
 import Ionicons from '@expo/vector-icons/Ionicons';
 import EditRecipePage from "../screens/EditRecipePage";
+import SettingsPage from "../screens/SettingsPage";
 
 const Stack = createStackNavigator();
 
@@ -109,6 +109,7 @@ const CreatePostOrRecipeStack = () => (
 const AccountPageStack = () => (
   <Stack.Navigator initialRouteName='AccountPage' screenOptions={stackOptions}>
     <Stack.Screen name='AccountPage' component={AccountPage} />
+    <Stack.Screen name='SettingsPage' component={SettingsPage} />
     <Stack.Screen name='DietaryPreference' component={DietaryPreference} />
   </Stack.Navigator>
 );

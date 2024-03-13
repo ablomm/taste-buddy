@@ -1,27 +1,27 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import BackButton from '../components/BackButton';
 import { useNavigation } from '@react-navigation/native';
-const profilePicture = require("../../assets/profile.jpg");
+import { getUserDetails } from '../functions/HTTPRequests';
+
+const emptyProfilePicture = require("../../assets/profile.jpg");
 
 
 const ViewPostPage = ({ route }) => {
     let post = route.params;
     let navigation = useNavigation();
-    let [user, setUser] = React.useState({ username: "Unknown" });
+    let [user, setUser] = React.useState({ username: "Unknown", profilePic: emptyProfilePicture });
 
-    const getUserDetails = async () => {
-        let user = await (await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/user/id/${post.author}`)).json();
-        setUser(user);
-    }
-
-    React.useEffect(() => {
-        getUserDetails()
+    useEffect(() => {
+        async function setUserDetails() {
+            setUser(await getUserDetails(post.author))
+        }
+        setUserDetails();
     }, [])
 
     return (
-        <>
+        <View style={styles.container}>
             <View style={styles.headerWrapper}>
                 <View style={styles.headerLeftWrapper}>
                     <View><BackButton navigation={navigation} /></View>
@@ -30,18 +30,23 @@ const ViewPostPage = ({ route }) => {
             </View>
             <ScrollView style={{ padding: 10 }}>
             <View style={styles.userBar}>
-                    <Image source={profilePicture} style={styles.profilePicture} />
+                    <Image source={{uri: user.profilePic}} style={styles.profilePicture} />
                     <Text style={styles.username}>{user.username}</Text>
                 </View>
                 <Image style={styles.image} source={{ uri: post.image }} />
                 <Text style={styles.description}>{post.description}</Text>
             </ScrollView>
-        </>
+        </View>
 
     )
 };
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        padding:5,
+        backgroundColor: '#fff',
+    },
     image: {
         width: "100%",
         height: 300,
