@@ -39,7 +39,7 @@ router.get("/id/:id", async (req: express.Request, res: express.Response) => {
 
   return res.send({
     username: user?.username,
-    porfilePic: user?.profilePic
+    profilePic: user?.profilePic
   })
 })
 

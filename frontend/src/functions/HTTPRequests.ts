@@ -1,11 +1,17 @@
-import { Alert } from "react-native";
+
+const localHostURL="http://localhost:8080";
 
 const getS3URL = async () => {
-    let result = await (await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/s3/s3GenerateUrl`)).json();
+    let result = await (await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || localHostURL}/s3/s3GenerateUrl`)).json();
     if (!result) {
         throw new Error("image link generation error")
     }
     return result;
+}
+
+export const getUserDetails = async (userId) => {
+    let user = await (await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || localHostURL}/user/id/${userId}`)).json();
+    return user;
 }
 
 export const putImage = async (image, type) => {
@@ -28,7 +34,7 @@ export const putImage = async (image, type) => {
 }
 
 export const saveRecipe = async (username, title, description, instructions, cookTime, calories, servings, ingredients, tags, image) => {
-    let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/recipe/save`, {  //save the recipe
+    let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || localHostURL}/recipe/save`, {  //save the recipe
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -55,7 +61,7 @@ export const saveRecipe = async (username, title, description, instructions, coo
 }
 
 export const savePost = async (username, description, tags, image, recipeURL) => {
-    let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/post/create`, {
+    let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || localHostURL}/post/create`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -77,7 +83,7 @@ export const savePost = async (username, description, tags, image, recipeURL) =>
 }
 
 export const saveProfilePicture = async (username, image) => {
-    let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/user/update-profile/profilePic`, {
+    let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || localHostURL}/user/update-profile/profilePic`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -96,7 +102,7 @@ export const saveProfilePicture = async (username, image) => {
 }
 
 export const login = async (username, password) => {
-    let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/login`, {
+    let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || localHostURL}/login`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -117,7 +123,7 @@ export const login = async (username, password) => {
 }
 
 export const signUp = async (username, email, password) => {
-    let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/user`, {
+    let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || localHostURL}/user`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
