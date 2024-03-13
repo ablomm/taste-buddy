@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import DietSelectionPage from './DietaryPreference';
 import { View, Text, TouchableOpacity, StyleSheet, Image, Platform, Alert  } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
@@ -10,14 +10,22 @@ import getBase64 from '../functions/GetBase64FromURI';
 import { UserContext } from "../providers/UserProvider";
 import { Buffer } from 'buffer';
 import { LoadingContext } from '../providers/LoadingProvider';
-import { putImage, saveProfilePicture } from '../functions/HTTPRequests';
+import { putImage, saveProfilePicture, getUserDetails } from '../functions/HTTPRequests';
 
 const SettingsPage = ({navigation}:any) => {
-    let currentProfilePicture;
-    const [image, setImage] = React.useState<any>(currentProfilePicture ? currentProfilePicture : null);
+    const [profilePic, setProfilePic] = React.useState<any>(null);
+    const [profilePicURI, setProfilePicURI] = React.useState<any>(null);
+
     const userContext = React.useContext(UserContext) as any;
     const loadingContext = React.useContext(LoadingContext) as any;
-
+    useEffect(() => {
+      async function setUserDetails() {
+        let i = await getUserDetails(userContext.state.userId)
+        setProfilePic(i.profilePic)
+        setProfilePicURI(i.profilePic)
+      }
+      setUserDetails();
+    }, [])
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -28,7 +36,9 @@ const SettingsPage = ({navigation}:any) => {
         });
 
         if (!result.canceled) {
-            setImage(result.assets[0] as any);
+            let i =result.assets[0] as any;
+            setProfilePic(i);
+            setProfilePicURI(i.uri)
         }
     };
     
@@ -42,11 +52,11 @@ const SettingsPage = ({navigation}:any) => {
           loadingContext.enable();
 
           try {
-            if (!image.base64) {
-              image.base64 = await getBase64(image.uri);
+            if (!profilePic.base64) {
+              profilePic.base64 = await getBase64(profilePic.uri);
             }
-            const buf = Buffer.from(image.base64, 'base64') //isolate the base64 buffer
-            let type = image.uri.substring(image.uri.lastIndexOf('.') + 1, image.uri.length);
+            const buf = Buffer.from(profilePic.base64, 'base64') //isolate the base64 buffer
+            let type = profilePic.uri.substring(profilePic.uri.lastIndexOf('.') + 1, profilePic.uri.length);
   
             let imageUrl = await putImage(buf, type)
   
@@ -77,7 +87,7 @@ const SettingsPage = ({navigation}:any) => {
             </View>
             <View style={styles.imageUpdateContainer}>
                 <TouchableRipple onPress={pickImage} borderless={true} style={styles.image}>
-                    <Image source={image ? { uri: image.uri } : require("../../assets/profile.jpg") as any} style={{ width: "100%", height: "100%" }} />
+                    <Image source={{ uri: profilePicURI }} style={{ width: "100%", height: "100%" }} />
                 </TouchableRipple>
                 <TouchableOpacity onPress={pickImage}><Text style={styles.imageButton}>Select Image</Text></TouchableOpacity>
                 <TouchableOpacity
