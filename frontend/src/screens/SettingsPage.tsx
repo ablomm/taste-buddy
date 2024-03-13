@@ -43,7 +43,7 @@ const SettingsPage = ({navigation}:any) => {
     };
     
     return(
-        <View style={styles.container}>
+      <View style={styles.container}>
         <Formik
         initialValues={{
         }}
@@ -76,31 +76,34 @@ const SettingsPage = ({navigation}:any) => {
         }}>
         {({ handleSubmit, values }) => (
             <>
-            <View style={styles.headerWrapper}>
-              <View style={styles.headerLeftWrapper}>
-                <BackButton navigation={navigation} />
-                <View style={styles.headerTiltleWrapper}><Text style={styles.headerTiltle}>Settings {`:)`}</Text></View>
+              <View style={styles.headerWrapper}>
+                <View style={styles.headerLeftWrapper}>
+                  <BackButton navigation={navigation} />
+                  <View style={styles.headerTiltleWrapper}><Text style={styles.headerTiltle}>Settings {`:)`}</Text></View>
+                </View>
+                <View>
+                  <TBButton title="save" style={styles.saveButton} textColor={{ color: "white" }} onPress={handleSubmit} />
+                </View>
               </View>
-              <View>
-                <TBButton title="save" style={styles.saveButton} textColor={{ color: "white" }} onPress={handleSubmit} />
+              <View style={styles.imageUpdateContainer}>
+                  <TouchableRipple onPress={pickImage} borderless={true} style={styles.image}>
+                      <Image source={{ uri: profilePicURI }} style={{ width: "100%", height: "100%" }} />
+                  </TouchableRipple>
+                  <TouchableOpacity onPress={pickImage}><Text style={styles.imageButton}>Select Image</Text></TouchableOpacity>
               </View>
-            </View>
-            <View style={styles.imageUpdateContainer}>
-                <TouchableRipple onPress={pickImage} borderless={true} style={styles.image}>
-                    <Image source={{ uri: profilePicURI }} style={{ width: "100%", height: "100%" }} />
-                </TouchableRipple>
-                <TouchableOpacity onPress={pickImage}><Text style={styles.imageButton}>Select Image</Text></TouchableOpacity>
-                <TouchableOpacity
-                    style={styles.dietButton}
-                    onPress={() => {navigation.navigate('DietaryPreference');}}
-                >
-                  <Text style={styles.dietButtonText}>Dietary Preferences</Text>
+              <TouchableOpacity
+                      style={styles.dietButton}
+                      onPress={() => {navigation.navigate('DietaryPreference');}}
+              >
+                <Text style={styles.dietButtonText}>Edit Dietary Preferences</Text>
               </TouchableOpacity>
-            </View>
+
+              <TBButton styles={styles.logoutButton} onPress={userContext.logout} title="Logout" />
             </>
             )}
         </Formik>
-        </View>
+        
+      </View>
         
     );
 }
@@ -110,13 +113,17 @@ const styles = StyleSheet.create({
         flex: 1,
         padding:10,
         backgroundColor: '#fff',
+        justifyContent: 'space-between',
+    },
+    logoutButton:{
+      bottom:10,
     },
     dietButton: {
       backgroundColor: "#8CC84B", // Light green color
-      paddingVertical: 5,
+      paddingVertical: 10,
+      alignSelf: "center",
       paddingHorizontal: 10,
       borderRadius: 5,
-      width: 110,
       borderWidth:0
     },
     dietButtonText: {
