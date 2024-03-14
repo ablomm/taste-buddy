@@ -6,9 +6,17 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-def train_model():
+def train_top_rated():
     top_rated.train()
-    return
+    return "Training completed."
+
+def extract_top_rated(data):
+    set = top_rated.setup()
+
+    if set:
+        return "Dataset extracted successfully"
+    else:
+        return "Dataset failed to extract"
 
 def personalized_recommendations(data):
     # insert part to get personalized recipes
@@ -39,6 +47,18 @@ def call_top_rated():
     data = request.json
     result = top_rated_recommendations(data)
     return result
+
+@app.route('/api/top-rated/setup', methods=['POST'])
+def setup_top_rated():
+    data = request.json
+    result = extract_top_rated(data)
+    return jsonify(result)
+
+@app.route('/api/top-rated/train', methods=['POST'])
+def train_top_rated():
+    data = request.json
+    result = train_top_rated()
+    return jsonify(result)
 
 if __name__ == '__main__':
     app.run(debug=True)
