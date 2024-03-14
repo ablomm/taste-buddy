@@ -5,11 +5,12 @@ from torch import save
 import torch 
 import pandas as pd
 
-recipes = pd.read_csv('data/recipes.csv')
-reviews = pd.read_csv('data/reviews.csv')
-
 class Loader(Dataset):
+    
     def __init__(self):
+        recipes = pd.read_csv('data/dataset/recipes.csv')
+        reviews = pd.read_csv('data/dataset/reviews.csv')
+
         self.reviews = reviews.copy()
 
         users = reviews.AuthorId.unique()

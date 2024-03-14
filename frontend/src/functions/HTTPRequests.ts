@@ -116,3 +116,32 @@ export const signUp = async (username, email, password) => {
         throw new Error("account creation unsuccessful");
     }
 }
+
+export const addRecipeToUserSaved = async(recipeID: number, username: any) => {
+    try {
+        let response = await fetch(
+          `${
+            process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
+          }/user/save-recipe/${username}}`,
+          {
+            method: "POST",
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({
+              recipeID: recipeID,
+            }),
+          }
+        );
+  
+        if (response.status !== 200) {
+          console.error("save recipe unsuccessful", username);
+      } else {
+        console.log("save recipe successful");
+      }
+      } catch (error) {
+        console.error(error);
+      }
+}
