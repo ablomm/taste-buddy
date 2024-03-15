@@ -17,6 +17,7 @@ model User {
   createDate   DateTime           @default(now())
   isModerator Boolean @default(false)
   savedRecipes UserSavedRecipes[]
+  rejectedRecommendedRecipes UserRejectedRecipes[]
   recipes      Recipe[]
   userPosts    UserPosts[]
   profilePic   String             @default("")
@@ -42,6 +43,14 @@ model Folder {
   userID       Int
   user         User               @relation(fields: [userID], references: [id])
   savedRecipes UserSavedRecipes[] @relation("UserSavedRecipesToFolders")
+}
+
+model UserRejectedRecipes {
+  id        Int       @id @default(autoincrement())
+  userID    Int
+  user      User      @relation(fields: [userID], references: [id])
+  recipeID  Int
+  @@unique([userID, recipeID])
 }
 
 model DietaryPref {

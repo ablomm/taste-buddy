@@ -19,7 +19,7 @@ import {
     getPersonalizedRecipes,
     getTopRatedRecipes
 } from '../service/recipe';
-import { getUserByUsername, getProfilePhotoByUsername } from "../service/user";
+import { getUserByUsername, getProfilePhotoByUsername, getSavedRecipeIDs, getRejectedRecipeIDs } from "../service/user";
 import {editRecipe, storeRecipe} from "../service/search";
 const router = express.Router();
 
@@ -113,15 +113,65 @@ router.get("/batch/:num", async (req: express.Request, res: express.Response) =>
     }
 });
 
+interface Recipe {
+    RecipeId: number | 0;
+    Name: string;
+    CookTime: string | null;
+    Description: string;
+    Images: string[];
+    RecipeCategory: string;
+    Keywords: string[];
+    RecipeIngredientQuantities: string[];
+    RecipeIngredientParts: string[];
+    AggregatedRating: number | 0;
+    Calories: number | 0;
+    RecipeServings: number | 0;
+    RecipeInstructions: string[];
+}
+
+const convertToRecipe = (recipe: Recipe) => {
+    return {
+      id: 0,
+      authorID: 0,
+      creationTime: Date.now(),
+      recipeTitle: recipe.Name,
+      description: recipe.Description,
+      cookTimeHours: 0,
+      cootTimeMinutes: 0,
+      calories: recipe.Calories,
+      servings: recipe.RecipeServings,
+      recipeImage: recipe.Images.length > 0 ? recipe.Images[0] : "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png",
+      averageRating: recipe.AggregatedRating,
+      ingredients: recipe.RecipeIngredientQuantities.map((quantity, index) => {
+        return { quantity: quantity, part: recipe.RecipeIngredientParts[index] }}),
+      instructions: recipe.RecipeInstructions
+    };
+  }
+
 router.post("/api/recommendations", async (req: express.Request, res: express.Response) => {
     try {
-        // Call the service function, passing the request body
-        const personalizedResult = await getPersonalizedRecipes(req.body);
-        const topRatedResult = await getTopRatedRecipes(req.body);
+       // add batch logic here so that cards can be reloaded 
+        // add contitional logic for calling correct calls
+        // add logic to combine recipes from both calls before returning 
+        // remove buttons on front end
+        // find out how to show full recipe 
+        // (maybe) add visual display for right/left/top swipe functionalities 
+        const userID = req.body.userID;
+        const savedRecipeIDs = await getSavedRecipeIDs(20); 
+        const rejectedRecipeIDs = await getRejectedRecipeIDs(20);
+        const temp = [ { recipeID: 39}, {recipeID: 41}, {recipeID: 43}, {recipeID: 51}, {recipeID: 52}, {recipeID: 54}, {recipeID: 60}]
+        const tempReject = [ {recipeID: 1}, {recipeID: 2}, {recipeID: 3}, {recipeID: 4}, {recipeID: 5}]
+        const personalizedResult = await getPersonalizedRecipes(temp, tempReject);
+        
+        // const topRatedResult = await getTopRatedRecipes(req.body);
+
         // insert logic to combine list of top rated and personalized recipes
+        const recipes = JSON.parse(personalizedResult);
+
+        const recommend = recipes.map(convertToRecipe)
 
         // Send the result back to the client
-        res.json(personalizedResult);
+        res.json(recommend);
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');

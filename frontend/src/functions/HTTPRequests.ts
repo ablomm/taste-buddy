@@ -122,7 +122,7 @@ export const addRecipeToUserSaved = async(recipeID: number, username: any) => {
         let response = await fetch(
           `${
             process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
-          }/user/save-recipe/${username}}`,
+          }/user/save-recipe/${username}`,
           {
             method: "POST",
             headers: {
@@ -141,6 +141,29 @@ export const addRecipeToUserSaved = async(recipeID: number, username: any) => {
       } else {
         console.log("save recipe successful");
       }
+      } catch (error) {
+        console.error(error);
+      }
+}
+
+export const addUserRejectedRecipe = async(recipeID: number, userID: number) => {
+    try {
+        let response = await fetch(
+          `${
+            process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
+          }/user/reject-recipe/${userID}`,
+          {
+            method: "POST",
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({
+              recipeID: recipeID,
+            }),
+          }
+        );
       } catch (error) {
         console.error(error);
       }

@@ -228,6 +228,27 @@ export async function saveRecipe(recipeID: number, userID: any) {
     }
 }
 
+export async function rejectRecipe(recipeID: number, userID: number){
+    //Check if existing
+    const existingRecord = await prisma.userRejectedRecipes.findUnique({
+        where: {
+            userID_recipeID: {
+                userID: userID,
+                recipeID: recipeID
+            }
+        }
+    });
+    // Add rejected recipe
+    if(!existingRecord){
+        return await prisma.userRejectedRecipes.create({
+            data: {
+                recipeID: recipeID,
+                userID: userID,
+            }
+        });
+    }
+}
+
 export async function deleteSavedRecipe(recipeID: any, userID: any) {
     const userSavedRecipe = await prisma.userSavedRecipes.findUnique({
         where: {
@@ -246,7 +267,7 @@ export async function deleteSavedRecipe(recipeID: any, userID: any) {
         return;
     }
 
-    const foldersToDisconnect = userSavedRecipe.folders.map((folder) => ({
+    const foldersToDisconnect = userSavedRecipe.folders.map((folder: any) => ({
         id: folder.id,
     }));
 
@@ -279,6 +300,29 @@ export async function getSavedRecipes(userId: any) {
     })
 
     return user;
+}
+
+export async function getSavedRecipeIDs(userID: number){
+    const savedRecipeIDs = await prisma.userSavedRecipes.findMany({
+        where: {
+            userID: userID
+        },
+        select:{
+            recipeID: true,
+        }
+    })
+    return savedRecipeIDs;
+}
+
+export async function getRejectedRecipeIDs(userID:number){
+    return await prisma.userRejectedRecipes.findMany({
+        where: {
+            userID: userID
+        },
+        select:{
+            recipeID: true,
+        }
+    })
 }
 
 export async function createFolder(userID: any, folderName: any) {

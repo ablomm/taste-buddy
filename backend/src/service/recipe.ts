@@ -129,11 +129,11 @@ export async function getRecipeBatch(batchNum: number) {
     });
 }
 
-export async function getPersonalizedRecipes(data: any): Promise<any> {
+export async function getPersonalizedRecipes(savedRecipeIDs: any, rejectedRecipeIDs: any): Promise<any> {
     return new Promise((resolve, reject) => {
-        const temp = [39, 41, 43, 51, 52, 54, 60];
-        // Convert the data to a JSON string
-        const postData = JSON.stringify(temp);
+        // Create payload with saved + rejected recipe IDs
+        const payload = {savedRecipeIDs: savedRecipeIDs, rejectedRecipeIDs:rejectedRecipeIDs}
+        const postData = JSON.stringify(payload);
 
         // Options for the HTTP request personalized
         const options: RequestOptions = {
@@ -158,8 +158,8 @@ export async function getPersonalizedRecipes(data: any): Promise<any> {
             res.on("end", () => {
                 try {
                     // Try to parse the JSON data
-                    // resolve(JSON.parse(body));
-                    resolve(body);
+                    resolve(JSON.parse(body));
+                    // resolve(body);
                 } catch (error) {
                     reject(error);
                 }
