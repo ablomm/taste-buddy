@@ -1,8 +1,11 @@
+import pandas as pd
+import numpy as np
 import top_rated
 import json
-import pandas as pd
 import sys
 from flask import Flask, request, jsonify
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 app = Flask(__name__)
 
@@ -19,9 +22,15 @@ def extract_top_rated(data):
         return "Dataset failed to extract"
 
 def personalized_recommendations(data):
-    # insert part to get personalized recipes
-    result = "personalized recs with data " + str(data)
-    return result
+    # get recipe IDs
+    saved_recipe_ids = [d['recipeID'] for d in data.get('savedRecipeIDs', [])]
+    rejected_recipe_ids = [d['recipeID'] for d in data.get('rejectedRecipeIDs', [])]
+
+    user_saved_recipes = recipes_full[recipes_full['RecipeId'].isin(saved_recipe_ids)]
+    user_rejected_recipes = recipes_full[recipes_full['RecipeId'].isin(rejected_recipe_ids)]
+    # result = user_saved_recipes["RecipeId", "Name", "CookTime", "Description", "Images", "RecipeCategory", "Keywords", "RecipeIngredientQuantities", "RecipeIngredientParts", "AggregatedRating", "Calories", "RecipeServings", "RecipeInstructions"]
+    result = user_saved_recipes
+    return result.to_json(orient='records')
 
 def top_rated_recommendations(data):
     # top rated recipe model 
