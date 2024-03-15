@@ -377,7 +377,7 @@ const AccountPage = () => {
   const [savedPosts1, setSavedPosts] = useState();
   const [userFolders, setUserFolders] = useState();
   const [refreshing, setRefreshing] = useState(false);
-  const [userDetails, setUserDetails] = useState({ username: "Unknown", profilePic: "" });
+  const [userDetails, setUserDetails] = useState({ username: "Unknown", profilePic: "", description: "" });
 
   useEffect(() => {
     fetchUserData();
@@ -509,6 +509,7 @@ const AccountPage = () => {
         <Image source={{uri: userDetails.profilePic}} style={styles.profilePicture} />
         <View style={styles.userInfo}>
           <Text style={styles.username}>{username}</Text>
+          <Text style={styles.profileDescription}>{userDetails.description}</Text>
         </View>
 
         <TouchableOpacity>
@@ -593,6 +594,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 5,
+  },
+  profileDescription: {
+    
   },
   screen: {
     flex: 1,

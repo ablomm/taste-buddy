@@ -1,7 +1,7 @@
 import express, { Response, Request } from 'express';
 const router = express.Router();
 import jwt from "jsonwebtoken";
-import { getUserByEmail, getUserByUsername } from "../service/user";
+import {getUserByUsername } from "../service/user";
 import bcrypt from "bcrypt";
 
 

@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import DietSelectionPage from './DietaryPreference';
 import { View, Text, TouchableOpacity, StyleSheet, Image, Platform, Alert  } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { TouchableRipple } from 'react-native-paper';
@@ -10,22 +9,26 @@ import getBase64 from '../functions/GetBase64FromURI';
 import { UserContext } from "../providers/UserProvider";
 import { Buffer } from 'buffer';
 import { LoadingContext } from '../providers/LoadingProvider';
-import { putImage, saveProfilePicture, getUserDetails } from '../functions/HTTPRequests';
+import { putImage, saveProfilePicture, saveProfileDescription, getUserDetails } from '../functions/HTTPRequests';
+import ValidatedInput from '../components/ValidatedInput';
 
 const SettingsPage = ({navigation}:any) => {
     const [profilePic, setProfilePic] = React.useState<any>(null);
     const [profilePicURI, setProfilePicURI] = React.useState<any>(null);
+    const [profileDescription, setProfileDescription] = React.useState<string>("");
 
     const userContext = React.useContext(UserContext) as any;
     const loadingContext = React.useContext(LoadingContext) as any;
+
     useEffect(() => {
       async function setUserDetails() {
         let i = await getUserDetails(userContext.state.userId)
-        setProfilePic(i.profilePic)
+        setProfileDescription(i.description)
         setProfilePicURI(i.profilePic)
       }
       setUserDetails();
     }, [])
+    
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -45,23 +48,28 @@ const SettingsPage = ({navigation}:any) => {
     return(
       <View style={styles.container}>
         <Formik
+        key={profileDescription} 
         initialValues={{
+          description: profileDescription,
         }}
 
-        onSubmit={async () => {
+        onSubmit={async (data: any) => {
           loadingContext.enable();
 
           try {
+          if(profilePic){
             if (!profilePic.base64) {
               profilePic.base64 = await getBase64(profilePic.uri);
             }
             const buf = Buffer.from(profilePic.base64, 'base64') //isolate the base64 buffer
             let type = profilePic.uri.substring(profilePic.uri.lastIndexOf('.') + 1, profilePic.uri.length);
-  
+            
             let imageUrl = await putImage(buf, type)
-  
             await saveProfilePicture(userContext.state.username, imageUrl)
-  
+          }
+
+            await saveProfileDescription(userContext.state.username, data.description)
+            
             console.log("Save Profile Picture successful")
             navigation.navigate('AccountPageStack');
 
@@ -74,7 +82,7 @@ const SettingsPage = ({navigation}:any) => {
             loadingContext.disable();
           }
         }}>
-        {({ handleSubmit, values }) => (
+        {({ errors, handleChange, handleBlur, handleSubmit,values }) => (
             <>
               <View style={styles.headerWrapper}>
                 <View style={styles.headerLeftWrapper}>
@@ -91,6 +99,19 @@ const SettingsPage = ({navigation}:any) => {
                   </TouchableRipple>
                   <TouchableOpacity onPress={pickImage}><Text style={styles.imageButton}>Select Image</Text></TouchableOpacity>
               </View>
+              <Text style={styles.header}>Description</Text>
+              <ValidatedInput
+                  onChangeText={handleChange('description')}
+                  onBlur={handleBlur('description')}
+                  value={values.description}
+                  error={errors.description}
+                  multiline={true}
+                  maxLength={95}
+                  style={{
+                    height: "auto",
+                    textAlignVertical: 'top',
+                  }}
+                />
               <TouchableOpacity
                       style={styles.dietButton}
                       onPress={() => {navigation.navigate('DietaryPreference');}}
@@ -114,6 +135,11 @@ const styles = StyleSheet.create({
         padding:10,
         backgroundColor: '#fff',
         justifyContent: 'space-between',
+    },
+    header: {
+      fontSize: 20,
+      marginLeft: 10,
+      fontWeight: "bold"
     },
     logoutButton:{
       bottom:10,

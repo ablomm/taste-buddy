@@ -1,7 +1,6 @@
 import express, {Response, Request} from 'express';
 import { PrismaClient } from '@prisma/client';
-import {createUser, setProfilePicOfUser, getModeratorStatus, addDietaryPref, getUserById, saveRecipe, getSavedRecipes, getUserByUsername, deleteSavedRecipe, createFolder, getUserFolders, deleteFolder, getRecipesInFolder, saveRecipeToFolder} from '../service/user';
-import { generateUploadURL } from '../service/s3';
+import {createUser, setProfilePicOfUser, setProfileDescription, getModeratorStatus, addDietaryPref, getUserById, saveRecipe, getSavedRecipes, getUserByUsername, deleteSavedRecipe, createFolder, getUserFolders, deleteFolder, getRecipesInFolder, saveRecipeToFolder} from '../service/user';
 const prisma = new PrismaClient();
 const router = express.Router();
 
@@ -39,7 +38,8 @@ router.get("/id/:id", async (req: express.Request, res: express.Response) => {
 
   return res.send({
     username: user?.username,
-    profilePic: user?.profilePic
+    profilePic: user?.profilePic,
+    description: user?.description
   })
 })
 
@@ -71,6 +71,22 @@ router.post("/update-profile/profilePic", async (req: express.Request, res: expr
     console.log("update profile pic userid : " + username);
 
     await setProfilePicOfUser(username, profilePic)
+
+    res.sendStatus(200);
+  } catch(error) {
+    console.error(error);
+  }
+});
+
+router.post("/update-profile/description", async (req: express.Request, res: express.Response) => {
+  try {
+    const { username,
+      description
+    } = req.body;
+
+    console.log("update profile description userid : " + username);
+
+    await setProfileDescription(username, description)
 
     res.sendStatus(200);
   } catch(error) {
