@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, Platform, Alert  } from 'react-native';
+import { View, Text, TouchableOpacity, KeyboardAvoidingView, StyleSheet, Image, Platform, Alert, ScrollView  } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { TouchableRipple } from 'react-native-paper';
 import BackButton from '../components/BackButton';
@@ -93,33 +93,44 @@ const SettingsPage = ({navigation}:any) => {
                   <TBButton title="save" style={styles.saveButton} textColor={{ color: "white" }} onPress={handleSubmit} />
                 </View>
               </View>
+              <ScrollView>
+              <View>
               <View style={styles.imageUpdateContainer}>
                   <TouchableRipple onPress={pickImage} borderless={true} style={styles.image}>
                       <Image source={{ uri: profilePicURI }} style={{ width: "100%", height: "100%" }} />
                   </TouchableRipple>
                   <TouchableOpacity onPress={pickImage}><Text style={styles.imageButton}>Select Image</Text></TouchableOpacity>
               </View>
-              <Text style={styles.header}>Description</Text>
-              <ValidatedInput
-                  onChangeText={handleChange('description')}
-                  onBlur={handleBlur('description')}
-                  value={values.description}
-                  error={errors.description}
-                  multiline={true}
-                  maxLength={95}
-                  style={{
-                    height: "auto",
-                    textAlignVertical: 'top',
-                  }}
-                />
+              <KeyboardAvoidingView
+              behavior='position'
+              enabled={Platform.OS === "ios"}
+              keyboardVerticalOffset={40}>
+              <View style={{marginVertical: 15}}>
+                <Text style={styles.header}>Description</Text>
+                <ValidatedInput
+                    onChangeText={handleChange('description')}
+                    onBlur={handleBlur('description')}
+                    value={values.description}
+                    error={errors.description}
+                    multiline={true}
+                    maxLength={95}
+                    style={{
+                      height: "auto",
+                      textAlignVertical: 'top',
+                    }}
+                  />
+              </View>
+              </KeyboardAvoidingView>
+              
               <TouchableOpacity
                       style={styles.dietButton}
                       onPress={() => {navigation.navigate('DietaryPreference');}}
               >
                 <Text style={styles.dietButtonText}>Edit Dietary Preferences</Text>
               </TouchableOpacity>
-
-              <TBButton styles={styles.logoutButton} onPress={userContext.logout} title="Logout" />
+              <TBButton style={styles.logoutButton} onPress={userContext.logout} title="Logout" />
+              </View>
+              </ScrollView>
             </>
             )}
         </Formik>
@@ -142,9 +153,10 @@ const styles = StyleSheet.create({
       fontWeight: "bold"
     },
     logoutButton:{
-      bottom:10,
+      marginVertical:15,
     },
     dietButton: {
+      marginVertical:15,
       backgroundColor: "#8CC84B", // Light green color
       paddingVertical: 10,
       alignSelf: "center",
