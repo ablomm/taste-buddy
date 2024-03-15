@@ -105,6 +105,25 @@ export const saveProfilePicture = async (username, image) => {
     }
 }
 
+export const saveProfileDescription = async (username, description) => {
+    let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || localHostURL}/user/update-profile/description`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+            username: username,
+            description: description
+        }),
+    });
+
+    if (response.status !== 200) {
+        throw new Error("Save Profile Description Failure")
+    }
+}
+
 export const login = async (username, password) => {
     let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || localHostURL}/login`, {
         method: 'POST',

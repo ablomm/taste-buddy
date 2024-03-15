@@ -11,10 +11,11 @@ export interface ValidatedInputProps {
     multiline?: boolean,
     textContentType?: any,
     secureTextEntry?: boolean,
+    maxLength?: number,
 }
 
 const ValidatedInput = (props: ValidatedInputProps) => {
-    let { placeholder = "", textContentType = "none", secureTextEntry = false, onChangeText, onBlur, value, error, style, multiline = false } = props;
+    let { placeholder = "", textContentType = "none", secureTextEntry = false, onChangeText, onBlur, value, error, style, multiline = false, maxLength } = props;
 
     return (
         <>
@@ -26,6 +27,7 @@ const ValidatedInput = (props: ValidatedInputProps) => {
                 secureTextEntry={secureTextEntry}
                 value={value}
                 multiline={multiline}
+                maxLength={maxLength}
                 style={[
                     {
                         backgroundColor: value ? 'white' : '#F6F6F6',

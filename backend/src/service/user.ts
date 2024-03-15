@@ -83,6 +83,16 @@ export async function setProfilePicOfUser(username:string, profilePic: string){
         },
     });
 }
+export async function setProfileDescription(username:string, description: string){
+    const updateUser = await prisma.user.update({
+        where: {
+            username: username,
+        },
+        data: {
+            description:description
+        },
+    });
+}
 
 export async function addDietaryPref(username: string, dietaryPref: string) {
     const updateUser = await prisma.user.update({
