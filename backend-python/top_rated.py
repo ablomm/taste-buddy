@@ -30,13 +30,12 @@ def get_zip():
         return True
     except Exception as e:
         print(e)
-        
-        return False # If there's an error (e.g., file not found), return a 404 response
+        return False 
 
 def setup():
     
     if not os.path.isfile("dataset.zip"):
-       return False
+       get_zip()
     
     with zipfile.ZipFile('dataset.zip', 'r') as zip_ref:
         zip_ref.extractall('data')
