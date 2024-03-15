@@ -2,19 +2,44 @@ import zipfile
 import pandas as pd
 import torch
 import os
-from Loader import Loader
-from MatrixFactorization import MatrixFactorization
+import boto3
 import warnings
 import numpy as np
+from Loader import Loader
+from MatrixFactorization import MatrixFactorization
 from torch.utils.data.dataset import Dataset
 from torch.utils.data import DataLoader
 from torch import save 
 from tqdm.notebook import tqdm
 from sklearn.cluster import KMeans
 
+s3 = boto3.client('s3',  
+                  aws_access_key_id='AKIASMHR2QCEZQPLXWXR',
+                  aws_secret_access_key= '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', 
+                  region_name='us-east-2')
+
+bucket_name = 'tastebuddy-images'
+folder_name = 'engine/'
+
+def get_zip():
+    object_key = folder_name + "dataset.zip"
+    file_path = "dataset.zip"
+    
+    try:
+        s3.download_file(bucket_name, object_key, file_path)
+        return True
+    except Exception as e:
+        print(e)
+        
+        return False # If there's an error (e.g., file not found), return a 404 response
+
 def setup():
-   with zipfile.ZipFile('dataset.zip', 'r') as zip_ref:
-    zip_ref.extractall('data')
+    
+    if not os.path.isfile("dataset.zip"):
+       return False
+    
+    with zipfile.ZipFile('dataset.zip', 'r') as zip_ref:
+        zip_ref.extractall('data')
 
     if os.path.isdir("data"):
        return True
