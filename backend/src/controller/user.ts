@@ -1,6 +1,6 @@
 import express, {Response, Request} from 'express';
 import { PrismaClient } from '@prisma/client';
-import {createUser, getModeratorStatus, addDietaryPref, getUserById, saveRecipe, getSavedRecipes, getUserByUsername, deleteSavedRecipe, createFolder, getUserFolders, deleteFolder, getRecipesInFolder, saveRecipeToFolder} from '../service/user';
+import {createUser, getModeratorStatus, addDietaryPref, getUserById, saveRecipe, getSavedRecipes, getUserByUsername, deleteSavedRecipe, createFolder, getUserFolders, deleteFolder, getRecipesInFolder, saveRecipeToFolder, rejectRecipe} from '../service/user';
 const prisma = new PrismaClient();
 const router = express.Router();
 
@@ -49,12 +49,18 @@ router.post("/add-dietary-preference/:username", async (req: updateUserRequest, 
   res.sendStatus(200);
 });
 
+router.post("/reject-recipe/:id", async (req: express.Request, res: express.Response) => {
+  const userID: number = Number(req.params['id'])
+  const recipeID: number = req.body.recipeID;
+  await rejectRecipe(recipeID, userID);
+  res.sendStatus(200);
+})
+
 router.post("/save-recipe/:username", async (req: saveRecipe, res: express.Response) => {
   const username: string = req.params["username"]
   const recipeID: number = req.body.recipeID;
-  const resultString: string = username.endsWith('}') ? username.slice(0, -1) : username; //remove the curly brackets thats at the end for some reason
 
-  const user = await getUserByUsername(resultString);
+  const user = await getUserByUsername(username);
   const userID = user?.id;
 
   await saveRecipe(recipeID, userID);

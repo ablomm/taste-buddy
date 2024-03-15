@@ -77,7 +77,7 @@ const ContentInteractionBar = () => {
       let response = await fetch(
         `${
           process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
-        }/user/save-recipe/${username}}`,
+        }/user/save-recipe/${username}`,
         {
           method: "POST",
           headers: {
