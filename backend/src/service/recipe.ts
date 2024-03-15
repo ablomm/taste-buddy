@@ -1,4 +1,5 @@
 import {PrismaClient} from '@prisma/client';
+import {updateRatingES} from "./search";
 
 
 const prisma = new PrismaClient();
@@ -15,7 +16,7 @@ type Instruction = {
     step: string
 }
 
-enum OrderBy {
+export enum OrderBy {
     DateAscending = "DateAscending",
     DateDescending = "DateDescending",
     RatingAscending = "RatingAscending",
@@ -327,7 +328,18 @@ export async function createReview(recipeID:number ,reviewText:string, rating:nu
             username,
             profilePic
         },
-    })
+    });
+
+    console.log('created recipe review in mysql');
+
+    // Calculate new average
+    const newAverageRating = await recalculateAverageRating(recipeID);
+
+    // Update recipe rating in mysql db
+    await updateRecipeRating(recipeID, newAverageRating);
+
+    // Update elastic search db
+    await updateRatingES(recipeID, newAverageRating);
 }
 
 /**
@@ -341,48 +353,57 @@ export async function createReview(recipeID:number ,reviewText:string, rating:nu
  */
 export async function getReviewsByPage(recipeID: number, page: number, order:OrderBy) {
     const reviewsPerPage = 15;
-    let orderBy = [{}];
+    let orderBy = {};
+
     switch (order) {
-        case OrderBy.DateAscending :
-            orderBy = [
-                {timePosted : 'asc'}
-            ]
+        case OrderBy.DateAscending:
+            orderBy = {timePosted: 'asc'};
             break;
-        case OrderBy.DateDescending :
-            orderBy = [
-                {timePosted : 'desc'}
-            ]
+        case OrderBy.DateDescending:
+            orderBy = {timePosted: 'desc'};
             break;
-        case OrderBy.RatingAscending :
-            orderBy = [
-                {rating : 'asc'}
-            ]
+        case OrderBy.RatingAscending:
+            orderBy = {rating: 'asc'};
             break;
-        case OrderBy.RatingDescending :
-            orderBy = [
-                {rating : 'desc'}
-            ]
+        case OrderBy.RatingDescending:
+            orderBy = {rating: 'desc'};
             break;
+        default:
+            break;
+    }
 
-        default :
-        return await prisma.review.findMany({
-            skip: reviewsPerPage * page,
+    try {
+        const totalReviews = await prisma.review.count({
+            where: {
+                recipeID: recipeID,
+            },
+        });
+
+        const totalPages = Math.ceil(totalReviews / reviewsPerPage);
+
+        const reviews = await prisma.review.findMany({
+            skip: reviewsPerPage * (page - 1),
             take: reviewsPerPage,
             where: {
-                recipeID: recipeID
+                recipeID: recipeID,
             },
-        })
-        break;
-        }
+            orderBy: orderBy,
+        });
 
-        return await prisma.review.findMany({
-            skip: reviewsPerPage * page,
-            take: reviewsPerPage,
-            where: {
-                recipeID: recipeID
-            },
-            orderBy:orderBy
-        })
+        return {reviews, totalPages};
+    } catch (error) {
+        console.error('Failed to fetch reviews:', error);
+        throw error;
+    }
+}
+
+export async function getReviewByUser(userID: number, recipeID: number) {
+    return await prisma.review.findFirst({
+        where: {
+            recipeID: recipeID,
+            userID: userID
+        },
+    });
 }
 
 export async function getRecipes() {
@@ -398,5 +419,66 @@ export async function getRecipesByUserID(userID: number|undefined) {
         where: {
             authorID: userID
         },
-    }); 
+    });
+}
+
+export async function getNumOfReviewByRecipe(recipeID: number) {
+    return await prisma.review.count({
+        where: {
+            recipeID: recipeID,
+        },
+    });
+}
+
+export async function updateRecipeRating(recipeID: number, rating: number) {
+    await prisma.recipe.update({
+        where: {
+            id: recipeID,
+        },
+        data: {
+            averageRating: rating,
+        },
+    });
+}
+
+export async function getRecipeRating(recipeID: number) {
+    const recipe = await prisma.recipe.findFirst({
+        where: {
+            id: recipeID,
+        },
+    });
+
+    if (!recipe) {
+        throw Error('Error retrieving recipe.');
+    }
+
+    return recipe.averageRating;
+}
+
+export async function deleteReview(recipeID: number, userID: number) {
+    await prisma.review.deleteMany({
+        where: {
+            recipeID: recipeID,
+            userID: userID
+        }
+    });
+
+
+    const newAverageRating = await recalculateAverageRating(recipeID);
+
+    await updateRecipeRating(recipeID, newAverageRating);
+    await updateRatingES(recipeID, newAverageRating)
+}
+
+export async function recalculateAverageRating(recipeID: number) {
+    // Query all reviews for the recipe
+    const reviews = await prisma.review.findMany({
+        where: {
+            recipeID: recipeID
+        }
+    });
+
+    // Calculate the new average rating
+    const totalRatings = reviews.reduce((acc, review) => acc + review.rating, 0);
+    return totalRatings / reviews.length;
 }
