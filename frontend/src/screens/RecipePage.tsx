@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, {useState, useEffect, useContext, useRef} from 'react';
 import { View, Text, TextInput, StyleSheet, KeyboardAvoidingView, ScrollView, Platform, Animated, Dimensions, ImageBackground} from "react-native";
 import Header from '../components/header/Header';
 import PosterHeader from '../components/RecipesAndPosts/PosterHeader';
@@ -70,30 +70,39 @@ const exampleRecipe: Recipe = {
             step: 6,
             instruction: "Step6"
         }
-    ]
+    ],
+    tags: ['tag1']
 };
 
 const RecipePage = ({ route, navigation }: any) => {
     const [recipe, setRecipe] = useState<Recipe>();
     const [tags, setTags] = useState(); // TODO: Need tags implemented in backend and frontend
     const [owner, setOwner] = useState<boolean>(false);
+    const [userId, setUserId] = React.useState<number>(-1);
+    const [username, setUsername] = React.useState<string>("");
+    const [recipeID, setRecipeID] = React.useState<number>(-1);
+    const [currentRating, setCurrentRating] = useState<number>();
 
-    const userContext = React.useContext(UserContext) as any;
+    const userContext = useContext(UserContext) as any;
 
     useEffect(() => {
-        const userId = userContext.state.userId;
-
-        if(route.params != undefined) {
+        if (route.params) {
             const {recipe} = route.params;
-            checkOwnership(recipe.authorID, userId);
+            let userID = userContext.state.userId;
+
+            setRecipeID(recipe.id);
+            setUserId(userID);
+            setUsername(userContext.state.username);
+
+            checkOwnership(recipe.authorID, userID);
             setRecipe(recipe);
-        } // TODO: REMOVE eventually when we don't need it for a demo
-        else {
-            setRecipe(exampleRecipe);
+            setCurrentRating(recipe.averageRating);
         }
+
     }, [route.params]);
 
-    const [scrollY, setScrollY] = useState<any>(new Animated.Value(0));
+
+    const scrollY = useRef(new Animated.Value(0)).current;
 
     const headerHeight = scrollY.interpolate({
         inputRange: [0, HEADER_EXPANDED_HEIGHT - HEADER_COLLAPSED_HEIGHT],
@@ -151,84 +160,72 @@ const RecipePage = ({ route, navigation }: any) => {
         });
     }
 
+    function updateRating(rating: number) {
+        setCurrentRating(rating);
+    }
+
     return(
         <View style={styles.container}>
-            <Header navigation = {navigation}/>
-            <View style={{ zIndex: 2 }}>
-                <PosterHeader
-                    owner={owner}
-                    editFunction={edit}
-                />
-
-                <Animated.View style={{ height: headerHeight, width: SCREEN_WIDTH,top: 0, left: 0, zIndex: 1 }}>
-                    {/** Placeholder image when url is not provided */}
+            <Header navigation={navigation}/>
+            <PosterHeader owner={owner} editFunction={edit}/>
+            <ScrollView
+                style={{flex: 1}}
+                contentContainerStyle={{paddingTop: HEADER_EXPANDED_HEIGHT, paddingBottom: 16, zIndex: 2}}
+                scrollEventThrottle={16}
+                onScroll={(event) => {
+                    scrollY.setValue(event.nativeEvent.contentOffset.y);
+                }}
+            >
+                <Animated.View style={{
+                    height: headerHeight,
+                    width: SCREEN_WIDTH,
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    zIndex: 1
+                }}>
                     <ImageBackground
                         source={recipe?.recipeImage ? { uri: recipe.recipeImage } : require('../../assets/temp/tempfood.jpg')}
                         style={{ flex: 1 }}
                     >
                         <LinearGradient
-                            colors={['rgba(0,0,0,0.49)', 'rgba(0,0,0,0.49)']} // Customize gradient colors
-                            start={{ x: 0, y: 0 }} // Linear gradient start point
-                            end={{ x: 0, y: 1 }} // Linear gradient end point
+                            colors={['rgba(0,0,0,0.49)', 'rgba(0,0,0,0.49)']}
+                            start={{x: 0, y: 0}}
+                            end={{x: 0, y: 1}}
                             style={{ flex: 1 }}
                         >
-                            <View style={{ top:8, left: 8}}>
+                            <View style={{top: 8, left: 8}}>
                                 <Animated.Text style={styles.recipeTitle}>{recipe?.recipeTitle}</Animated.Text>
-                                <Animated.Text style={[styles.subSectionOfRecipeTitle, {opacity: heroTitleOpacity}]}>tags</Animated.Text>
-                                <Animated.Text style={[styles.subSectionOfRecipeTitle, {opacity: heroTitleOpacity}]}>{recipe?.cookTimeHours} h {recipe?.cootTimeMinutes} m</Animated.Text>
-                                <Animated.Text style={[styles.subSectionOfRecipeTitle, {opacity: heroTitleOpacity}]}>{recipe?.calories} calories</Animated.Text>
-                                <Animated.Text style={[styles.subSectionOfRecipeTitle, {opacity: heroTitleOpacity}]}>{recipe?.servings} {recipe?.servings != undefined && recipe?.servings > 1 ? 'servings' : 'serving'}</Animated.Text>
+                                <Animated.Text
+                                    style={[styles.subSectionOfRecipeTitle, {opacity: heroTitleOpacity}]}>tags</Animated.Text>
+                                <Animated.Text
+                                    style={[styles.subSectionOfRecipeTitle, {opacity: heroTitleOpacity}]}>{recipe?.cookTimeHours} h {recipe?.cootTimeMinutes} m</Animated.Text>
+                                <Animated.Text
+                                    style={[styles.subSectionOfRecipeTitle, {opacity: heroTitleOpacity}]}>{recipe?.calories} calories</Animated.Text>
+                                <Animated.Text
+                                    style={[styles.subSectionOfRecipeTitle, {opacity: heroTitleOpacity}]}>{recipe?.servings} {recipe?.servings != undefined && recipe?.servings > 1 ? 'servings' : 'serving'}</Animated.Text>
                             </View>
-
                         </LinearGradient>
                     </ImageBackground>
                 </Animated.View>
-                <KeyboardAvoidingView
-                            style={styles.avoidingView}
-                            behavior='padding'
-                            enabled={Platform.OS === "ios"}
-                            keyboardVerticalOffset={40}
-                >
-                    <ScrollView contentContainerStyle={styles.scrollContainer}
-                    onScroll={Animated.event(
-                        [{ nativeEvent: {
-                             contentOffset: {
-                               y: scrollY
-                             }
-                           }
-                        }],
-                        { useNativeDriver: true })}
-                      scrollEventThrottle={16}>
 
-                        <RecipeContentInteractionBar stars={recipe?.averageRating}/>
-                        {
-                            // stars
-                            //description
-                            //ingrediants (check list)
-                            //instructions (text)
-                        }
-                        <Text style={styles.recipeDescription}>{recipe?.description}</Text>
-                        <>
-                            {/* Dynamically generate ingredients list */}
-                            <Text style={styles.subTitle}>Ingredients</Text>
-                            {recipe?.ingredients.map((ingredient, index) => (
-                                <CheckboxRecipe key={index} checkboxText={ingredient.ingredient} />
-                            ))}
-                        </>
-                        <>
-                            {/* Dynamically generate instructions list */}
-                            <Text style={styles.subTitle}>Instructions</Text>
-                            {recipe?.instructions.map((instruction) => (
-                                <CheckboxRecipe key={instruction.step} checkboxText={instruction.instruction} />
-                            ))}
-                        </>
-                        <Text style={styles.postTime}>{recipe?.creationTime ? reformatTime(recipe.creationTime) : null}</Text>
-                        {/* Separator */}
-                        <View style={styles.separator}></View>
-                        <RecipeReviews/>
-                    </ScrollView>
-                    </KeyboardAvoidingView>
+                <View style={styles.scrollContainer}>
+                    <RecipeContentInteractionBar stars={currentRating}/>
+                    <Text style={styles.recipeDescription}>{recipe?.description}</Text>
+                    <Text style={styles.subTitle}>Ingredients</Text>
+                    {recipe?.ingredients.map((ingredient, index) => (
+                        <CheckboxRecipe key={index} checkboxText={ingredient.ingredient}/>
+                    ))}
+                    <Text style={styles.subTitle}>Instructions</Text>
+                    {recipe?.instructions.map((instruction) => (
+                        <CheckboxRecipe key={instruction.step} checkboxText={instruction.instruction}/>
+                    ))}
+                    <Text
+                        style={styles.postTime}>{recipe?.creationTime ? reformatTime(recipe.creationTime) : null}</Text>
+                    <View style={styles.separator}></View>
+                    <RecipeReviews recipeID={recipeID} username={username} userID={userId} updateRating={updateRating}/>
                 </View>
+            </ScrollView>
         </View>
     );
 }
@@ -245,7 +242,6 @@ const styles = StyleSheet.create({
     scrollContainer: {
         padding: 16,
         flexGrow: 1,
-        paddingBottom: 300,
     },
     subTitle: {
         fontSize: 20,

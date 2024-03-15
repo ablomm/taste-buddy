@@ -15,11 +15,10 @@ import { UserContext } from "../providers/UserProvider";
 import Modal from "react-native-modal";
 import TBButton from "../components/TBButton";
 import { FontAwesome } from "@expo/vector-icons"; // or 'react-native-vector-icons/MaterialIcons'
-import Icon from 'react-native-vector-icons/FontAwesome';
-import { getUserDetails } from '../functions/HTTPRequests';
+import Icon from "react-native-vector-icons/FontAwesome";
+import { getUserDetails } from "../functions/HTTPRequests";
 
 const Tab = createMaterialTopTabNavigator();
-
 
 interface Post {
   id: number;
@@ -57,7 +56,7 @@ const RecentPostsScreen: (
             userRecipes.slice(-3).map((recipe) => (
               <View key={recipe.id} style={styles.postContainer}>
                 <Image
-                  source={{ uri: recipe.image }}
+                  source={{ uri: recipe.recipeImage }}
                   style={styles.postImage}
                 />
               </View>
@@ -387,11 +386,11 @@ const AccountPage = () => {
 
   const navigateToSettings = () => {
     // Navigate to the settings page
-    navigation.navigate('SettingsPage');
+    navigation.navigate("SettingsPage");
   };
 
   const fetchUserData = async () => {
-    setUserDetails(await getUserDetails(userContext.state.userId))
+    setUserDetails(await getUserDetails(userContext.state.userId));
     try {
       //get posts
       const response = await fetch(
@@ -506,7 +505,10 @@ const AccountPage = () => {
   return (
     <View style={styles.container}>
       <View style={styles.profileHeader}>
-        <Image source={{uri: userDetails.profilePic}} style={styles.profilePicture} />
+        <Image
+          source={{ uri: userDetails.profilePic }}
+          style={styles.profilePicture}
+        />
         <View style={styles.userInfo}>
           <Text style={styles.username}>{username}</Text>
           <Text style={styles.profileDescription}>{userDetails.description}</Text>
@@ -516,7 +518,7 @@ const AccountPage = () => {
           <Icon name="share-square" style={styles.icon}></Icon>
         </TouchableOpacity>
         <TouchableOpacity>
-          <Icon name="gear" style={styles.icon} onPress={navigateToSettings}/>
+          <Icon name="gear" style={styles.icon} onPress={navigateToSettings} />
         </TouchableOpacity>
       </View>
 
@@ -552,7 +554,6 @@ const AccountPage = () => {
           </Tab.Screen>
         </Tab.Navigator>
       </NavigationContainer>
-      <TBButton onPress={userContext.logout} title="Logout" />
     </View>
   );
 };
@@ -567,12 +568,12 @@ const styles = StyleSheet.create({
   //   alignItems: 'center',
   //   justifyContent: 'center',
   // },
-  icon:{
+  icon: {
     width: 30,
     height: 30,
-    fontSize:27,
-    marginLeft:8,
-    color:"#00D387"
+    fontSize: 27,
+    marginLeft: 8,
+    color: "#00D387",
   },
   profileHeader: {
     flexDirection: "row",
