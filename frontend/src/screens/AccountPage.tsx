@@ -17,6 +17,7 @@ import TBButton from "../components/TBButton";
 import { FontAwesome } from "@expo/vector-icons"; // or 'react-native-vector-icons/MaterialIcons'
 import Icon from "react-native-vector-icons/FontAwesome";
 import { getUserDetails } from "../functions/HTTPRequests";
+const fallbackProfilePicture = require("../../assets/profile.jpg");
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -506,7 +507,7 @@ const AccountPage = () => {
     <View style={styles.container}>
       <View style={styles.profileHeader}>
         <Image
-          source={{ uri: userDetails.profilePic }}
+          source={userDetails.profilePic ? { uri: userDetails.profilePic } : fallbackProfilePicture}
           style={styles.profilePicture}
         />
         <View style={styles.userInfo}>

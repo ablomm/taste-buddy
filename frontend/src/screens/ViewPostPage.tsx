@@ -4,6 +4,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import BackButton from '../components/BackButton';
 import { useNavigation } from '@react-navigation/native';
 import { getUserDetails } from '../functions/HTTPRequests';
+const fallbackProfilePicture = require("../../assets/profile.jpg");
 
 const ViewPostPage = ({ route }) => {
     let post = route.params;
@@ -11,8 +12,9 @@ const ViewPostPage = ({ route }) => {
     let [user, setUser] = React.useState({ username: "Unknown", profilePic: "" });
 
     useEffect(() => {
+        let authorId = post.userId ? post.userId : post.author;
         async function setUserDetails() {
-            setUser(await getUserDetails(post.author))
+            setUser(await getUserDetails(authorId))
         }
         setUserDetails();
     }, [])
@@ -27,7 +29,7 @@ const ViewPostPage = ({ route }) => {
             </View>
             <ScrollView style={{ padding: 10 }}>
             <View style={styles.userBar}>
-                    <Image source={{uri: user.profilePic}} style={styles.profilePicture} />
+                    <Image source={user.profilePic ? {uri: user.profilePic} : fallbackProfilePicture} style={styles.profilePicture} />
                     <Text style={styles.username}>{user.username}</Text>
                 </View>
                 <Image style={styles.image} source={{ uri: post.image }} />

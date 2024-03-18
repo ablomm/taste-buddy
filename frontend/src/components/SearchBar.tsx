@@ -43,6 +43,7 @@ const SearchBar = ({ clicked, searchPhrase, setSearchPhrase, setClicked, handleS
             {clicked && (
                 <View>
                     <TBButton
+                        style = {styles.button}
                         title="Cancel"
                         onPress={cancelClick == undefined ?
                             (): void => {
@@ -96,6 +97,13 @@ const styles = StyleSheet.create({
         marginLeft: 10,
         width: "90%",
     },
+    button: {
+        margin: 0,
+        marginRight: 5,
+        marginLeft: 5,
+        backgroundColor: "lightgrey",
+        borderWidth: 0,
+    }
 });
 
 export default SearchBar;
