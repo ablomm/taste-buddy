@@ -1,5 +1,4 @@
 import express from 'express';
-import { generateUploadURL } from '../service/s3';
 import {
     createRecipe,
     createIngredients,
@@ -15,7 +14,7 @@ import {
     processIngredients,
     processInstructions,
     getRecipeBatch,
-    getRecipesByUserID,
+    getRecipesByUserID, getReviewByUser, OrderBy, deleteReview, getRecipeRating,
     getPersonalizedRecipes,
     getTopRatedRecipes
 } from '../service/recipe';
@@ -88,11 +87,6 @@ router.post("/save", async (req: express.Request, res: express.Response) => {
     await storeRecipe(elasticSearchRecipe, recipeID);
 
     res.sendStatus(200);
-});
-
-router.get("/s3Url", async (req: express.Request, res: express.Response) => {
-    const imageURL = await generateUploadURL()
-    return res.send({ imageURL });
 });
 
 router.get("/get-all-recipes", async (req: express.Request, res: express.Response) => {
@@ -291,15 +285,29 @@ router.post("/saveReview", async (req: express.Request, res: express.Response) =
     }
 });
 
-router.get("/reviews", async (req: express.Request, res: express.Response) => {
-    const {
-        recipeID,
-        page,
-        orderBy
-    } = req.body;
+router.get("/review-by-user", async (req: express.Request, res: express.Response) => {
+    try {
+        const userID = req.query.userID;
+        const recipeID = req.query.recipeID;
 
-    const reviews = await getReviewsByPage(recipeID, page, orderBy)
-    res.send({reviews});
+        const review = await getReviewByUser(Number(userID), Number(recipeID));
+
+        res.status(200).send({
+            found: review != null,
+            review: review
+        });
+    } catch (error) {
+        res.status(500).send("Something went wrong ...");
+    }
+});
+
+router.get("/reviews", async (req: express.Request, res: express.Response) => {
+    const page = parseInt(req.query.page as string) || 1;
+    const orderBy = req.query.orderBy as OrderBy || OrderBy.DateDescending;
+    const recipeID = parseInt(req.query.recipeID as string);
+
+    const {reviews, totalPages} = await getReviewsByPage(recipeID, page, orderBy)
+    res.send({reviews, totalPages});
 });
 export default router;
 
@@ -311,9 +319,36 @@ router.get("/get-recipes-for-user/:username", async (req: express.Request, res: 
         const user = await getUserByUsername(username);
         const userId = user?.id;
 
-        const recipes = await getRecipesByUserID(userId); 
+        const recipes = await getRecipesByUserID(userId);
 
         res.json(recipes);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send(error);
+    }
+});
+
+router.get("/delete-review", async (req: express.Request, res: express.Response) => {
+    try {
+        const userID = parseInt(req.query.userID as string);
+        const recipeID = parseInt(req.query.recipeID as string);
+
+        await deleteReview(recipeID, userID);
+
+        res.sendStatus(200);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send(error);
+    }
+});
+
+router.get("/get-recipe-rating", async (req: express.Request, res: express.Response) => {
+    try {
+        const recipeID = parseInt(req.query.recipeID as string);
+
+        const rating = await getRecipeRating(recipeID);
+
+        res.json({rating});
     } catch (error) {
         console.error(error);
         res.status(500).send(error);

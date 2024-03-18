@@ -137,7 +137,7 @@ const CreatePostPage = ({ route, navigation }: any) => {
           <>
             <View style={styles.headerWrapper}>
               <View style={styles.headerLeftWrapper}>
-                <View><BackButton navigation={navigation} /></View>
+                <BackButton navigation={navigation} />
                 <View style={styles.headerTiltleWrapper}><Text style={styles.headerTiltle}>Create Post {`<_<`}</Text></View>
               </View>
               <View>

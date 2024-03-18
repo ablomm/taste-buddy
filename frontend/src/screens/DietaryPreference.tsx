@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import {UserContext} from "../providers/UserProvider";
+import BackButton from '../components/BackButton';
 
 const dietaryOptions = ['Vegetarian', 'Vegan', 'Gluten-Free', 'Dairy-Free', 'Nut-Free'];
 const allergyOptions = ['Shellfish', 'Soy', 'Egg', 'Fish', 'Other'];
@@ -28,10 +29,6 @@ const DietSelectionPage: React.FC = () => {
         ? prevOptions.filter((item) => item !== option)
         : [...prevOptions, option]
     );
-  };
-
-  const handleSkip = () => {
-    navigation.navigate('AccountPage');
   };
 
   const handleContinue = async () => {
@@ -63,9 +60,7 @@ const DietSelectionPage: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.skipButton} onPress={handleSkip}>
-        <Text style={{ color: '#4CAF50', fontSize: 16, fontWeight: 'bold' }}>Skip</Text>
-      </TouchableOpacity>
+      <BackButton navigation={navigation}/>
 
       <Text style={styles.subHeading}>Dietary Preferences:</Text>
       <View style={styles.optionsContainer}>
@@ -120,6 +115,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+    backgroundColor:'#fff'
   },
   skipButton: {
     position: 'absolute',

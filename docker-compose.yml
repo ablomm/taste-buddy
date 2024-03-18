@@ -43,7 +43,7 @@ services:
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.12.2
-    environment: 
+    environment:
       ES_JAVA_OPTS: -Xms2g -Xmx2g
       bootstrap.memory_lock: "true"
       discovery.type: single-node
@@ -51,6 +51,7 @@ services:
       xpack.security.enrollment.enabled: "false"
     volumes:
       - elasticsearch-db:/usr/share/elasticsearch/data
+      - ./backend/init-indices.sh:/init-indices.sh
     ports:
       - "9200:9200"
     networks:
@@ -62,7 +63,14 @@ services:
       nofile:
         soft: 65536
         hard: 65536
-
+    command: >
+      bash -c '
+              /usr/local/bin/docker-entrypoint.sh &
+              chmod +x /init-indices.sh &
+              /init-indices.sh
+              wait $!
+              exec tail -f /dev/null
+            '
 
   kibana:
     image: docker.elastic.co/kibana/kibana:8.12.2
