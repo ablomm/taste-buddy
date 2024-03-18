@@ -1,5 +1,8 @@
 import pandas as pd
 import numpy as np
+import top_rated
+import json
+import sys
 from flask import Flask, request, jsonify
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
@@ -9,6 +12,18 @@ parquet_path = 'recipes.parquet'
 recipes_full = pd.read_parquet(parquet_path)
 recipes_full = recipes_full[recipes_full['Images'].apply(lambda x: x is not None and len(x) > 0)]
 
+def train_top_rated():
+    top_rated.train()
+    return "Training completed."
+
+def extract_top_rated(data):
+    set = top_rated.setup()
+
+    if set:
+        return "Dataset extracted successfully"
+    else:
+        return "Dataset failed to extract"
+    
 def personalized_recommendations(data):
     # Get recipe IDs
     saved_recipe_ids = [d['recipeID'] for d in data.get('savedRecipeIDs', [])]
@@ -61,9 +76,17 @@ def personalized_recommendations(data):
     return result.to_json(orient='records')
 
 def top_rated_recommendations(data):
-    # top rated recipe model ? 
-    result = "top rated recipes" + str(data)
-    return result
+    # top rated recipe model 
+    result = top_rated.top100()
+
+    all_recipes_list = []
+
+    #convert dataframes within list to a list of dictionaries
+    for df in result:
+        if isinstance(df, pd.DataFrame) and not df.empty:
+            all_recipes_list.extend(df.to_dict(orient="records"))
+            
+    return json.dumps(all_recipes_list)
 
 @app.route('/api/personalized-recommendations', methods=['POST'])
 def call_personalized():
@@ -75,7 +98,7 @@ def call_personalized():
 def call_top_rated():
     data = request.json
     result = top_rated_recommendations(data)
-    return jsonify(result)
+    return result
 
 if __name__ == '__main__':
     app.run(debug=True)
