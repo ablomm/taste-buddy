@@ -14,7 +14,11 @@ import {
     processIngredients,
     processInstructions,
     getRecipeBatch,
-    getRecipesByUserID, getReviewByUser, OrderBy, deleteReview, getRecipeRating,
+    getRecipesByUserID, 
+    getReviewByUser, 
+    OrderBy, 
+    deleteReview, 
+    getRecipeRating,
     getPersonalizedRecipes,
     getTopRatedRecipes
 } from '../service/recipe';
