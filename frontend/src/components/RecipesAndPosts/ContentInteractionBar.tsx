@@ -18,55 +18,52 @@ interface Folder {
   checked: boolean;
 }
 
-const ContentInteractionBar = () => {
+const ContentInteractionBar = ({ recipeID }) => {
   const userContext = React.useContext(UserContext) as any;
   const username = userContext.state.username;
   const [isModalVisible, setModalVisible] = useState(false);
-  let recipeID = 1;
+  //let recipeID = 1;
 
   const [checkboxes, setCheckboxes] = useState<Folder[]>([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        //get folders
-        const response = await fetch(
-          `${
-            process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
-          }/user/get-folders/${username}`,
-          {
-            method: "GET",
-            headers: {
-              Accept: "application/json",
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
-          }
-        );
+  const getFolders = async () => {
+    try {
+      //get folders
+      const response = await fetch(
+        `${
+          process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
+        }/user/get-folders/${username}`,
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
 
-        const result = await response.json();
-        const foldersFromServer: Folder[] = result.folder;
+      const result = await response.json();
+      const foldersFromServer: Folder[] = result.folder;
 
-        // Add the 'checked' property to each folder with a default value of false
-        const foldersWithChecked: Folder[] = foldersFromServer
-          .filter((folder) => folder.folderName !== "All")
-          .map((folder) => ({ ...folder, checked: false }));
+      // Add the 'checked' property to each folder with a default value of false
+      const foldersWithChecked: Folder[] = foldersFromServer
+        .filter((folder) => folder.folderName !== "All")
+        .map((folder) => ({ ...folder, checked: false }));
 
-        setCheckboxes(foldersWithChecked);
-        console.log("logFolders" + JSON.stringify(foldersWithChecked));
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    fetchData();
-  }, [username]);
+      setCheckboxes(foldersWithChecked);
+      console.log("logFolders" + JSON.stringify(foldersWithChecked));
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
   };
 
   const handleSave = async () => {
+    getFolders();
     toggleModal();
   };
 
