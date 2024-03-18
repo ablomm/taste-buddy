@@ -117,7 +117,7 @@ export const signUp = async (username, email, password) => {
     }
 }
 
-export const addRecipeToUserSaved = async(recipeID: number, username: any) => {
+export const addRecipeToUserSaved = async(recipeID: number, username: string) => {
     try {
         let response = await fetch(
           `${
@@ -137,9 +137,9 @@ export const addRecipeToUserSaved = async(recipeID: number, username: any) => {
         );
   
         if (response.status !== 200) {
-          console.error("save recipe unsuccessful", username);
+          console.error("Save Recipe Unsuccessful");
       } else {
-        console.log("save recipe successful");
+        console.log("Save Recipe Successful");
       }
       } catch (error) {
         console.error(error);
