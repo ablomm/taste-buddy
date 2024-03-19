@@ -55,7 +55,7 @@ router.post("/save", async (req: express.Request, res: express.Response) => {
     } = req.body;
 
     console.log("recipe /save username: " + username);
-    console.log(username)
+
     const user = await getUserByUsername(username);
     const userId = user?.id;
     const processedTags = processTags(tags);
