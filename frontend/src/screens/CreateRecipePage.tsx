@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TextInput, StyleSheet, KeyboardAvoidingView, ScrollView, Image, Platform, Alert, ActivityIndicator } from "react-native";
+import { View, Text, StyleSheet, KeyboardAvoidingView, ScrollView, Image, Platform, Alert } from "react-native";
 import * as yup from 'yup';
 import { Formik} from 'formik';
 import ValidatedInput from '../components/ValidatedInput';

@@ -105,6 +105,7 @@ model Posts {
   creationTime  DateTime    @default(now())
   userPosts     UserPosts[]
   postTags      PostTags[]
+  isDeleted     Boolean     @default(false)
 }
 model UserPosts {
   postID    Int     @unique

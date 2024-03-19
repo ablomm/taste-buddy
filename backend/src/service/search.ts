@@ -25,10 +25,21 @@ export async function search(searchTerm: string) {
         response = await client.search({
             index: ['recipes', 'posts'],
             query: {
-                multi_match: {
-                    query: searchTerm,
-                    type: 'best_fields', // Find best match based on relevancy
-                    fields: ['*'] // Search through all fields
+                bool: {
+                    must: {
+                        multi_match: {
+                            query: searchTerm,
+                            type: 'best_fields', // Find best match based on relevancy
+                            fields: ['*'] // Search through all fields
+                        }
+                    },
+                    filter: {
+                        bool: {
+                            must_not: {
+                                term: { isDeleted: 1 }
+                            }
+                        }
+                    }
                 }
             }
         });
@@ -209,6 +220,20 @@ export async function storePost(userId: number|any, description: string, tags: a
         });
 
         console.log("Successfully added to Elasticsearch DB ...");
+    } catch(error) {
+        console.error(error);
+    }
+}
+
+export async function hidePost(postId: number) {
+    try {
+        await client.update({
+            index: 'posts',
+            id: postId.toString(),
+            doc: {isDeleted: true}
+        });
+
+        console.log("Successfully set deleted to true in Elasticsearch DB ...");
     } catch(error) {
         console.error(error);
     }
