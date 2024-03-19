@@ -37,6 +37,7 @@ function SearchResultBody({ navigation, searchResults, search }) {
         }
     }
 
+    // TODO: Determine if scrollable or limited filter tags is better
     function applyRecipeSortingAndFiltering() {
         if(relevantRecipes.length != 0) {
             let processedArray:Recipe[] = [... relevantRecipes];

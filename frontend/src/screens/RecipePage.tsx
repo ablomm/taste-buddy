@@ -19,76 +19,15 @@ import RecipeContentInteractionBar from "../components/RecipesAndPosts/RecipeCon
 import RecipeReviews from "../components/RecipesAndPosts/RecipeReviews";
 import { Recipe } from "../interfaces/RecipeInterface";
 import { UserContext } from "../providers/UserProvider";
+import {truncateText} from "../functions/Utility";
 
 const HEADER_EXPANDED_HEIGHT = 130;
 const HEADER_COLLAPSED_HEIGHT = 50;
 const { width: SCREEN_WIDTH } = Dimensions.get("screen");
 
-const exampleRecipe: Recipe = {
-  id: 2,
-  authorID: 1,
-  creationTime: "2024-02-23T23:36:34.705Z",
-  recipeTitle: "Recipe",
-  description: "Simple description",
-  cookTimeHours: 1,
-  cootTimeMinutes: 0,
-  calories: 1000,
-  servings: 4,
-  recipeImage:
-    "https://tastebuddy-images.s3.us-east-2.amazonaws.com/bc38304304213d170915c6441e9910d9",
-  averageRating: 3,
-  ingredients: [
-    {
-      recipeID: 2,
-      ingredient: "Ingredient1",
-      amount: 20,
-      measurementType: "tsp",
-    },
-    {
-      recipeID: 2,
-      ingredient: "Ingredient2",
-      amount: 100,
-      measurementType: "g",
-    },
-  ],
-  instructions: [
-    {
-      recipeID: 2,
-      step: 1,
-      instruction: "Step1",
-    },
-    {
-      recipeID: 2,
-      step: 2,
-      instruction: "Step2",
-    },
-    {
-      recipeID: 2,
-      step: 3,
-      instruction: "Step3",
-    },
-    {
-      recipeID: 2,
-      step: 4,
-      instruction: "Step4",
-    },
-    {
-      recipeID: 2,
-      step: 5,
-      instruction: "Step5",
-    },
-    {
-      recipeID: 2,
-      step: 6,
-      instruction: "Step6",
-    },
-  ],
-  tags: ["tag1"],
-};
 
 const RecipePage = ({ route, navigation }: any) => {
   const [recipe, setRecipe] = useState<Recipe>();
-  const [tags, setTags] = useState(); // TODO: Need tags implemented in backend and frontend
   const [owner, setOwner] = useState<boolean>(false);
   const [userId, setUserId] = React.useState<number>(-1);
   const [username, setUsername] = React.useState<string>("");
@@ -218,14 +157,15 @@ const RecipePage = ({ route, navigation }: any) => {
                 <Animated.Text style={styles.recipeTitle}>
                   {recipe?.recipeTitle}
                 </Animated.Text>
-                <Animated.Text
-                  style={[
-                    styles.subSectionOfRecipeTitle,
-                    { opacity: heroTitleOpacity },
-                  ]}
+
+                {recipe?.tags ? <Animated.Text
+                    style={[
+                      styles.subSectionOfRecipeTitle,
+                      {opacity: heroTitleOpacity},
+                    ]}
                 >
-                  tags
-                </Animated.Text>
+                  {truncateText(recipe.tags.join(", "), 19)}
+                </Animated.Text> : null}
                 <Animated.Text
                   style={[
                     styles.subSectionOfRecipeTitle,
@@ -266,7 +206,7 @@ const RecipePage = ({ route, navigation }: any) => {
           <Text style={styles.recipeDescription}>{recipe?.description}</Text>
           <Text style={styles.subTitle}>Ingredients</Text>
           {recipe?.ingredients.map((ingredient, index) => (
-            <CheckboxRecipe key={index} checkboxText={ingredient.ingredient} />
+              <CheckboxRecipe key={index} checkboxText={`${ingredient.ingredient} ${ingredient.measurementType}`}/>
           ))}
           <Text style={styles.subTitle}>Instructions</Text>
           {recipe?.instructions.map((instruction) => (
