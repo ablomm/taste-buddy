@@ -58,15 +58,9 @@ router.put("/delete-post", async (req: express.Request, res: express.Response) =
     if(token) {
          verify  = jwt.verify(token, process.env.JWTSHARED as any) as JwtPayload;
          if(verify) {
-            const {
-                username,
-                postId
-            } = req.body;
+            const {userId, postId} = req.body;
     
             try {
-                const user = await getUserByUsername(username)
-                const userId = user?.id;
-    
                 console.log("Deleting post ID: " + postId + " for user ID: " + userId);
     
                 await deletePost(postId);

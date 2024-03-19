@@ -11,6 +11,7 @@ import {
   Dimensions,
   ImageBackground,
 } from "react-native";
+import {IconButton} from "react-native-paper";
 import Header from "../components/header/Header";
 import PosterHeader from "../components/RecipesAndPosts/PosterHeader";
 import { LinearGradient } from "expo-linear-gradient";
@@ -28,7 +29,6 @@ const { width: SCREEN_WIDTH } = Dimensions.get("screen");
 
 const RecipePage = ({ route, navigation }: any) => {
   const [recipe, setRecipe] = useState<Recipe>();
-  const [owner, setOwner] = useState<boolean>(false);
   const [userId, setUserId] = React.useState<number>(-1);
   const [username, setUsername] = React.useState<string>("");
   const [recipeID, setRecipeID] = React.useState<number>(-1);
@@ -45,7 +45,6 @@ const RecipePage = ({ route, navigation }: any) => {
       setUserId(userID);
       setUsername(userContext.state.username);
 
-      checkOwnership(recipe.authorID, userID);
       setRecipe(recipe);
       setCurrentRating(recipe.averageRating);
     }
@@ -64,12 +63,6 @@ const RecipePage = ({ route, navigation }: any) => {
     outputRange: [1, 0],
     extrapolate: "clamp",
   });
-
-  function checkOwnership(recipeAuthorId: number, userId: number) {
-    if (recipeAuthorId == userId) {
-      setOwner(true);
-    }
-  }
 
   function reformatTime(creationTime: string) {
     // Convert the string to a Date object
@@ -103,10 +96,10 @@ const RecipePage = ({ route, navigation }: any) => {
     return timeAgo;
   }
 
-  function edit() {
-    navigation.navigate("EditRecipePage", {
-      recipe: recipe,
-    });
+  function editButton() {
+    return(<IconButton icon="pencil"
+    size={16}
+    onPress={()=>navigation.navigate("EditRecipePage", {recipe: recipe})} />)
   }
 
   function updateRating(rating: number) {
@@ -116,7 +109,7 @@ const RecipePage = ({ route, navigation }: any) => {
   return (
     <View style={styles.container}>
       <Header title = "View Recipe" />
-      <PosterHeader userId = {recipe?.authorID} owner={owner} editFunction={edit} />
+      <PosterHeader userId = {recipe?.authorID} personalComponent={editButton} />
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={{

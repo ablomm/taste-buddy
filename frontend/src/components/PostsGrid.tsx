@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, NativeScrollEvent, RefreshControl, Dimensions } from 'react-native';
+import {StyleSheet, ScrollView, NativeScrollEvent, RefreshControl} from 'react-native';
 import Post from './Post';
 import { TouchableRipple } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';

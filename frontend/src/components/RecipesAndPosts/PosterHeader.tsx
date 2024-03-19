@@ -1,16 +1,21 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image} from "react-native";
-import {IconButton} from "react-native-paper";
 import { getUserDetails } from '../../functions/HTTPRequests';
+import { UserContext } from '../../providers/UserProvider';
+
 const fallbackProfilePicture = require("../../../assets/profile.jpg");
 
-const PosterHeader = ({ userId, owner, editFunction }) => {
-    let [user, setUser] = React.useState({ username: "Unknown", profilePic: "" });
+const PosterHeader = ({ userId, personalComponent = () => null}) => {
+    let [user, setUser] = useState({ username: "Unknown", profilePic: "" });
+    let [owner, setOwner] = useState<boolean>(false);
 
+    const userContext = React.useContext(UserContext) as any;
+    
     useEffect(() => {
         async function setUserDetails() {
             setUser(await getUserDetails(userId))
         }
+        setOwner(userId==userContext.state.userId);
         setUserDetails();
     }, [userId])
     
@@ -22,9 +27,7 @@ const PosterHeader = ({ userId, owner, editFunction }) => {
             </View>
             { owner ?
                 <View>
-                    <IconButton icon="pencil"
-                                size={16}
-                                onPress={editFunction} />
+                    {personalComponent()}
                 </View>
                 :
                 null

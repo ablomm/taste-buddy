@@ -37,6 +37,26 @@ export const putImage = async (image, type) => {
     return url.split('?')[0]
 }
 
+export const deletePost = async (userId, postId) => {
+
+    let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || localHostURL}/post/delete-post`, {
+        method: 'PUT',
+        headers: {
+            'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+            userId: userId,
+            postId: postId
+        }),
+    });
+
+    if (response.status !== 200) {
+        throw new Error("Delete Post Failure")
+    }
+}
+
 export const saveRecipe = async (username, title, description, instructions, cookTime, calories, servings, ingredients, tags, image) => {
     let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || localHostURL}/recipe/save`, {  //save the recipe
         method: 'POST',

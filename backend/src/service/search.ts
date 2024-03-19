@@ -36,7 +36,7 @@ export async function search(searchTerm: string) {
                     filter: {
                         bool: {
                             must_not: {
-                                term: { isDeleted: 1 }
+                                term: { isDeleted: true }
                             }
                         }
                     }
@@ -206,6 +206,7 @@ export async function editRecipe(
 export async function storePost(userId: number|any, description: string, tags: any[], image: string, recipeURL: string, postID: number) {
     try {
         const document = {
+            id: postID,
             userId: userId,
             description: description,
             tags: tags,
