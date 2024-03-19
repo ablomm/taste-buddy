@@ -23,12 +23,16 @@ export enum OrderBy {
     RatingDescending = "RatingDescending"
 }
 
-export async function createRecipe(userID: number|any, title: string,description: string,instructions: string,cookTime: number,calories: number,servings: number,tags: any,image: string) {
+export function processTags(tags: any[]) {
+    return tags.map((tag) => tag.value);
+}
+
+export async function createRecipe(userID: number | any, title: string, description: string, instructions: string, cookTime: number, calories: number, servings: number, tags: any[], image: string) {
 
     const cookTimeHours = Math.floor(cookTime/60);
     const cootTimeMinutes = cookTime%60;
 
-    await prisma.recipe.create({
+    const newRecipe = await prisma.recipe.create({
         data: {
             authorID: userID,
             recipeTitle: title,
@@ -38,9 +42,38 @@ export async function createRecipe(userID: number|any, title: string,description
             calories: calories/1,
             servings: servings/1,
             recipeImage: image,
-            averageRating: 0
+            averageRating: 0,
         },
     })
+
+    // Connect or create tags
+    await Promise.all(tags.map(async tagName => {
+        const existingTag = await prisma.tag.findUnique({
+            where: {name: tagName},
+        });
+
+        if (existingTag) {
+            // Tag already exists, connect it to the recipe
+            await prisma.recipe.update({
+                where: {id: newRecipe.id},
+                data: {
+                    tags: {
+                        connect: {id: existingTag.id},
+                    },
+                },
+            });
+        } else {
+            // Tag does not exist, create it and connect it to the recipe
+            await prisma.tag.create({
+                data: {
+                    name: tagName,
+                    recipes: {
+                        connect: {id: newRecipe.id},
+                    },
+                },
+            });
+        }
+    }));
 
 
 }

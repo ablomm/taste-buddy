@@ -191,7 +191,8 @@ const EditRecipePage = ({ route, navigation }: any) => {
             recipeImage: recipe.recipeImage,
             averageRating: recipe.averageRating,
             ingredients: assembleIngredientRecipe(),
-            instructions: assembleInstructionsRecipe()
+            instructions: assembleInstructionsRecipe(),
+            tags: data.tags
         };
 
         try {

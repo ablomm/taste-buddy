@@ -4,6 +4,7 @@ import {NoResultMessage} from "./NoResultMessage";
 import {TouchableRipple} from "react-native-paper";
 import StarRating from "react-native-star-rating-widget";
 import {Recipe} from "../../interfaces/RecipeInterface";
+import {truncateText} from "../../functions/Utility";
 
 
 export function RecipeTab({navigation, search, recipes}) {
@@ -41,13 +42,6 @@ export function RecipeTab({navigation, search, recipes}) {
             </View>
         </TouchableRipple>
     );
-
-    const truncateText = (text: string, maxLength: number): string => {
-        if (text.length > maxLength) {
-            return text.substring(0, maxLength) + '...';
-        }
-        return text;
-    };
 
     return (
         <>
