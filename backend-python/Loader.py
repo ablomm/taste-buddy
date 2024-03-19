@@ -8,8 +8,8 @@ import pandas as pd
 class Loader(Dataset):
     
     def __init__(self):
-        recipes = pd.read_csv('data/dataset/recipes.csv')
-        reviews = pd.read_csv('data/dataset/reviews.csv')
+        recipes = pd.read_csv('data/dataset/dataset/recipes.csv')
+        reviews = pd.read_csv('data/dataset/dataset/reviews.csv')
 
         self.reviews = reviews.copy()
 

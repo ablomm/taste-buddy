@@ -14,8 +14,8 @@ from tqdm.notebook import tqdm
 from sklearn.cluster import KMeans
 
 s3 = boto3.client('s3',  
-                  aws_access_key_id='AKIASMHR2QCEZQPLXWXR',
-                  aws_secret_access_key= '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', 
+                  aws_access_key_id= os.environ.get("AWS_ACCESS_KEY_ID", ""),
+                  aws_secret_access_key= os.environ.get("AWS_SECRET_ACCESS_KEY", ""), 
                   region_name='us-east-2')
 
 bucket_name = 'tastebuddy-images'
@@ -24,26 +24,38 @@ folder_name = 'engine/'
 def get_zip():
     object_key = folder_name + "dataset.zip"
     file_path = "dataset.zip"
-    
+
     try:
+        print(os.environ.get("AWS_ACCESS_KEY_ID", ""))
+        print(os.environ.get("AWS_SECRET_ACCESS_KEY", ""))
         s3.download_file(bucket_name, object_key, file_path)
+
+        if os.path.isfile("dataset.zip"):
+            print('dataset downloaded')
+
         return True
     except Exception as e:
+        print('dataset unable to download')
         print(e)
         return False 
 
 def setup():
     
-    if not os.path.isfile("dataset.zip"):
+    if (not os.path.isfile("dataset.zip")):
        get_zip()
-    
-    with zipfile.ZipFile('dataset.zip', 'r') as zip_ref:
-        zip_ref.extractall('data')
 
     if os.path.isdir("data"):
        return True
     else:
-       return False
+        try: 
+           with zipfile.ZipFile('dataset.zip', 'r') as zip_ref:
+            zip_ref.extractall('data')
+
+            print('extracted dataset.zip')
+        except Exception as e:
+            print('unable to extract dataset.zip')
+            print(e)
+            return False
 
 def train():
 
@@ -111,8 +123,8 @@ def train():
 
 
 def top100():
-    recipes = pd.read_csv('data/dataset/recipes.csv')
-    reviews = pd.read_csv('data/dataset/reviews.csv')
+    recipes = pd.read_parquet('data/dataset/dataset/recipes.parquet')
+    reviews = pd.read_parquet('data/dataset/dataset/reviews.parquet')
     
     recipe_names = recipes.set_index('RecipeId')['Name'].to_dict()
     n_users = len(reviews.AuthorId.unique())

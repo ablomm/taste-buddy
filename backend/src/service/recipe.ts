@@ -185,7 +185,7 @@ export async function getTopRatedRecipes(data: any): Promise<any> {
             // hostname: 'localhost',
             hostname: "127.0.0.1",
             port: 5000,
-            path: "/api/top-rated-recommendations",
+            path: "/api/top-rated-recipes",
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -204,6 +204,93 @@ export async function getTopRatedRecipes(data: any): Promise<any> {
                     // Try to parse the JSON data
                     // resolve(JSON.parse(body));
                     resolve(body);
+                } catch (error) {
+                    reject(error);
+                }
+            });
+        });
+        req.on("error", (error: Error) => {
+            reject(error);
+        });
+
+        // Write data to request body and end the request
+        req.write(postData);
+        req.end();
+    });
+}
+
+export async function setupTopRatedModel(data: any): Promise<any> {
+    return new Promise((resolve, reject) => {
+        // Convert the data to a JSON string
+        const postData = JSON.stringify(data);
+
+        // Options for the HTTP request top rated
+        const options: RequestOptions = {
+            // hostname: 'localhost',
+            hostname: "127.0.0.1",
+            port: 5000,
+            path: "/api/top-rated/setup",
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Content-Length": Buffer.byteLength(postData),
+            },
+        };
+        // Set up the request
+        const req = http.request(options, (res: IncomingMessage) => {
+            // Handle incoming data
+            let body = "";
+            res.on("data", (chunk: Buffer) => {
+                body += chunk;
+            });
+            res.on("end", () => {
+                try {
+                    // Try to parse the JSON data
+                    resolve(JSON.parse(body));
+                } catch (error) {
+                    reject(error);
+                }
+            });
+        });
+        req.on("error", (error: Error) => {
+            reject(error);
+        });
+
+        // Write data to request body and end the request
+        req.write(postData);
+        req.end();
+    });
+}
+
+
+export async function trainTopRated(data: any): Promise<any> {
+    return new Promise((resolve, reject) => {
+        // Convert the data to a JSON string
+        const postData = JSON.stringify(data);
+
+        // Options for the HTTP request top rated
+        const options: RequestOptions = {
+            // hostname: 'localhost',
+            hostname: "127.0.0.1",
+            port: 5000,
+            path: "/api/top-rated/train",
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Content-Length": Buffer.byteLength(postData),
+            },
+        };
+        // Set up the request
+        const req = http.request(options, (res: IncomingMessage) => {
+            // Handle incoming data
+            let body = "";
+            res.on("data", (chunk: Buffer) => {
+                body += chunk;
+            });
+            res.on("end", () => {
+                try {
+                    // Try to parse the JSON data
+                    resolve(JSON.parse(body));
                 } catch (error) {
                     reject(error);
                 }

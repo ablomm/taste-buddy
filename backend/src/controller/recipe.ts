@@ -17,7 +17,9 @@ import {
     getRecipeBatch,
     getRecipesByUserID,
     getPersonalizedRecipes,
-    getTopRatedRecipes
+    getTopRatedRecipes,
+    setupTopRatedModel,
+    trainTopRated
 } from '../service/recipe';
 import { getUserByUsername, getProfilePhotoByUsername, getSavedRecipeIDs, getRejectedRecipeIDs } from "../service/user";
 import {editRecipe, storeRecipe} from "../service/search";
@@ -161,17 +163,41 @@ router.post("/api/recommendations", async (req: express.Request, res: express.Re
         const rejectedRecipeIDs = await getRejectedRecipeIDs(20);
         const temp = [ { recipeID: 39}, {recipeID: 41}, {recipeID: 43}, {recipeID: 51}, {recipeID: 52}, {recipeID: 54}, {recipeID: 60}]
         const tempReject = [ {recipeID: 1}, {recipeID: 2}, {recipeID: 3}, {recipeID: 4}, {recipeID: 5}]
-        const personalizedResult = await getPersonalizedRecipes(temp, tempReject);
         
-        // const topRatedResult = await getTopRatedRecipes(req.body);
+        const personalizedResult = await getPersonalizedRecipes(temp, tempReject);
+        const topRatedResult = await getTopRatedRecipes(req.body);
 
         // insert logic to combine list of top rated and personalized recipes
-        const recipes = JSON.parse(personalizedResult);
+        //const recipes = JSON.parse(personalizedResult); //personalized results
+        const recipes = JSON.parse(topRatedResult.replace(/\bNaN\b/g, "null")); //top rated results
 
         const recommend = recipes.map(convertToRecipe)
 
         // Send the result back to the client
         res.json(recommend);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+router.post("/api/recommendations/setup", async (req: express.Request, res: express.Response) => {
+    try { 
+        const topRatedSetupResult = await setupTopRatedModel(req.body); 
+        console.log(topRatedSetupResult)
+        // Send the result back to the client
+        res.json(topRatedSetupResult);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+router.post("/api/recommendations/train", async (req: express.Request, res: express.Response) => {
+    try { 
+        const trainingModel = await trainTopRated(req.body); 
+        // Send the result back to the client
+        res.json(trainingModel);
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');
