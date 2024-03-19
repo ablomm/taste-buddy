@@ -1,2 +1,2 @@
 -- AlterTable
-ALTER TABLE `posts` ADD COLUMN `isDeleted` BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE `Posts` ADD COLUMN `isDeleted` BOOLEAN NOT NULL DEFAULT false;
