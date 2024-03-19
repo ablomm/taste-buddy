@@ -130,7 +130,7 @@ interface Recipe {
 
 const convertToRecipe = (recipe: Recipe) => {
     return {
-      id: 0,
+      id: recipe.RecipeId,
       authorID: 0,
       creationTime: Date.now(),
       recipeTitle: recipe.Name,
@@ -142,8 +142,9 @@ const convertToRecipe = (recipe: Recipe) => {
       recipeImage: recipe.Images.length > 0 ? recipe.Images[0] : "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png",
       averageRating: recipe.AggregatedRating,
       ingredients: recipe.RecipeIngredientQuantities.map((quantity, index) => {
-        return { quantity: quantity, part: recipe.RecipeIngredientParts[index] }}),
-      instructions: recipe.RecipeInstructions
+        return { recipeID: recipe.RecipeId, amount: quantity, ingredient: recipe.RecipeIngredientParts[index], measurementType: "tbsp"}}),
+      instructions: recipe.RecipeInstructions,
+      tags: []
     };
   }
 
@@ -168,7 +169,7 @@ router.post("/api/recommendations", async (req: express.Request, res: express.Re
         
         // If there are saved recipes, get personalized recipes
         // if(savedRecipeIDs.length > 0){
-            personalizedResult = await getPersonalizedRecipes(temp, tempReject);
+            personalizedResult = await getPersonalizedRecipes(temp, rejectedRecipeIDs);
             personalizedRecipes = JSON.parse(personalizedResult);
         // }
              
@@ -192,7 +193,7 @@ router.post("/api/recommendations", async (req: express.Request, res: express.Re
         // Send the result back to the client
         res.json(recommend);
     } catch (error) {
-        console.error(error);
+        console.error("catching error!", error);
         res.status(500).send('Internal Server Error');
     }
 });
