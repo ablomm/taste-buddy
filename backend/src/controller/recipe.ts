@@ -14,7 +14,7 @@ import {
     processIngredients,
     processInstructions,
     getRecipeBatch,
-    getRecipesByUserID, getReviewByUser, OrderBy, deleteReview, getRecipeRating
+    getRecipesByUserID, getReviewByUser, OrderBy, deleteReview, getRecipeRating, processTags
 } from '../service/recipe';
 import { getUserByUsername, getProfilePhotoByUsername } from "../service/user";
 import {editRecipe, storeRecipe} from "../service/search";
@@ -22,9 +22,6 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 
 const router = express.Router();
 
-/*
-TODO: Update average rating everytime new rating is added
- */
 
 router.get("/get-recipe", async (req: express.Request, res: express.Response) => {
     let recipe = null;
@@ -63,7 +60,9 @@ router.post("/save", async (req: express.Request, res: express.Response) => {
 
     const user = await getUserByUsername(username);
     const userId = user?.id;
-    await createRecipe(userId,title,description,instructions,cookTime,calories,servings,tags,image);
+    const processedTags = processTags(tags);
+
+    await createRecipe(userId, title, description, instructions, cookTime, calories, servings, processedTags, image);
 
     const recipe = await getRecipeByUserAndTitle(userId,title);
 
@@ -79,7 +78,8 @@ router.post("/save", async (req: express.Request, res: express.Response) => {
     const elasticSearchRecipe: any = {
         ...recipe,
         ingredients: ingredientsObj,
-        instructions: instructionsObj
+        instructions: instructionsObj,
+        tags: processedTags
     }
 
     // Store in elastic search db

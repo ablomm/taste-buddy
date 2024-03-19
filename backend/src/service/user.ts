@@ -112,7 +112,7 @@ export async function addDietaryPref(username: string, dietaryPref: string) {
 
 export async function saveRecipeToFolder(recipeID: number, userID: any, folderID: any) {
     //check if saved already
-    
+
     for (let i=0; i<folderID.length;i++) {
 
         const existingFolder = await prisma.folder.findUnique({ //check if folder exists first
@@ -137,7 +137,7 @@ export async function saveRecipeToFolder(recipeID: number, userID: any, folderID
             console.log("Folder doesn't exist!")
         }
     }
-} 
+}
 
 export async function saveRecipe(recipeID: number, userID: any) {
     //check if saved already

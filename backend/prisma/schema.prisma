@@ -4,7 +4,7 @@
 generator client {
   provider = "prisma-client-js"
 }
-  
+
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
@@ -39,7 +39,7 @@ model UserSavedRecipes {
 
 model Folder {
   id           Int                @id @default(autoincrement())
-  folderName   String             
+  folderName   String
   userID       Int
   user         User               @relation(fields: [userID], references: [id])
   savedRecipes UserSavedRecipes[] @relation("UserSavedRecipesToFolders")
@@ -50,7 +50,7 @@ model DietaryPref {
   id                 Int                  @id @default(autoincrement())
   author             User                 @relation(fields: [authorID], references: [id])
   authorID           Int
-  dietaryPref        String               
+  dietaryPref        String
 }
 
 model Recipe {
@@ -67,7 +67,7 @@ model Recipe {
   recipeIngredients  RecipeIngredients[]
   recipeInstructions RecipeInstructions[]
   recipeImage        String
-  tags               RecipeTags[]
+  tags               Tag[]                @relation("RecipeTags")
   usersSaved         UserSavedRecipes[]
   averageRating      Int                  @default(0)
 }
@@ -89,10 +89,10 @@ model RecipeInstructions {
   instruction String
 }
 
-model RecipeTags {
-  id     Int      @id @default(autoincrement())
-  tag    String
-  recipe Recipe[]
+model Tag {
+  id     Int       @id @default(autoincrement())
+  name    String   @unique
+  recipes Recipe[] @relation("RecipeTags")
 }
 
 model Posts {
