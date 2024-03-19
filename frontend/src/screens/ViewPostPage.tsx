@@ -1,14 +1,12 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import BackButton from '../components/BackButton';
-import { useNavigation } from '@react-navigation/native';
 import { getUserDetails } from '../functions/HTTPRequests';
+import Header from '../components/header/Header';
 const fallbackProfilePicture = require("../../assets/profile.jpg");
 
 const ViewPostPage = ({ route }) => {
     let post = route.params;
-    let navigation = useNavigation();
     let [user, setUser] = React.useState({ username: "Unknown", profilePic: "" });
 
     useEffect(() => {
@@ -21,12 +19,7 @@ const ViewPostPage = ({ route }) => {
 
     return (
         <View style={styles.container}>
-            <View style={styles.headerWrapper}>
-                <View style={styles.headerLeftWrapper}>
-                    <View><BackButton navigation={navigation} /></View>
-                    <View style={styles.headerTiltleWrapper}><Text style={styles.headerTiltle}>View Post</Text></View>
-                </View>
-            </View>
+            <Header title = "View Post" />
             <ScrollView style={{ padding: 10 }}>
             <View style={styles.userBar}>
                     <Image source={user.profilePic ? {uri: user.profilePic} : fallbackProfilePicture} style={styles.profilePicture} />
@@ -71,28 +64,6 @@ const styles = StyleSheet.create({
     },
     username: {
         margin: 10,
-        color: "#000",
-        fontSize: 20,
-        fontWeight: "700",
-    },
-    headerWrapper: {
-        alignItems: 'center',
-        height: 60,
-        backgroundColor: "white",
-        display: 'flex',
-        flexDirection: "row",
-        justifyContent: "space-between",
-        paddingHorizontal: 12,
-    },
-    headerLeftWrapper: {
-        alignItems: 'center',
-        display: 'flex',
-        flexDirection: "row",
-    },
-    headerTiltleWrapper: {
-        marginLeft: 15
-    },
-    headerTiltle: {
         color: "#000",
         fontSize: 20,
         fontWeight: "700",

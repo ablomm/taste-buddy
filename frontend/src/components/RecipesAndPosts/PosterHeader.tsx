@@ -1,13 +1,24 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Image} from "react-native";
 import {IconButton} from "react-native-paper";
+import { getUserDetails } from '../../functions/HTTPRequests';
+const fallbackProfilePicture = require("../../../assets/profile.jpg");
 
-const PosterHeader = ({ owner, editFunction }) => {
+const PosterHeader = ({ userId, owner, editFunction }) => {
+    let [user, setUser] = React.useState({ username: "Unknown", profilePic: "" });
+
+    useEffect(() => {
+        async function setUserDetails() {
+            setUser(await getUserDetails(userId))
+        }
+        setUserDetails();
+    }, [userId])
+    
     return(
         <View style={styles.container}>
             <View style={styles.subContainer}>
-                <Image source={require("../../../assets/no-image.png")} style={styles.profileImage}/>
-                <Text style={styles.profileUsername}>username</Text>
+                <Image source={user.profilePic ? {uri: user.profilePic} : fallbackProfilePicture} style={styles.profileImage}/>
+                <Text style={styles.profileUsername}>{user.username}</Text>
             </View>
             { owner ?
                 <View>

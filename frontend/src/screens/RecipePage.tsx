@@ -176,8 +176,8 @@ const RecipePage = ({ route, navigation }: any) => {
 
   return (
     <View style={styles.container}>
-      <Header navigation={navigation} />
-      <PosterHeader owner={owner} editFunction={edit} />
+      <Header title = "View Recipe" />
+      <PosterHeader userId = {recipe?.authorID} owner={owner} editFunction={edit} />
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={{

@@ -39,10 +39,11 @@ model UserSavedRecipes {
 
 model Folder {
   id           Int                @id @default(autoincrement())
-  folderName   String             @unique
+  folderName   String             
   userID       Int
   user         User               @relation(fields: [userID], references: [id])
   savedRecipes UserSavedRecipes[] @relation("UserSavedRecipesToFolders")
+  @@unique([userID, folderName])
 }
 
 model DietaryPref {

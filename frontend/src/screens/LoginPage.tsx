@@ -3,10 +3,10 @@ import {View, Text, StyleSheet, Image} from "react-native";
 import LoginForm from "../components/loginSignupPageComponents/LoginForm";
 import Header from "../components/header/Header";
 
-const LoginPage = ({navigation}:any) =>{
+const LoginPage = () =>{
     return(
         <View style={styles.container}>
-            <Header navigation = {navigation}/>
+            <Header title = "Login"/>
             <LoginForm/>
         </View>
     );

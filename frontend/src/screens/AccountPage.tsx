@@ -410,7 +410,6 @@ const AccountPage = () => {
 
       await response.json().then((result) => {
         setPosts(result);
-        console.log("recent posts: ", result);
       });
     } catch (error) {
       console.error(error);
@@ -434,7 +433,6 @@ const AccountPage = () => {
 
       await response.json().then((result) => {
         setUserRecipes(result);
-        console.log("recent recipes: ", result);
       });
     } catch (error) {
       console.error(error);

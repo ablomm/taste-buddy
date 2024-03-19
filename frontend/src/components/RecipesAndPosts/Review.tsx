@@ -1,20 +1,30 @@
 import {Image, Text, View} from "react-native";
 import StarRating from "react-native-star-rating-widget";
-import React from "react";
+import React, { useEffect } from "react";
 import {Review} from "../../interfaces/ReviewInterface";
 import {IconButton} from "react-native-paper";
+import { getUserDetails } from "../../functions/HTTPRequests";
+const fallbackProfilePicture = require("../../../assets/profile.jpg");
 
 export function UserReview({review, currentUserID, handleDelete}: {
     review: Review,
     currentUserID: number,
     handleDelete: any
 }) {
+    let [user, setUser] = React.useState({ username: "Unknown", profilePic: "" });
+
+    useEffect(() => {
+        async function setUserDetails() {
+            setUser(await getUserDetails(review.userID))
+        }
+        setUserDetails();
+    }, [])
 
     return (
         <View style={{flexDirection: 'row', paddingHorizontal: 5, paddingVertical: 6}}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
                 <Image
-                    source={review.profilePicture ? {uri: review.profilePicture} : require('../../../assets/temp/tempfood.jpg')}
+                    source={user.profilePic ? {uri: user.profilePic} : fallbackProfilePicture}
                     style={{width: 50, height: 50, borderRadius: 50}}/>
                 <View style={{flexDirection: 'column', marginLeft: 10}}>
                     <Text>{review.username}</Text>

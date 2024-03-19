@@ -150,8 +150,8 @@ export async function saveRecipe(recipeID: number, userID: any) {
         }
     });
 
-    //check if folder 0 exists already
-    const existingFolder0 = await prisma.folder.findUnique({
+    //check if folder 0 exists already (this is unique)
+    const existingFolder0 = await prisma.folder.findFirst({
         where: {
             userID: userID,
             folderName: 'All'

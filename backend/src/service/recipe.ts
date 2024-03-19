@@ -478,6 +478,10 @@ export async function recalculateAverageRating(recipeID: number) {
         }
     });
 
+    if (reviews.length === 0) {
+        return 0;
+    }
+
     // Calculate the new average rating
     const totalRatings = reviews.reduce((acc, review) => acc + review.rating, 0);
     return totalRatings / reviews.length;
