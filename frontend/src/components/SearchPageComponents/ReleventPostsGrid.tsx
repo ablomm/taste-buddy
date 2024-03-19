@@ -45,9 +45,9 @@ const RelevantPostsGrid = ({posts}) => {
                     }
         >
 
-            {currentPosts.map((post: any) => {
+            {currentPosts.map((post: any, index) => {
                 return (
-                    <TouchableRipple key={post.id} onPress={() => {
+                    <TouchableRipple key={index} onPress={() => {
                         navigation.push("ViewPostPage", post);
                     }}>
                         <Post key={post.id} imageUrl={post.image} />
