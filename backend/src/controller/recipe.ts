@@ -18,6 +18,8 @@ import {
 } from '../service/recipe';
 import { getUserByUsername, getProfilePhotoByUsername } from "../service/user";
 import {editRecipe, storeRecipe} from "../service/search";
+import jwt, { JwtPayload } from "jsonwebtoken";
+
 const router = express.Router();
 
 
@@ -107,69 +109,66 @@ router.get("/batch/:num", async (req: express.Request, res: express.Response) =>
 
 router.put("/edit-recipe", async (req: express.Request, res: express.Response) => {
     const { token } = req.cookies;
-    let verify = true;
+    let verify;
 
-    // if(token) {
-    //     verify  = jwt.verify(token, process.env.JWTSHARED as any) as JwtPayload;
-    // }
-
-    if(verify) {
-        const {
-            username,
-            recipeId,
-            title,
-            description,
-            instructions,
-            cookTime,
-            calories,
-            servings,
-            ingredients,
-            tags,
-            image
-        } = req.body;
-
-        try {
-            const user = await getUserByUsername(username)
-            const userId = user?.id;
-
-            console.log("Updating recipe ID: " + recipeId + " for user ID: " + userId);
-
-            await updateRecipe(
+    if(token) {
+         verify  = jwt.verify(token, process.env.JWTSHARED as any) as JwtPayload;
+         if(verify) {
+            const {
+                username,
                 recipeId,
-                userId,
                 title,
                 description,
+                instructions,
                 cookTime,
                 calories,
                 servings,
+                ingredients,
+                tags,
                 image
-            );
-
-            await updateIngredients(recipeId, ingredients);
-            await updateInstructions(recipeId, instructions);
-
-            // Edit recipe in elastic search
-            await editRecipe(
-                recipeId,
-                title,
-                description,
-                cookTime,
-                calories,
-                servings,
-                image,
-                processIngredients(recipeId, ingredients),
-                processInstructions(recipeId, instructions)
+            } = req.body;
+    
+            try {
+                const user = await getUserByUsername(username)
+                const userId = user?.id;
+    
+                console.log("Updating recipe ID: " + recipeId + " for user ID: " + userId);
+    
+                await updateRecipe(
+                    recipeId,
+                    userId,
+                    title,
+                    description,
+                    cookTime,
+                    calories,
+                    servings,
+                    image
                 );
-
-            console.log(`Successfully updated recipe ID: ${recipeId}`);
-        } catch (error) {
-            console.error(error);
+    
+                await updateIngredients(recipeId, ingredients);
+                await updateInstructions(recipeId, instructions);
+    
+                // Edit recipe in elastic search
+                await editRecipe(
+                    recipeId,
+                    title,
+                    description,
+                    cookTime,
+                    calories,
+                    servings,
+                    image,
+                    processIngredients(recipeId, ingredients),
+                    processInstructions(recipeId, instructions)
+                    );
+    
+                console.log(`Successfully updated recipe ID: ${recipeId}`);
+            } catch (error) {
+                console.error(error);
+            }
+    
+            return res.status(200).send('success');
         }
-
-        return res.status(200).send('success');
-    }
-
-    return res.status(403).send('Failed to authenticate user');
+    }else{return res.status(403).send('Failed to authenticate user');}
 });
 
 router.get("/getPosts", async (req: express.Request, res: express.Response) => {
