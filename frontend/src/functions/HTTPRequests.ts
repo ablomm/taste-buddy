@@ -1,11 +1,21 @@
-import { Alert } from "react-native";
+import { defaultProfilePicture } from "../constants/DefaultImages";
+
+const localHostURL="http://localhost:8080";
 
 const getS3URL = async () => {
-    let result = await (await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/recipe/s3Url`)).json();
+    let result = await (await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || localHostURL}/s3/s3GenerateUrl`)).json();
     if (!result) {
         throw new Error("image link generation error")
     }
     return result;
+}
+
+export const getUserDetails = async (userId) => {
+    let user = await (await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || localHostURL}/user/id/${userId}`)).json();
+    if(!user.profilePic){
+        user.profilePic = defaultProfilePicture;
+    }
+    return user;
 }
 
 export const putImage = async (image, type) => {
@@ -28,7 +38,7 @@ export const putImage = async (image, type) => {
 }
 
 export const saveRecipe = async (username, title, description, instructions, cookTime, calories, servings, ingredients, tags, image) => {
-    let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/recipe/save`, {  //save the recipe
+    let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || localHostURL}/recipe/save`, {  //save the recipe
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -55,7 +65,7 @@ export const saveRecipe = async (username, title, description, instructions, coo
 }
 
 export const savePost = async (username, description, tags, image, recipeURL) => {
-    let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/post/create`, {
+    let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || localHostURL}/post/create`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -76,8 +86,27 @@ export const savePost = async (username, description, tags, image, recipeURL) =>
     }
 }
 
+export const saveProfilePicture = async (username, image) => {
+    let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || localHostURL}/user/update-profile/profilePic`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+            username: username,
+            profilePic: image
+            }),
+    });
+
+    if (response.status !== 200) {
+        throw new Error("Save Profile Picture Failure")
+    }
+}
+
 export const login = async (username, password) => {
-    let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/login`, {
+    let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || localHostURL}/login`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -98,7 +127,7 @@ export const login = async (username, password) => {
 }
 
 export const signUp = async (username, email, password) => {
-    let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/user`, {
+    let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || localHostURL}/user`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -117,7 +146,7 @@ export const signUp = async (username, email, password) => {
     }
 }
 
-export const addRecipeToUserSaved = async(recipeID: number, username: any) => {
+export const addRecipeToUserSaved = async(recipeID: number, username: string) => {
     try {
         let response = await fetch(
           `${
@@ -137,9 +166,9 @@ export const addRecipeToUserSaved = async(recipeID: number, username: any) => {
         );
   
         if (response.status !== 200) {
-          console.error("save recipe unsuccessful", username);
+          console.error("Save Recipe Unsuccessful");
       } else {
-        console.log("save recipe successful");
+        console.log("Save Recipe Successful");
       }
       } catch (error) {
         console.error(error);

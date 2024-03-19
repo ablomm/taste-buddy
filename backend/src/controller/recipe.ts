@@ -1,5 +1,4 @@
 import express from 'express';
-import { generateUploadURL } from '../service/s3';
 import {
     createRecipe,
     createIngredients,
@@ -15,7 +14,11 @@ import {
     processIngredients,
     processInstructions,
     getRecipeBatch,
-    getRecipesByUserID,
+    getRecipesByUserID, 
+    getReviewByUser, 
+    OrderBy, 
+    deleteReview, 
+    getRecipeRating,
     getPersonalizedRecipes,
     getTopRatedRecipes,
     setupTopRatedModel,
@@ -23,6 +26,7 @@ import {
 } from '../service/recipe';
 import { getUserByUsername, getProfilePhotoByUsername, getSavedRecipeIDs, getRejectedRecipeIDs } from "../service/user";
 import {editRecipe, storeRecipe} from "../service/search";
+
 const router = express.Router();
 
 /*
@@ -91,11 +95,6 @@ router.post("/save", async (req: express.Request, res: express.Response) => {
     res.sendStatus(200);
 });
 
-router.get("/s3Url", async (req: express.Request, res: express.Response) => {
-    const imageURL = await generateUploadURL()
-    return res.send({ imageURL });
-});
-
 router.get("/get-all-recipes", async (req: express.Request, res: express.Response) => {
     try{
         const allRecipes = await getAllRecipes();
@@ -133,7 +132,7 @@ interface Recipe {
 
 const convertToRecipe = (recipe: Recipe) => {
     return {
-      id: 0,
+      id: recipe.RecipeId,
       authorID: 0,
       creationTime: Date.now(),
       recipeTitle: recipe.Name,
@@ -145,38 +144,81 @@ const convertToRecipe = (recipe: Recipe) => {
       recipeImage: recipe.Images.length > 0 ? recipe.Images[0] : "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png",
       averageRating: recipe.AggregatedRating,
       ingredients: recipe.RecipeIngredientQuantities.map((quantity, index) => {
-        return { quantity: quantity, part: recipe.RecipeIngredientParts[index] }}),
-      instructions: recipe.RecipeInstructions
+        return { recipeID: recipe.RecipeId, amount: quantity, ingredient: recipe.RecipeIngredientParts[index], measurementType: "tbsp"}}),
+      instructions: recipe.RecipeInstructions,
+      tags: []
     };
   }
 
 router.post("/api/recommendations", async (req: express.Request, res: express.Response) => {
     try {
-       // add batch logic here so that cards can be reloaded 
-        // add contitional logic for calling correct calls
-        // add logic to combine recipes from both calls before returning 
-        // remove buttons on front end
-        // find out how to show full recipe 
-        // (maybe) add visual display for right/left/top swipe functionalities 
+        // add batch logic here so that cards can be reloaded -- i think this is good/done
+        // add loading sign -- maybe customize one for page -- should be done!
+        // find out how to show full recipe (on swipe up) -- MAYBE add button directly on card
+        // update recommendation algorithm
+        // display ellipses for overflowing text on description -- should be done!
+        // update UI to be darker so that text is more visible -- maybe okay now?
+        // (maybe) filter out data without images -- done!
+        // (maybe) get larger list and retain some recipes instead of fetching every time
+
         const userID = req.body.userID;
         const savedRecipeIDs = await getSavedRecipeIDs(20); 
         const rejectedRecipeIDs = await getRejectedRecipeIDs(20);
+
+        let personalizedResult, personalizedRecipes;
         const temp = [ { recipeID: 39}, {recipeID: 41}, {recipeID: 43}, {recipeID: 51}, {recipeID: 52}, {recipeID: 54}, {recipeID: 60}]
         const tempReject = [ {recipeID: 1}, {recipeID: 2}, {recipeID: 3}, {recipeID: 4}, {recipeID: 5}]
         
-        const personalizedResult = await getPersonalizedRecipes(temp, tempReject);
-        const topRatedResult = await getTopRatedRecipes(req.body);
+        // If there are saved recipes, get personalized recipes
+        // if(savedRecipeIDs.length > 0){
+            personalizedResult = await getPersonalizedRecipes(temp, rejectedRecipeIDs);
+            personalizedRecipes = JSON.parse(personalizedResult);
+        // }
+             
+        // Get top rated recipes
+        // const topRatedResult = await getTopRatedRecipes(rejectedRecipeIDs);
+        // const recipes = JSON.parse(topRatedResult.replace(/\bNaN\b/g, "null"));
 
-        // insert logic to combine list of top rated and personalized recipes
-        //const recipes = JSON.parse(personalizedResult); //personalized results
-        const recipes = JSON.parse(topRatedResult.replace(/\bNaN\b/g, "null")); //top rated results
+        // Combine personalized results with top rated
+        // const recipes = personalizedRecipes.concat(topRecipes);
+        const recipes = personalizedRecipes;
 
+        // Randomize combined list so that they are shown randomly to user
+        for (let i = recipes.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [recipes[i], recipes[j]] = [recipes[j], recipes[i]];
+        }
+
+        // convert recipes to Recipe object matching database before returning
         const recommend = recipes.map(convertToRecipe)
 
         // Send the result back to the client
         res.json(recommend);
     } catch (error) {
+        console.error("catching error!", error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+router.post("/api/recommendations/setup", async (req: express.Request, res: express.Response) => {
+    try { 
+        const topRatedSetupResult = await setupTopRatedModel(req.body); 
+        console.log(topRatedSetupResult)
+        // Send the result back to the client
+        res.json(topRatedSetupResult);
+    } catch (error) {
         console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+router.post("/api/recommendations/train", async (req: express.Request, res: express.Response) => {
+    try { 
+        const trainingModel = await trainTopRated(req.body); 
+        // Send the result back to the client
+        res.json(trainingModel);
+    } catch (error) {
+        console.error("catching error!", error);
         res.status(500).send('Internal Server Error');
     }
 });
@@ -296,15 +338,29 @@ router.post("/saveReview", async (req: express.Request, res: express.Response) =
     }
 });
 
-router.get("/reviews", async (req: express.Request, res: express.Response) => {
-    const {
-        recipeID,
-        page,
-        orderBy
-    } = req.body;
+router.get("/review-by-user", async (req: express.Request, res: express.Response) => {
+    try {
+        const userID = req.query.userID;
+        const recipeID = req.query.recipeID;
 
-    const reviews = await getReviewsByPage(recipeID, page, orderBy)
-    res.send({reviews});
+        const review = await getReviewByUser(Number(userID), Number(recipeID));
+
+        res.status(200).send({
+            found: review != null,
+            review: review
+        });
+    } catch (error) {
+        res.status(500).send("Something went wrong ...");
+    }
+});
+
+router.get("/reviews", async (req: express.Request, res: express.Response) => {
+    const page = parseInt(req.query.page as string) || 1;
+    const orderBy = req.query.orderBy as OrderBy || OrderBy.DateDescending;
+    const recipeID = parseInt(req.query.recipeID as string);
+
+    const {reviews, totalPages} = await getReviewsByPage(recipeID, page, orderBy)
+    res.send({reviews, totalPages});
 });
 export default router;
 
@@ -316,9 +372,36 @@ router.get("/get-recipes-for-user/:username", async (req: express.Request, res: 
         const user = await getUserByUsername(username);
         const userId = user?.id;
 
-        const recipes = await getRecipesByUserID(userId); 
+        const recipes = await getRecipesByUserID(userId);
 
         res.json(recipes);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send(error);
+    }
+});
+
+router.get("/delete-review", async (req: express.Request, res: express.Response) => {
+    try {
+        const userID = parseInt(req.query.userID as string);
+        const recipeID = parseInt(req.query.recipeID as string);
+
+        await deleteReview(recipeID, userID);
+
+        res.sendStatus(200);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send(error);
+    }
+});
+
+router.get("/get-recipe-rating", async (req: express.Request, res: express.Response) => {
+    try {
+        const recipeID = parseInt(req.query.recipeID as string);
+
+        const rating = await getRecipeRating(recipeID);
+
+        res.json({rating});
     } catch (error) {
         console.error(error);
         res.status(500).send(error);

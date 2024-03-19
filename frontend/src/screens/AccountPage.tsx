@@ -15,11 +15,10 @@ import { UserContext } from "../providers/UserProvider";
 import Modal from "react-native-modal";
 import TBButton from "../components/TBButton";
 import { FontAwesome } from "@expo/vector-icons"; // or 'react-native-vector-icons/MaterialIcons'
-import { black } from "react-native-paper/lib/typescript/styles/themes/v2/colors";
+import Icon from "react-native-vector-icons/FontAwesome";
+import { getUserDetails } from "../functions/HTTPRequests";
 
 const Tab = createMaterialTopTabNavigator();
-
-const profilePicture = require("../../assets/profile.jpg");
 
 interface Post {
   id: number;
@@ -57,7 +56,7 @@ const RecentPostsScreen: (
             userRecipes.slice(-3).map((recipe) => (
               <View key={recipe.id} style={styles.postContainer}>
                 <Image
-                  source={{ uri: recipe.image }}
+                  source={{ uri: recipe.recipeImage }}
                   style={styles.postImage}
                 />
               </View>
@@ -377,6 +376,10 @@ const AccountPage = () => {
   const [savedPosts1, setSavedPosts] = useState();
   const [userFolders, setUserFolders] = useState();
   const [refreshing, setRefreshing] = useState(false);
+  const [userDetails, setUserDetails] = useState({
+    username: "Unknown",
+    profilePic: "",
+  });
 
   useEffect(() => {
     fetchUserData();
@@ -386,10 +389,11 @@ const AccountPage = () => {
 
   const navigateToSettings = () => {
     // Navigate to the settings page
-    navigation.navigate("DietaryPreference");
+    navigation.navigate("SettingsPage");
   };
 
   const fetchUserData = async () => {
+    setUserDetails(await getUserDetails(userContext.state.userId));
     try {
       //get posts
       const response = await fetch(
@@ -504,16 +508,20 @@ const AccountPage = () => {
   return (
     <View style={styles.container}>
       <View style={styles.profileHeader}>
-        <Image source={profilePicture} style={styles.profilePicture} />
+        <Image
+          source={{ uri: userDetails.profilePic }}
+          style={styles.profilePicture}
+        />
         <View style={styles.userInfo}>
           <Text style={styles.username}>{username}</Text>
-          <TouchableOpacity
-            style={styles.settingsButton}
-            onPress={navigateToSettings}
-          >
-            <Text style={styles.settingsButtonText}>Settings</Text>
-          </TouchableOpacity>
         </View>
+
+        <TouchableOpacity>
+          <Icon name="share-square" style={styles.icon}></Icon>
+        </TouchableOpacity>
+        <TouchableOpacity>
+          <Icon name="gear" style={styles.icon} onPress={navigateToSettings} />
+        </TouchableOpacity>
       </View>
 
       <NavigationContainer independent={true}>
@@ -548,7 +556,6 @@ const AccountPage = () => {
           </Tab.Screen>
         </Tab.Navigator>
       </NavigationContainer>
-      <TBButton onPress={userContext.logout} title="Logout" />
     </View>
   );
 };
@@ -563,6 +570,13 @@ const styles = StyleSheet.create({
   //   alignItems: 'center',
   //   justifyContent: 'center',
   // },
+  icon: {
+    width: 30,
+    height: 30,
+    fontSize: 27,
+    marginLeft: 8,
+    color: "#00D387",
+  },
   profileHeader: {
     flexDirection: "row",
     alignItems: "center",
@@ -571,9 +585,9 @@ const styles = StyleSheet.create({
     borderBottomColor: "#ccc",
   },
   profilePicture: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 75,
+    height: 75,
+    borderRadius: 50,
     marginRight: 15,
   },
   userInfo: {
@@ -583,18 +597,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 5,
-  },
-  settingsButton: {
-    backgroundColor: "#8CC84B", // Light green color
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    borderRadius: 5,
-    width: 110,
-  },
-  settingsButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
   },
   screen: {
     flex: 1,

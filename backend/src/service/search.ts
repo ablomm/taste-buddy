@@ -1,5 +1,4 @@
 import {Client} from '@elastic/elasticsearch';
-import * as fs from "fs";
 import 'dotenv/config';
 
 
@@ -106,6 +105,27 @@ export async function storeRecipe(recipe: any, recipeID: number|undefined) {
     } catch(error) {
         console.error(error);
         throw new Error("Error storing the recipe: " + error);
+    }
+}
+
+export async function updateRatingES(recipeID: number, newRating: number) {
+    try {
+        if (recipeID == undefined) {
+            new Error("Recipe ID is missing.");
+        } else {
+            await client.update({
+                index: 'recipes',
+                id: recipeID.toString(),
+                doc: {
+                    averageRating: newRating
+                }
+            });
+
+            console.log("Successfully updated recipe rating in Elasticsearch DB ...");
+        }
+    } catch (error) {
+        console.error(error);
+        throw new Error("Error updating the recipe rating: " + error);
     }
 }
 
