@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: "100%",
-    height: 300,
+    height: 350,
     alignSelf: "center",
     marginBottom: 10,
     borderRadius: 10,
