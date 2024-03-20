@@ -90,7 +90,7 @@ const SignedInNavigation = () => (
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home-outline" size={size} color={color} />),
-          tabBarActiveTintColor: '#8CC84B',
+          tabBarActiveTintColor: 'green',
           tabBarInactiveTintColor: 'gray',
         }}
       />

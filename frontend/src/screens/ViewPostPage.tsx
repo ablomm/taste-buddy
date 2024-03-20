@@ -15,6 +15,7 @@ import TBButton from "../components/TBButton";
 import { deletePost } from "../functions/HTTPRequests";
 import { LoadingContext } from "../providers/LoadingProvider";
 import PostTabBar from "../components/PostTabBar";
+import { UserContext } from '../providers/UserProvider';
 
 const ViewPostPage = ({ route }) => {
   let post = route.params;
@@ -22,6 +23,8 @@ const ViewPostPage = ({ route }) => {
     useState<boolean>(false);
   let userId = post.userId ? post.userId : post.author;
   const loadingContext = React.useContext(LoadingContext) as any;
+  const userContext = React.useContext(UserContext) as any;
+  const username = userContext.state.username;
 
   function moreOptionsButton() {
     return (
@@ -33,6 +36,28 @@ const ViewPostPage = ({ route }) => {
     );
   }
 
+  const calculateTimeDifference = (timeString) => {
+    const currentTime = new Date();
+    const pastTime = new Date(timeString);
+  
+    // Calculate the difference in milliseconds
+    const timeDifference = currentTime.getTime() - pastTime.getTime();
+  
+    // Convert milliseconds to minutes, hours, and days
+    const minutes = Math.floor(timeDifference / (1000 * 60));
+    const hours = Math.floor(timeDifference / (1000 * 60 * 60));
+    const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+  
+    // Determine the appropriate format based on the time difference
+    if (minutes < 60) {
+      return `${minutes} minute${minutes !== 1 ? "s" : ""} ago`;
+    } else if (hours < 24) {
+      return `${hours} hour${hours !== 1 ? "s" : ""} ago`;
+    } else {
+      return `${days} day${days !== 1 ? "s" : ""} ago`;
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Header />
@@ -40,7 +65,12 @@ const ViewPostPage = ({ route }) => {
         <PosterHeader userId={userId} personalComponent={moreOptionsButton} />
         <Image style={styles.image} source={{ uri: post.image }} />
         <PostTabBar />
-        <Text style={styles.description}>{post.description}</Text>
+        <View style={styles.flex}>
+          <Text style={styles.username}>{username}</Text>
+          <Text style={styles.description}>{post.description}</Text>
+        </View>
+        
+        <Text style={styles.time}>{calculateTimeDifference(post.creationTime)}</Text>
       </ScrollView>
       <Modal
         animationType="slide"
@@ -117,6 +147,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 22,
   },
+  flex: {
+    flexDirection: 'row', // Align items horizontally
+    alignItems: 'center', // Align items vertically
+  },
+  username: {
+    paddingLeft: 10,
+    fontSize: 17,
+    fontWeight: "700"
+  },
   header: {
     color: "#000",
     fontSize: 20,
@@ -133,16 +172,16 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-  username: {
-    margin: 10,
-    color: "#000",
-    fontSize: 20,
-    fontWeight: "700",
-  },
   description: {
-    fontSize: 17,
+    fontSize: 15,
     margin: 10,
   },
+  time: {
+    fontSize: 12,
+    marginLeft: 10,
+    margin: 5,
+    color: 'grey'
+  }
 });
 
 export default ViewPostPage;
