@@ -106,6 +106,7 @@ const RecipeReviews = ({ userID, username, recipeID, updateRating }) => {
   const handleReviewSubmit = async () => {
     await submitReview();
     const ratingResponse = await getRecipeRating(recipeID);
+    setPages(currentPage)
     updateRating(ratingResponse["rating"]);
   };
 
@@ -202,7 +203,6 @@ const RecipeReviews = ({ userID, username, recipeID, updateRating }) => {
 
   const loadMoreReviews = async () => {
     const response = await retrieveReviews(currentPage + 1, sortBy, recipeID);
-
     if (response != undefined) {
       setReviews([...reviews, response["reviews"]]);
       setCurrentPage(currentPage + 1);

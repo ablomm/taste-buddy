@@ -284,7 +284,15 @@ const CreateRecipePage = ({ route, navigation }: any) => {
                   error={errors.title}
                 />
 
-                <Text style={styles.header}>Instructions*</Text>
+                <Text style={styles.header}>Ingredients</Text>
+                <View style={styles.multiContainer}>
+                  {ingredients.map((ingredient, index) => {
+                    return (<IngredientListItem onPress={() => { openEditIngredientForm(index) }} ingredient={ingredient} key={index} />);
+                  })}
+                  <TBButton style={styles.addButton} onPress={() => setIngredientsModalVisible(true)} title="+" />
+                </View>
+
+                <Text style={styles.header}>Instructions</Text>
                 <View style={styles.multiContainer}>
                   {steps.map((step, index) => {
                     return (<StepListItem onPress={() => { openEditStepForm(index) }} item={step} index={index} key={index} />);
@@ -332,14 +340,6 @@ const CreateRecipePage = ({ route, navigation }: any) => {
                   value={values.servings}
                   error={errors.servings}
                 />
-
-                <Text style={styles.header}>Ingredients</Text>
-                <View style={styles.multiContainer}>
-                  {ingredients.map((ingredient, index) => {
-                    return (<IngredientListItem onPress={() => { openEditIngredientForm(index) }} ingredient={ingredient} key={index} />);
-                  })}
-                  <TBButton style={styles.addButton} onPress={() => setIngredientsModalVisible(true)} title="+" />
-                </View>
 
                 <Text style={styles.header}>Tags</Text>
                 <View style={styles.multiContainer}>
