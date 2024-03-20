@@ -117,6 +117,9 @@ const SavedPostsScreen = ({
     } catch (error: any) {
       console.error(error.stack);
     }
+    
+      refreshFunction();
+
     toggleModal();
   };
 
@@ -147,6 +150,9 @@ const SavedPostsScreen = ({
     } catch (error: any) {
       console.error(error.stack);
     }
+    
+    refreshFunction();
+
     toggleModal1();
   };
 
