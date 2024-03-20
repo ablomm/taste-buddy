@@ -10,6 +10,10 @@ import {
   Animated,
   Dimensions,
   ImageBackground,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  Modal,
+  Image
 } from "react-native";
 import {IconButton} from "react-native-paper";
 import Header from "../components/header/Header";
@@ -33,6 +37,7 @@ const RecipePage = ({ route, navigation }: any) => {
   const [username, setUsername] = React.useState<string>("");
   const [recipeID, setRecipeID] = React.useState<number>(-1);
   const [currentRating, setCurrentRating] = useState<number>();
+  const [modalVisible, setModalVisible] = useState(false);
 
   const userContext = useContext(UserContext) as any;
 
@@ -108,6 +113,23 @@ const RecipePage = ({ route, navigation }: any) => {
 
   return (
     <View style={styles.container}>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(false);
+        }}
+      >
+        <View style={styles.modalContainer}>
+          <View style={{ width: '100%', aspectRatio: 1 }}>
+            <Image source={{ uri: recipe?.recipeImage }} style={{ flex: 1 }} />
+          </View>
+          <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.closeButton}>
+            <Text style={styles.closeText}>Close</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
       <Header title = "View Recipe" />
       <PosterHeader userId = {recipe?.authorID} personalComponent={editButton} />
       <ScrollView
@@ -123,73 +145,80 @@ const RecipePage = ({ route, navigation }: any) => {
         }}
       >
         <Animated.View
-          style={{
-            height: headerHeight,
-            width: SCREEN_WIDTH,
-            position: "absolute",
-            top: 0,
-            left: 0,
-            zIndex: 1,
-          }}
+  style={{
+    height: headerHeight,
+    width: SCREEN_WIDTH,
+    position: "absolute",
+    top: 0,
+    left: 0,
+    zIndex: 1,
+  }}
+>
+  <TouchableWithoutFeedback onPress={() => setModalVisible(true)}>
+    <View style={{ flex: 1 }}>
+      <ImageBackground
+        source={
+          recipe?.recipeImage
+            ? { uri: recipe.recipeImage }
+            : require("../../assets/temp/tempfood.jpg")
+        }
+        style={{ flex: 1 }}
+      >
+        <LinearGradient
+          colors={["rgba(0,0,0,0.49)", "rgba(0,0,0,0.49)"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
+          style={{ flex: 1 }}
         >
-          <ImageBackground
-            source={
-              recipe?.recipeImage
-                ? { uri: recipe.recipeImage }
-                : require("../../assets/temp/tempfood.jpg")
-            }
-            style={{ flex: 1 }}
-          >
-            <LinearGradient
-              colors={["rgba(0,0,0,0.49)", "rgba(0,0,0,0.49)"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 0, y: 1 }}
-              style={{ flex: 1 }}
-            >
-              <View style={{ top: 8, left: 8 }}>
-                <Animated.Text style={styles.recipeTitle}>
-                  {recipe?.recipeTitle}
-                </Animated.Text>
+          <View style={{ top: 8, left: 8 }}>
+            <Animated.Text style={styles.recipeTitle}>
+              {recipe?.recipeTitle}
+            </Animated.Text>
 
-                {recipe?.tags ? <Animated.Text
-                    style={[
-                      styles.subSectionOfRecipeTitle,
-                      {opacity: heroTitleOpacity},
-                    ]}
-                >
-                  {truncateText(recipe.tags.join(", "), 19)}
-                </Animated.Text> : null}
-                <Animated.Text
-                  style={[
-                    styles.subSectionOfRecipeTitle,
-                    { opacity: heroTitleOpacity },
-                  ]}
-                >
-                  {recipe?.cookTimeHours} h {recipe?.cootTimeMinutes} m
-                </Animated.Text>
-                <Animated.Text
-                  style={[
-                    styles.subSectionOfRecipeTitle,
-                    { opacity: heroTitleOpacity },
-                  ]}
-                >
-                  {recipe?.calories} calories
-                </Animated.Text>
-                <Animated.Text
-                  style={[
-                    styles.subSectionOfRecipeTitle,
-                    { opacity: heroTitleOpacity },
-                  ]}
-                >
-                  {recipe?.servings}{" "}
-                  {recipe?.servings != undefined && recipe?.servings > 1
-                    ? "servings"
-                    : "serving"}
-                </Animated.Text>
-              </View>
-            </LinearGradient>
-          </ImageBackground>
-        </Animated.View>
+            {recipe?.tags ? (
+              <Animated.Text
+                style={[
+                  styles.subSectionOfRecipeTitle,
+                  { opacity: heroTitleOpacity },
+                ]}
+              >
+                {truncateText(recipe.tags.join(", "), 19)}
+              </Animated.Text>
+            ) : null}
+            <Animated.Text
+              style={[
+                styles.subSectionOfRecipeTitle,
+                { opacity: heroTitleOpacity },
+              ]}
+            >
+              {recipe?.cookTimeHours} h {recipe?.cootTimeMinutes} m
+            </Animated.Text>
+            <Animated.Text
+              style={[
+                styles.subSectionOfRecipeTitle,
+                { opacity: heroTitleOpacity },
+              ]}
+            >
+              {recipe?.calories} calories
+            </Animated.Text>
+            <Animated.Text
+              style={[
+                styles.subSectionOfRecipeTitle,
+                { opacity: heroTitleOpacity },
+              ]}
+            >
+              {recipe?.servings}{" "}
+              {recipe?.servings !== undefined && recipe?.servings > 1
+                ? "servings"
+                : "serving"}
+            </Animated.Text>
+          </View>
+        </LinearGradient>
+      </ImageBackground>
+    </View>
+  </TouchableWithoutFeedback>
+</Animated.View>
+
 
         <View style={styles.scrollContainer}>
           <RecipeContentInteractionBar
@@ -268,6 +297,26 @@ const styles = StyleSheet.create({
     borderBottomColor: "#6E6E6E",
     borderBottomWidth: 1,
     marginVertical: 10,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+  },
+  imageBackground: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 20,
+    right: 20,
+  },
+  closeText: {
+    color: 'white',
+    fontSize: 16,
   },
 });
 export default RecipePage;
