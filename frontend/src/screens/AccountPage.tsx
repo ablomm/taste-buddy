@@ -20,6 +20,7 @@ import { getRecipesInFolder, getUserDetails } from "../functions/HTTPRequests";
 import PostsGrid from "../components/PostsGrid";
 import RecipeListItem from "../components/RecipeListItem";
 import { LoadingContext } from "../providers/LoadingProvider";
+import { TouchableRipple } from "react-native-paper";
 const fallbackProfilePicture = require("../../assets/profile.jpg");
 
 const Tab = createMaterialTopTabNavigator();
@@ -117,8 +118,8 @@ const SavedPostsScreen = ({
     } catch (error: any) {
       console.error(error.stack);
     }
-    
-      refreshFunction();
+
+    refreshFunction();
 
     toggleModal();
   };
@@ -149,7 +150,7 @@ const SavedPostsScreen = ({
     } catch (error: any) {
       console.error(error.stack);
     }
-    
+
     refreshFunction();
 
     toggleModal1();
@@ -207,15 +208,18 @@ const SavedPostsScreen = ({
             )}
           </View>
         </View>
-        <View style={styles.plusContainerContainer}>
-            <TouchableOpacity onPress={toggleModal} style={styles.plusContainer}>
+
+
+        <View style={{ display: isModalVisible2 ? "flex" : "none" }}>
+          <View style={styles.plusContainerContainer}>
+            <TouchableRipple onPress={toggleModal} style={styles.plusContainer}>
               <FontAwesome
                 name="plus"
                 size={40}
                 color="white"
                 style={styles.plusIcon}
               />
-            </TouchableOpacity>
+            </TouchableRipple>
             <Modal
               isVisible={isModalVisible}
               style={styles.modalCenter}
@@ -230,21 +234,19 @@ const SavedPostsScreen = ({
                   value={folderName}
                   onChangeText={(text) => setFolderName(text)}
                 />
-                <TouchableOpacity
+                <TouchableRipple
                   style={styles.addFolderButton}
                   onPress={() => addFolder(folderName)}
                 >
                   <Text style={styles.addButtonLabel}>Add Folder</Text>
-                </TouchableOpacity>
+                </TouchableRipple>
               </View>
             </Modal>
           </View>
-
-        <View style={{ display: isModalVisible2 ? "flex" : "none" }}>
           <View style={styles.folderContainer}>
             {userFolders.map((folder) => {
               return (
-                <TouchableOpacity
+                <TouchableRipple
                   style={styles.postContainer}
                   key={`${folder.id}-${Math.random()}`}
                   onPress={() => {
@@ -256,62 +258,64 @@ const SavedPostsScreen = ({
                     }
                   }}
                 >
-                  <View
-                    key={`${folder.id}-${Math.random()}`}
-                    style={styles.folders}
-                  >
-                    <Text
-                      style={styles.addButtonLabel}
-                      key={`${folder.id}-${Math.random()}`}
-                    >
-                      {folder.folderName}
-                    </Text>
-                  </View>
-                  <Modal
-                    isVisible={isModalVisible1}
-                    style={styles.modalCenter}
-                    onBackdropPress={toggleModal1}
-                    key={`${folder.id}-${Math.random()}`}
-                  >
+                  <>
                     <View
-                      style={styles.modalContent}
                       key={`${folder.id}-${Math.random()}`}
+                      style={styles.folders}
                     >
                       <Text
-                        style={styles.modalTitle}
+                        style={styles.addButtonLabel}
                         key={`${folder.id}-${Math.random()}`}
                       >
-                        Delete Folder?
+                        {folder.folderName}
                       </Text>
+                    </View>
+                    <Modal
+                      isVisible={isModalVisible1}
+                      style={styles.modalCenter}
+                      onBackdropPress={toggleModal1}
+                      key={`${folder.id}-${Math.random()}`}
+                    >
                       <View
-                        style={styles.deleteContainer}
+                        style={styles.modalContent}
                         key={`${folder.id}-${Math.random()}`}
                       >
-                        <TouchableOpacity
-                          style={styles.addFolderButton1}
+                        <Text
+                          style={styles.modalTitle}
                           key={`${folder.id}-${Math.random()}`}
-                          onPress={() => {
-                            deleteFolder(folder.id);
-                          }}
                         >
-                          <Text
-                            style={styles.addButtonLabel}
+                          Delete Folder?
+                        </Text>
+                        <View
+                          style={styles.deleteContainer}
+                          key={`${folder.id}-${Math.random()}`}
+                        >
+                          <TouchableRipple
+                            style={styles.addFolderButton1}
                             key={`${folder.id}-${Math.random()}`}
+                            onPress={() => {
+                              deleteFolder(folder.id);
+                            }}
                           >
-                            Yes
-                          </Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          style={styles.addFolderButton2}
-                          key={`${folder.id}-${Math.random()}`}
-                          onPress={() => toggleModal1()}
-                        >
-                          <Text style={styles.addButtonLabel}>No</Text>
-                        </TouchableOpacity>
+                            <Text
+                              style={styles.addButtonLabel}
+                              key={`${folder.id}-${Math.random()}`}
+                            >
+                              Yes
+                            </Text>
+                          </TouchableRipple>
+                          <TouchableRipple
+                            style={styles.addFolderButton2}
+                            key={`${folder.id}-${Math.random()}`}
+                            onPress={() => toggleModal1()}
+                          >
+                            <Text style={styles.addButtonLabel}>No</Text>
+                          </TouchableRipple>
+                        </View>
                       </View>
-                    </View>
-                  </Modal>
-                </TouchableOpacity>
+                    </Modal>
+                  </>
+                </TouchableRipple>
               );
             })}
           </View>
