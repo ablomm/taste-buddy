@@ -8,12 +8,10 @@ import {
   TouchableOpacity,
   RefreshControl,
   ScrollView,
-  FlatList,
-  SafeAreaView,
   Alert,
 } from "react-native";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import { NavigationContainer, useNavigation } from "@react-navigation/native";
+import { NavigationContainer, useNavigation, useFocusEffect } from "@react-navigation/native";
 import { UserContext } from "../providers/UserProvider";
 import Modal from "react-native-modal";
 import { FontAwesome } from "@expo/vector-icons"; // or 'react-native-vector-icons/MaterialIcons'
@@ -330,10 +328,6 @@ const AccountPage = () => {
     description: "",
   });
 
-  useEffect(() => {
-    fetchUserData();
-  }, []);
-
   const navigation: any = useNavigation();
 
   const navigateToSettings = () => {
@@ -451,6 +445,12 @@ const AccountPage = () => {
       setRefreshing(false);
     }, 1000);
   }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      onRefresh();
+    }, [])
+  );
 
   return (
     <View style={styles.container}>

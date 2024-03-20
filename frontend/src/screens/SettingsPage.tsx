@@ -76,7 +76,7 @@ const SettingsPage = ({ navigation }: any) => {
               if (!profilePic.base64) {
                 profilePic.base64 = await getBase64(profilePic.uri);
               }
-              const buf = Buffer.from(profilePic.base64, "base64"); //isolate the base64 buffer
+              const buf = Buffer.from(profilePic.base64, "base64");
               let type = profilePic.uri.substring(
                 profilePic.uri.lastIndexOf(".") + 1,
                 profilePic.uri.length
@@ -92,7 +92,7 @@ const SettingsPage = ({ navigation }: any) => {
             );
 
             console.log("Save Profile Picture successful");
-            navigation.navigate("AccountPageStack");
+            navigation.navigate("AccountPage");
           } catch (error: any) {
             console.error("Error saving profile picture");
             console.error(error);
