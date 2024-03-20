@@ -19,7 +19,7 @@ export function RecipeTab({ navigation, search, recipes }) {
 
     return (
         <>
-            {recipes.length != 0 ?
+            {recipes != null && recipes.length != 0 ?
                 <FlatList
                     data={recipes}
                     renderItem={({ item }) => <RecipeListItem item={item} navigation={navigation} />}
