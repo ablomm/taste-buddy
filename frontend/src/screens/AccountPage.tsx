@@ -41,6 +41,7 @@ const RecentPostsScreen = ({
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={refreshFunction} />
       }
+      style={{ backgroundColor: "white" }}
     >
       <View style={styles.screen}>
         <PostsGrid posts={posts} navigation={navigation}></PostsGrid>
@@ -93,8 +94,7 @@ const SavedPostsScreen = ({
   const addFolder = async (folderName) => {
     try {
       let response = await fetch(
-        `${
-          process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
+        `${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
         }/user/create-folder/${username}}`,
         {
           method: "POST",
@@ -123,8 +123,7 @@ const SavedPostsScreen = ({
   const deleteFolder = async (folderId) => {
     try {
       let response = await fetch(
-        `${
-          process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
+        `${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
         }/user/delete-folder/${username}}`,
         {
           method: "DELETE",
@@ -202,9 +201,8 @@ const SavedPostsScreen = ({
             )}
           </View>
         </View>
-        <View style={{ display: isModalVisible2 ? "flex" : "none" }}>
-          <View style={styles.postsContainer}>
-            <TouchableOpacity onPress={toggleModal} style={styles.addButton}>
+        <View style={styles.plusContainerContainer}>
+            <TouchableOpacity onPress={toggleModal} style={styles.plusContainer}>
               <FontAwesome
                 name="plus"
                 size={40}
@@ -234,6 +232,10 @@ const SavedPostsScreen = ({
                 </TouchableOpacity>
               </View>
             </Modal>
+          </View>
+
+        <View style={{ display: isModalVisible2 ? "flex" : "none" }}>
+          <View style={styles.folderContainer}>
             {userFolders.map((folder) => {
               return (
                 <TouchableOpacity
@@ -340,8 +342,7 @@ const AccountPage = () => {
     try {
       //get posts
       const response = await fetch(
-        `${
-          process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
+        `${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
         }/post/get-posts/${username}`,
         {
           method: "GET",
@@ -363,8 +364,7 @@ const AccountPage = () => {
     try {
       //get posts
       const response = await fetch(
-        `${
-          process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
+        `${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
         }/recipe/get-recipes-for-user/${username}`,
         {
           method: "GET",
@@ -386,8 +386,7 @@ const AccountPage = () => {
     try {
       //get folders
       const response = await fetch(
-        `${
-          process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
+        `${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
         }/user/get-folders/${username}`,
         {
           method: "GET",
@@ -413,8 +412,7 @@ const AccountPage = () => {
     try {
       //get saved recipes
       const response = await fetch(
-        `${
-          process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
+        `${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
         }/user/get-saved-recipes/${username}`,
         {
           method: "GET",
@@ -480,7 +478,8 @@ const AccountPage = () => {
 
       <NavigationContainer independent={true}>
         <Tab.Navigator
-          screenOptions={({}) => ({
+          sceneContainerStyle={{ backgroundColor: 'transparent' }}
+          screenOptions={({ }) => ({
             tabBarStyle: {
               backgroundColor: "rgba(160, 220, 95, 0.15)",
             },
@@ -579,12 +578,25 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     justifyContent: "space-between",
   },
-  postContainer: {
-    width: "48%",
+  plusContainerContainer: {
+    flex: 1,
+    flexGrow: 50,
+    width: "100%",
     marginBottom: 10,
     marginTop: 10,
     justifyContent: "center",
     alignItems: "center",
+  },
+  postContainer: {
+    flex: 1,
+    minWidth: 100,
+    maxWidth: 100,
+    height: 100,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 1,
+    borderWidth: 1,
+    borderColor: "#fff"
   },
   postImage: {
     width: 100,
@@ -597,13 +609,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   addButton: {
-    marginLeft: 50,
-    marginTop: 30,
     borderRadius: 5,
     backgroundColor: "#8CC84B",
     alignItems: "center", // Center items horizontally
     justifyContent: "center",
-    width: 50,
+    width: '95%',
     height: 55,
   },
   backIcon: {
@@ -611,14 +621,26 @@ const styles = StyleSheet.create({
     paddingLeft: 5,
   },
   folders: {
-    marginRight: 15,
-    marginTop: 10,
     borderRadius: 5,
     backgroundColor: "rgba(140, 200, 75, 0.9)",
     alignItems: "center", // Center items horizontally
     justifyContent: "center",
-    width: 95,
-    height: 95,
+    width: '100%',
+    height: '100%',
+  },
+  folderContainer: {
+    marginHorizontal: "auto",
+    flexDirection: "row",
+    justifyContent: "center",
+    flexWrap: "wrap",
+  },
+  plusContainer: {
+    borderRadius: 5,
+    backgroundColor: "rgba(100, 150, 55, 0.9)",
+    alignItems: "center", // Center items horizontally
+    justifyContent: "center",
+    width: '95%',
+    height: 60,
   },
   foldersLabel: {
     color: "#fff",
