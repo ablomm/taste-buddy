@@ -1,6 +1,7 @@
 import express, {Response, Request} from 'express';
 import { PrismaClient } from '@prisma/client';
-import {createUser, setProfilePicOfUser, setProfileDescription, getModeratorStatus, addDietaryPref, getUserById, saveRecipe, getSavedRecipes, getUserByUsername, deleteSavedRecipe, createFolder, getUserFolders, deleteFolder, getRecipesInFolder, saveRecipeToFolder} from '../service/user';
+import {createUser, setProfilePicOfUser, setProfileDescription, getModeratorStatus, addDietaryPref, getUserById, saveRecipe, getSavedRecipes, getUserByUsername, deleteSavedRecipe, createFolder, getUserFolders, deleteFolder, saveRecipeToFolder} from '../service/user';
+import { getRecipesInFolder } from '../service/recipe';
 const prisma = new PrismaClient();
 const router = express.Router();
 
@@ -161,7 +162,7 @@ router.get("/get-mod-status/:username", async (req: express.Request, res: expres
 // get recipes from a folder
 router.get("/get-recipes-in-folder/:username", async (req: express.Request, res: express.Response) => {
   const username: string = req.params["username"]
-  const folderName: string = req.params.folderName;
+  const folderName: string = req.query["folderName"] as string;
   const resultString: string = username.endsWith('}') ? username.slice(0, -1) : username; //remove the curly brackets thats at the end for some reason
 
   const user = await getUserByUsername(resultString);

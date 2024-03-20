@@ -64,8 +64,8 @@ model Recipe {
   cootTimeMinutes    Int
   calories           Int?
   servings           Int
-  recipeIngredients  RecipeIngredients[]
-  recipeInstructions RecipeInstructions[]
+  ingredients  RecipeIngredients[]
+  instructions RecipeInstructions[]
   recipeImage        String
   tags               Tag[]                @relation("RecipeTags")
   usersSaved         UserSavedRecipes[]

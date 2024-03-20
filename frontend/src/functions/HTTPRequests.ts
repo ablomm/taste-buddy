@@ -1,6 +1,6 @@
 import { defaultProfilePicture } from "../constants/DefaultImages";
 
-const localHostURL="http://localhost:8080";
+const localHostURL = "http://localhost:8080";
 
 const getS3URL = async () => {
     let result = await (await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || localHostURL}/s3/s3GenerateUrl`)).json();
@@ -12,7 +12,7 @@ const getS3URL = async () => {
 
 export const getUserDetails = async (userId) => {
     let user = await (await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || localHostURL}/user/id/${userId}`)).json();
-    if(!user.profilePic){
+    if (!user.profilePic) {
         user.profilePic = defaultProfilePicture;
     }
     return user;
@@ -43,7 +43,7 @@ export const deletePost = async (userId, postId) => {
         method: 'PUT',
         headers: {
             'Accept': 'application/json',
-                    'Content-Type': 'application/json',
+            'Content-Type': 'application/json',
         },
         credentials: 'include',
         body: JSON.stringify({
@@ -117,7 +117,7 @@ export const saveProfilePicture = async (username, image) => {
         body: JSON.stringify({
             username: username,
             profilePic: image
-            }),
+        }),
     });
 
     if (response.status !== 200) {
@@ -183,4 +183,29 @@ export const signUp = async (username, email, password) => {
     if (response.status !== 200) {
         throw new Error("account creation unsuccessful");
     }
+}
+
+export const getPostPage = async (page: number) => {
+    const response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/post/page/${page}`);
+    return await response.json();
+}
+
+export const getRecipesInFolder = async (username: string, folderName: string) => {
+    let response = await fetch(
+        `${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/user/get-recipes-in-folder/${username}?folderName=${folderName}`,
+        {
+            method: "GET",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+            },
+            credentials: "include",
+        }
+    );
+
+    if (response.status !== 200) {
+        throw new Error("got recipes in folder unsuccessfully");
+    }
+
+    return await response.json();
 }

@@ -519,3 +519,27 @@ export async function recalculateAverageRating(recipeID: number) {
     const totalRatings = reviews.reduce((acc, review) => acc + review.rating, 0);
     return totalRatings / reviews.length;
 }
+
+
+export async function getRecipesInFolder(userID: any, folderName: any) {
+    const recipes = await prisma.recipe.findMany({
+        include: {
+            ingredients: true,
+            instructions: true,
+            tags: true,
+        },
+        where: {
+            usersSaved: {
+                some: {
+                    userID: { equals: userID },
+                    folders: {
+                        some: {
+                            folderName: { equals: folderName }
+                        }
+                    }
+                }
+            }
+        }
+    });
+    return recipes;
+}

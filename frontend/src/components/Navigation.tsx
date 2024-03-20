@@ -51,7 +51,7 @@ const LoggedOutNavigation = () => (
 
 const SignedInNavigation = () => (
   <NavigationContainer>
-    <Tab.Navigator initialRouteName='ExplorePage' screenOptions={tabBarOptions} sceneContainerStyle={{ backgroundColor: 'transparent' }}/*tabBar={props => <NavBar {...props} />}*/>
+    <Tab.Navigator initialRouteName='AccountPageStack' screenOptions={tabBarOptions} sceneContainerStyle={{ backgroundColor: 'transparent' }}/*tabBar={props => <NavBar {...props} />}*/>
       <Tab.Screen
         name='ExplorePage'
         component={ExplorePage}
@@ -109,7 +109,10 @@ const CreatePostOrRecipeStack = () => (
 const AccountPageStack = () => (
   <Stack.Navigator initialRouteName='AccountPage' screenOptions={stackOptions}>
     <Stack.Screen name='AccountPage' component={AccountPage} />
+    <Stack.Screen name='ViewPostPage' component={ViewPostPage} />
+    <Stack.Screen name='RecipePage' component={RecipePage} />
     <Stack.Screen name='SettingsPage' component={SettingsPage} />
+    <Stack.Screen name='EditRecipePage' component={EditRecipePage} />
     <Stack.Screen name='DietaryPreference' component={DietaryPreference} />
   </Stack.Navigator>
 );
@@ -118,8 +121,8 @@ const SearchPageStack = () => (
   <Stack.Navigator initialRouteName='SearchPage' screenOptions={stackOptions}>
     <Stack.Screen name='SearchPage' component={SearchPage} />
     <Stack.Screen name='ViewPostPage' component={ViewPostPage} />
-      <Stack.Screen name='RecipePage' component={RecipePage} />
-      <Stack.Screen name='EditRecipePage' component={EditRecipePage} />
+    <Stack.Screen name='RecipePage' component={RecipePage} />
+    <Stack.Screen name='EditRecipePage' component={EditRecipePage} />
   </Stack.Navigator>
 );
 export default Navigation;

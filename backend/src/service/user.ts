@@ -336,25 +336,3 @@ export async function deleteFolder(folderID: any) {
 
     return user;
 }
-
-export async function getRecipesInFolder(userID: any, folderName: any) {
-    const user = await prisma.user.findMany({
-        where: {
-            id: userID,
-        },
-        include: {
-            savedRecipes: {
-                include: {
-                    recipe: true,
-                    folders: {
-                        where: {
-                            folderName: folderName,
-                        },
-                    },
-                },
-            },
-        },
-    })
-
-    return user;
-}

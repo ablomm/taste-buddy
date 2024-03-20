@@ -1,67 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import {StyleSheet, ScrollView, NativeScrollEvent, RefreshControl} from 'react-native';
+import React from 'react';
+import {StyleSheet, View} from 'react-native';
 import Post from './Post';
 import { TouchableRipple } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 
-const PostsGrid = () => {
-    const [data, setData] = useState<any[]>([]);
-    const [page, setPage] = useState(0);
-    const [refreshing, setRefresh] = useState(false);
-    const navigation: any = useNavigation();
-
-    const isCloseToBottom = (nativeEvent: NativeScrollEvent) => {
-
-        const paddingToBottom = 20;
-        return nativeEvent.layoutMeasurement.height + nativeEvent.contentOffset.y >=
-            nativeEvent.contentSize.height - paddingToBottom;
-    };
-
-    const retrievePosts = async () => {
-        setPage(page + 1);
-        try {
-            const response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/post/page/${page}`, {  //get secure s3 access url
-                method: 'GET',
-            })
-                .then((res) => { return res.json() })
-                .then((json) => {
-                    setData([...data, ...json])
-                });
-        } catch (error: any) {
-            console.log("posts retrieving error")
-            console.log(error)
-        }
-    };
-
-    useEffect(() => {
-        retrievePosts();
-    }, []);
-
-    const _onRefresh = React.useCallback(() => {
-        setRefresh(true);
-        console.log("refreshing")
-        retrievePosts().then(() => {
-            setRefresh(false);
-        });
-    }, [])
+const PostsGrid = ({posts, navigation = null}: any) => {
+    navigation = navigation == null ? useNavigation() : navigation;
 
     return (
-        <ScrollView contentContainerStyle={styles.app}
-            onScroll={({ nativeEvent }) => {
-                if (isCloseToBottom(nativeEvent)) {
-                    retrievePosts();
-                }
-            }}
-            scrollEventThrottle={400}
-            refreshControl={
-                <RefreshControl
-                    refreshing={refreshing}
-                    onRefresh={_onRefresh}
-                />
-            }
-        >
-
-            {data.map((post: any) => {
+        <View style = {styles.container}>
+            {posts.map((post: any) => {
                 return (
                     <TouchableRipple
                         key={post.id}
@@ -72,14 +20,14 @@ const PostsGrid = () => {
                     </TouchableRipple>
                 )
             })}
-        </ScrollView>
+        </View>
     );
 };
 
 
 const styles = StyleSheet.create({
 
-    app: {
+    container: {
         marginHorizontal: "auto",
         flexDirection: "row",
         justifyContent: "center",

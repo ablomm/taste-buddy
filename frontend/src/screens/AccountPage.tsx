@@ -8,15 +8,20 @@ import {
   TouchableOpacity,
   RefreshControl,
   ScrollView,
+  FlatList,
+  SafeAreaView,
+  Alert,
 } from "react-native";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { UserContext } from "../providers/UserProvider";
 import Modal from "react-native-modal";
-import TBButton from "../components/TBButton";
 import { FontAwesome } from "@expo/vector-icons"; // or 'react-native-vector-icons/MaterialIcons'
 import Icon from "react-native-vector-icons/FontAwesome";
-import { getUserDetails } from "../functions/HTTPRequests";
+import { getRecipesInFolder, getUserDetails } from "../functions/HTTPRequests";
+import PostsGrid from "../components/PostsGrid";
+import RecipeListItem from "../components/RecipeListItem";
+import { LoadingContext } from "../providers/LoadingProvider";
 const fallbackProfilePicture = require("../../assets/profile.jpg");
 
 const Tab = createMaterialTopTabNavigator();
@@ -25,20 +30,8 @@ interface Post {
   id: number;
   content: string;
 }
-const RecentPostsScreen: (
-  {
-    posts,
-  }: {
-    posts: any;
-  },
-  refreshFunction,
-  refreshing
-) => React.JSX.Element = ({
-  posts,
-  refreshFunction,
-  refreshing,
-  userRecipes,
-}) => {
+
+const RecentPostsScreen = ({ posts, navigation, refreshFunction, refreshing, userRecipes }) => {
   return (
     <ScrollView
       refreshControl={
@@ -46,23 +39,7 @@ const RecentPostsScreen: (
       }
     >
       <View style={styles.screen}>
-        <View style={styles.postsContainer}>
-          {posts &&
-            posts.slice(-3).map((post) => (
-              <View key={post.id} style={styles.postContainer}>
-                <Image source={{ uri: post.image }} style={styles.postImage} />
-              </View>
-            ))}
-          {userRecipes &&
-            userRecipes.slice(-3).map((recipe) => (
-              <View key={recipe.id} style={styles.postContainer}>
-                <Image
-                  source={{ uri: recipe.recipeImage }}
-                  style={styles.postImage}
-                />
-              </View>
-            ))}
-        </View>
+        <PostsGrid posts={posts} navigation={navigation}></PostsGrid>
       </View>
     </ScrollView>
   );
@@ -73,12 +50,7 @@ interface SavedPostsScreenProps {
   content: string;
 }
 
-const SavedPostsScreen = ({
-  savedPosts1,
-  userFolders,
-  refreshFunction,
-  refreshing,
-}) => {
+const SavedPostsScreen = ({ savedPosts1, userFolders, refreshFunction, refreshing, navigation }) => {
   const [isModalVisible, setModalVisible] = useState(false); //for create folder button
   const [isModalVisible1, setModalVisible1] = useState(false); //for delete folder button
   const [isModalVisible2, setModalVisible2] = useState(true); //disable to show recipes in folder
@@ -90,6 +62,8 @@ const SavedPostsScreen = ({
 
   const userContext = React.useContext(UserContext) as any;
   const username = userContext.state.username;
+  const loadingContext = React.useContext(LoadingContext) as any;
+
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
@@ -110,8 +84,7 @@ const SavedPostsScreen = ({
   const addFolder = async (folderName) => {
     try {
       let response = await fetch(
-        `${
-          process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
+        `${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
         }/user/create-folder/${username}}`,
         {
           method: "POST",
@@ -140,8 +113,7 @@ const SavedPostsScreen = ({
   const deleteFolder = async (folderId) => {
     try {
       let response = await fetch(
-        `${
-          process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
+        `${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
         }/user/delete-folder/${username}}`,
         {
           method: "DELETE",
@@ -167,48 +139,15 @@ const SavedPostsScreen = ({
     toggleModal1();
   };
 
-  const getRecipesInFolder = async (folderName) => {
+  const _getRecipesInFolder = async (folderName) => {
+    loadingContext.enable();
     try {
-      let response = await fetch(
-        `${
-          process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
-        }/user/get-recipes-in-folder/${username}?folderName=${folderName}`,
-        {
-          method: "GET",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        }
-      );
-
-      if (response.status !== 200) {
-        console.error("got recipes in folder unsuccessfully");
-      } else {
-        await response.json().then((result) => {
-          let test = JSON.stringify(result);
-          let test1 = JSON.parse(test);
-
-          setRecipesInFolder(
-            test1[0].savedRecipes.filter(
-              (recipe) =>
-                recipe.folders.some(
-                  (folder) => folder.folderName === folderName
-                ) && recipe.isShowing === true
-            ) || []
-          );
-          console.log(
-            "recipes in folder " +
-              folderName +
-              ": " +
-              JSON.stringify(test1[0].savedRecipes)
-          );
-        });
-        console.log("got recipes in folder successfully");
-      }
+      setRecipesInFolder(await getRecipesInFolder(username, folderName))
     } catch (error: any) {
       console.error(error.stack);
+      Alert.alert("failure getting recipes");
+    } finally {
+      loadingContext.disable();
     }
     toggleModal2();
     toggleModal3();
@@ -236,20 +175,10 @@ const SavedPostsScreen = ({
             />
           </TouchableOpacity>
           <View style={styles.postsContainer}>
-            {recipesInFolder &&
-              recipesInFolder.map((post) => {
-                return (
-                  <TouchableOpacity style={styles.postContainer} key={post.id}>
-                    <View key={post.id} style={styles.postContainer}>
-                      <Image
-                        source={{ uri: post.recipe.recipeImage }}
-                        style={styles.postImage}
-                        key={post.id}
-                      />
-                    </View>
-                  </TouchableOpacity>
-                );
-              })}
+            {recipesInFolder && recipesInFolder.map(item => (
+              <RecipeListItem key={item.id} item={item} navigation={navigation} />
+            ))}
+
             {recipesInFolder.length === 0 && (
               <View style={styles.noRecipesText}>
                 <Text>No recipes in folder</Text>
@@ -295,7 +224,7 @@ const SavedPostsScreen = ({
                   style={styles.postContainer}
                   key={`${folder.id}-${Math.random()}`}
                   onPress={() => {
-                    getRecipesInFolder(folder.folderName);
+                    _getRecipesInFolder(folder.folderName);
                   }}
                   onLongPress={() => {
                     if (folder.id !== 1) {
@@ -383,7 +312,7 @@ const AccountPage = () => {
     fetchUserData();
   }, []);
 
-  const navigation = useNavigation();
+  const navigation: any = useNavigation();
 
   const navigateToSettings = () => {
     // Navigate to the settings page
@@ -395,8 +324,7 @@ const AccountPage = () => {
     try {
       //get posts
       const response = await fetch(
-        `${
-          process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
+        `${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
         }/post/get-posts/${username}`,
         {
           method: "GET",
@@ -418,8 +346,7 @@ const AccountPage = () => {
     try {
       //get posts
       const response = await fetch(
-        `${
-          process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
+        `${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
         }/recipe/get-recipes-for-user/${username}`,
         {
           method: "GET",
@@ -441,8 +368,7 @@ const AccountPage = () => {
     try {
       //get folders
       const response = await fetch(
-        `${
-          process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
+        `${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
         }/user/get-folders/${username}`,
         {
           method: "GET",
@@ -468,8 +394,7 @@ const AccountPage = () => {
     try {
       //get saved recipes
       const response = await fetch(
-        `${
-          process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
+        `${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
         }/user/get-saved-recipes/${username}`,
         {
           method: "GET",
@@ -528,6 +453,7 @@ const AccountPage = () => {
               posts ? (
                 <RecentPostsScreen
                   posts={posts}
+                  navigation={navigation}
                   userRecipes={userRecipes}
                   refreshFunction={onRefresh}
                   refreshing={refreshing}
@@ -545,6 +471,7 @@ const AccountPage = () => {
                   userFolders={userFolders}
                   refreshFunction={onRefresh}
                   refreshing={refreshing}
+                  navigation={navigation}
                 />
               ) : (
                 <Text>Loading ...</Text>
@@ -596,7 +523,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   profileDescription: {
-    
+
   },
   screen: {
     flex: 1,

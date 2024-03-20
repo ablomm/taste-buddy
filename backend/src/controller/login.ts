@@ -23,8 +23,7 @@ router.post("/", async (req: express.Request, res: express.Response) => {
     res.cookie("token", token, {
       httpOnly: true,
     })
-    res.json({"username": user.username, "id" : user.id})
-    res.sendStatus(200);
+    res.status(200).json({"username": user.username, "id" : user.id})
   } else {
     res.sendStatus(401);
   }

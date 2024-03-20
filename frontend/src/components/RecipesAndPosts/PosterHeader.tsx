@@ -5,7 +5,7 @@ import { UserContext } from '../../providers/UserProvider';
 
 const fallbackProfilePicture = require("../../../assets/profile.jpg");
 
-const PosterHeader = ({ userId, personalComponent = () => null}) => {
+const PosterHeader = ({ userId, personalComponent}) => {
     let [user, setUser] = useState({ username: "Unknown", profilePic: "" });
     let [owner, setOwner] = useState<boolean>(false);
 
