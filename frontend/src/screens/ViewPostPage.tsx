@@ -14,6 +14,7 @@ import { IconButton } from "react-native-paper";
 import TBButton from "../components/TBButton";
 import { deletePost } from "../functions/HTTPRequests";
 import { LoadingContext } from "../providers/LoadingProvider";
+import PostTabBar from "../components/PostTabBar";
 
 const ViewPostPage = ({ route }) => {
   let post = route.params;
@@ -34,10 +35,11 @@ const ViewPostPage = ({ route }) => {
 
   return (
     <View style={styles.container}>
-      <Header title="View Post" />
+      <Header />
       <ScrollView style={{ padding: 10 }}>
         <PosterHeader userId={userId} personalComponent={moreOptionsButton} />
         <Image style={styles.image} source={{ uri: post.image }} />
+        <PostTabBar />
         <Text style={styles.description}>{post.description}</Text>
       </ScrollView>
       <Modal
@@ -138,7 +140,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   description: {
-    fontSize: 20,
+    fontSize: 17,
     margin: 10,
   },
 });

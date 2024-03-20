@@ -73,7 +73,6 @@ const GalleryPage = ({navigation}:any) => {
         <View style={styles.container}>
             <View style={styles.headerWrapper}>
                 <View style={styles.headerLeftWrapper}>
-                    <View><BackButton navigation = {navigation}/></View>
                     <View style={styles.headerTiltleWrapper}><Text style={styles.headerTiltle}>Select an Image {`<_<`}</Text></View>
                 </View>
                 <View>

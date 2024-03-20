@@ -21,7 +21,8 @@ export default Header;
 const styles = StyleSheet.create({
     headerWrapper: {
         alignItems: 'center',
-        height: 60,
+        paddingTop: 10,
+        height: 35,
         backgroundColor: "white",
         display: 'flex',
         flexDirection: "row",
@@ -38,7 +39,7 @@ const styles = StyleSheet.create({
     },
     headerTiltle: {
         color: "#000",
-        fontSize: 20,
+        fontSize: 17,
         fontWeight: "700",
     },
 });
