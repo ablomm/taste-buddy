@@ -31,7 +31,13 @@ interface Post {
   content: string;
 }
 
-const RecentPostsScreen = ({ posts, navigation, refreshFunction, refreshing, userRecipes }) => {
+const RecentPostsScreen = ({
+  posts,
+  navigation,
+  refreshFunction,
+  refreshing,
+  userRecipes,
+}) => {
   return (
     <ScrollView
       refreshControl={
@@ -50,7 +56,13 @@ interface SavedPostsScreenProps {
   content: string;
 }
 
-const SavedPostsScreen = ({ savedPosts1, userFolders, refreshFunction, refreshing, navigation }) => {
+const SavedPostsScreen = ({
+  savedPosts1,
+  userFolders,
+  refreshFunction,
+  refreshing,
+  navigation,
+}) => {
   const [isModalVisible, setModalVisible] = useState(false); //for create folder button
   const [isModalVisible1, setModalVisible1] = useState(false); //for delete folder button
   const [isModalVisible2, setModalVisible2] = useState(true); //disable to show recipes in folder
@@ -63,7 +75,6 @@ const SavedPostsScreen = ({ savedPosts1, userFolders, refreshFunction, refreshin
   const userContext = React.useContext(UserContext) as any;
   const username = userContext.state.username;
   const loadingContext = React.useContext(LoadingContext) as any;
-
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
@@ -84,7 +95,8 @@ const SavedPostsScreen = ({ savedPosts1, userFolders, refreshFunction, refreshin
   const addFolder = async (folderName) => {
     try {
       let response = await fetch(
-        `${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
+        `${
+          process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
         }/user/create-folder/${username}}`,
         {
           method: "POST",
@@ -113,7 +125,8 @@ const SavedPostsScreen = ({ savedPosts1, userFolders, refreshFunction, refreshin
   const deleteFolder = async (folderId) => {
     try {
       let response = await fetch(
-        `${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
+        `${
+          process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
         }/user/delete-folder/${username}}`,
         {
           method: "DELETE",
@@ -142,7 +155,7 @@ const SavedPostsScreen = ({ savedPosts1, userFolders, refreshFunction, refreshin
   const _getRecipesInFolder = async (folderName) => {
     loadingContext.enable();
     try {
-      setRecipesInFolder(await getRecipesInFolder(username, folderName))
+      setRecipesInFolder(await getRecipesInFolder(username, folderName));
     } catch (error: any) {
       console.error(error.stack);
       Alert.alert("failure getting recipes");
@@ -175,9 +188,14 @@ const SavedPostsScreen = ({ savedPosts1, userFolders, refreshFunction, refreshin
             />
           </TouchableOpacity>
           <View style={styles.postsContainer}>
-            {recipesInFolder && recipesInFolder.map(item => (
-              <RecipeListItem key={item.id} item={item} navigation={navigation} />
-            ))}
+            {recipesInFolder &&
+              recipesInFolder.map((item) => (
+                <RecipeListItem
+                  key={item.id}
+                  item={item}
+                  navigation={navigation}
+                />
+              ))}
 
             {recipesInFolder.length === 0 && (
               <View style={styles.noRecipesText}>
@@ -306,7 +324,11 @@ const AccountPage = () => {
   const [savedPosts1, setSavedPosts] = useState();
   const [userFolders, setUserFolders] = useState();
   const [refreshing, setRefreshing] = useState(false);
-  const [userDetails, setUserDetails] = useState({ username: "Unknown", profilePic: "", description: "" });
+  const [userDetails, setUserDetails] = useState({
+    username: "Unknown",
+    profilePic: "",
+    description: "",
+  });
 
   useEffect(() => {
     fetchUserData();
@@ -324,7 +346,8 @@ const AccountPage = () => {
     try {
       //get posts
       const response = await fetch(
-        `${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
+        `${
+          process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
         }/post/get-posts/${username}`,
         {
           method: "GET",
@@ -346,7 +369,8 @@ const AccountPage = () => {
     try {
       //get posts
       const response = await fetch(
-        `${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
+        `${
+          process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
         }/recipe/get-recipes-for-user/${username}`,
         {
           method: "GET",
@@ -368,7 +392,8 @@ const AccountPage = () => {
     try {
       //get folders
       const response = await fetch(
-        `${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
+        `${
+          process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
         }/user/get-folders/${username}`,
         {
           method: "GET",
@@ -394,7 +419,8 @@ const AccountPage = () => {
     try {
       //get saved recipes
       const response = await fetch(
-        `${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
+        `${
+          process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
         }/user/get-saved-recipes/${username}`,
         {
           method: "GET",
@@ -430,12 +456,18 @@ const AccountPage = () => {
     <View style={styles.container}>
       <View style={styles.profileHeader}>
         <Image
-          source={userDetails.profilePic ? { uri: userDetails.profilePic } : fallbackProfilePicture}
+          source={
+            userDetails.profilePic
+              ? { uri: userDetails.profilePic }
+              : fallbackProfilePicture
+          }
           style={styles.profilePicture}
         />
         <View style={styles.userInfo}>
           <Text style={styles.username}>{username}</Text>
-          <Text style={styles.profileDescription}>{userDetails.description}</Text>
+          <Text style={styles.profileDescription}>
+            {userDetails.description}
+          </Text>
         </View>
 
         <TouchableOpacity>
@@ -447,8 +479,17 @@ const AccountPage = () => {
       </View>
 
       <NavigationContainer independent={true}>
-        <Tab.Navigator>
-          <Tab.Screen name="Recent Posts">
+        <Tab.Navigator
+          screenOptions={({}) => ({
+            tabBarStyle: {
+              backgroundColor: "rgba(160, 220, 95, 0.15)",
+            },
+            tabBarIndicatorStyle: {
+              backgroundColor: "#8CC84B",
+            },
+          })}
+        >
+          <Tab.Screen name="Your Posts">
             {() =>
               posts ? (
                 <RecentPostsScreen
@@ -499,7 +540,7 @@ const styles = StyleSheet.create({
     height: 30,
     fontSize: 27,
     marginLeft: 8,
-    color: "#00D387",
+    color: "#8CC84B",
   },
   profileHeader: {
     flexDirection: "row",
@@ -522,9 +563,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 5,
   },
-  profileDescription: {
-
-  },
+  profileDescription: {},
   screen: {
     flex: 1,
     backgroundColor: "#fff",

@@ -192,7 +192,7 @@ const ContentInteractionBar = ({ recipeID }) => {
       >
         <Icon
           name="bookmark"
-          style={[styles.icon, { color: isSaved ? "#00D387" : "#d3d3d3" }]}
+          style={[styles.icon, { color: isSaved ? "#8CC84B" : "#d3d3d3" }]}
         />
       </TouchableOpacity>
       <Modal
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
     height: 30,
     fontSize: 27,
     marginLeft: 8,
-    color: "#00D387",
+    color: "#8CC84B",
   },
   modalCenter: {
     alignItems: "center", // Center items horizontally

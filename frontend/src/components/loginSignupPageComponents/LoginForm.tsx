@@ -66,7 +66,7 @@ const LoginForm = () => {
                         value={values.password}
                         error={errors.password}
                     />
-                    <TBButton onPress={handleSubmit} title="Login" />
+                    <TBButton style={{ backgroundColor: "#FFFFFF", borderColor: "#000" }} onPress={handleSubmit} title="Login" />
                 </View>
             )}
         </Formik>
