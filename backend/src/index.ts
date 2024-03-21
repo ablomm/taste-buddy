@@ -2,7 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import'express-async-errors';
+import 'express-async-errors';
 import cookieParser from "cookie-parser";
 import userController from "./controller/user"
 import loginController from "./controller/login"
@@ -35,15 +35,17 @@ app.use('/s3', s3Controller);
 
 //error handler; must be last
 app.use((err: Error, req: express.Request, res: express.Response, next: express.RequestHandler) => {
-    console.error(err.stack);
-    res.status(500).json(err)
+  console.error(err.stack);
+  res.status(500).json(err)
 });
 
 const PORT = process.env.PORT || 8080
 
-app.listen(PORT, () => {
-  if (process.argv[2] == "-scripts") {
-      populateES();
-  }
-  console.log(`app listening on port ${PORT}`)
-})
+if (process.argv[2] == "-scripts") {
+  populateES();
+} else {
+  app.listen(PORT, () => {
+    console.log(`app listening on port ${PORT}`)
+  })
+}
+
