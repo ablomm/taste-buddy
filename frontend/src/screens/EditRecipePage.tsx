@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import { View, Text, StyleSheet, KeyboardAvoidingView, ScrollView, Platform } from "react-native";
+import { View, Text, StyleSheet, KeyboardAvoidingView, ScrollView, Platform, Alert } from "react-native";
 import * as yup from 'yup';
 import { Formik } from 'formik';
 import ValidatedInput from '../components/ValidatedInput';
@@ -13,11 +13,13 @@ import AddStepForm, { Step } from '../components/CreateRecipe/steps/AddStepForm'
 import EditStepForm from '../components/CreateRecipe/steps/EditStepForm';
 import StepListItem from '../components/CreateRecipe/steps/StepListItem';
 import {Recipe} from "../interfaces/RecipeInterface";
+import { LoadingContext } from '../providers/LoadingProvider';
 
 
 const EditRecipePage = ({ route, navigation }: any) => {
     const { recipe } = route.params;
     const userContext = React.useContext(UserContext) as any;
+    const loadingContext = React.useContext(LoadingContext) as any;
 
     // define validation rules for each field
     const recipeSchema = yup.object().shape({
@@ -191,9 +193,11 @@ const EditRecipePage = ({ route, navigation }: any) => {
             recipeImage: recipe.recipeImage,
             averageRating: recipe.averageRating,
             ingredients: assembleIngredientRecipe(),
-            instructions: assembleInstructionsRecipe()
+            instructions: assembleInstructionsRecipe(),
+            tags: data.tags
         };
 
+        loadingContext.enable();
         try {
             let response = await fetch(`${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"}/recipe/edit-recipe`, {  //save the recipe
                 method: 'PUT',
@@ -213,8 +217,10 @@ const EditRecipePage = ({ route, navigation }: any) => {
                 navigation.navigate('RecipePage', {recipe: newAssembledRecipe});
             }
         } catch (error: any) {
-            console.log("Edit error");
             console.error(error.stack);
+            Alert.alert("Error saving");
+        } finally {
+            loadingContext.disable();
         }
     };
 

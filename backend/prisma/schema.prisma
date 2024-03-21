@@ -4,7 +4,7 @@
 generator client {
   provider = "prisma-client-js"
 }
-  
+
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
@@ -14,6 +14,7 @@ model User {
   email        String             @unique
   username     String             @unique
   password     String
+  description  String             @default("")
   createDate   DateTime           @default(now())
   isModerator Boolean @default(false)
   savedRecipes UserSavedRecipes[]
@@ -39,10 +40,11 @@ model UserSavedRecipes {
 
 model Folder {
   id           Int                @id @default(autoincrement())
-  folderName   String             @unique
+  folderName   String
   userID       Int
   user         User               @relation(fields: [userID], references: [id])
   savedRecipes UserSavedRecipes[] @relation("UserSavedRecipesToFolders")
+  @@unique([userID, folderName])
 }
 
 model UserRejectedRecipes {
@@ -57,7 +59,7 @@ model DietaryPref {
   id                 Int                  @id @default(autoincrement())
   author             User                 @relation(fields: [authorID], references: [id])
   authorID           Int
-  dietaryPref        String               
+  dietaryPref        String
 }
 
 model Recipe {
@@ -71,10 +73,10 @@ model Recipe {
   cootTimeMinutes    Int
   calories           Int?
   servings           Int
-  recipeIngredients  RecipeIngredients[]
-  recipeInstructions RecipeInstructions[]
+  ingredients  RecipeIngredients[]
+  instructions RecipeInstructions[]
   recipeImage        String
-  tags               RecipeTags[]
+  tags               Tag[]                @relation("RecipeTags")
   usersSaved         UserSavedRecipes[]
   averageRating      Int                  @default(0)
 }
@@ -96,10 +98,10 @@ model RecipeInstructions {
   instruction String
 }
 
-model RecipeTags {
-  id     Int      @id @default(autoincrement())
-  tag    String
-  recipe Recipe[]
+model Tag {
+  id     Int       @id @default(autoincrement())
+  name    String   @unique
+  recipes Recipe[] @relation("RecipeTags")
 }
 
 model Posts {
@@ -112,6 +114,7 @@ model Posts {
   creationTime  DateTime    @default(now())
   userPosts     UserPosts[]
   postTags      PostTags[]
+  isDeleted     Boolean     @default(false)
 }
 model UserPosts {
   postID    Int     @unique

@@ -41,5 +41,5 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
 const PORT = process.env.PORT || 8080
 
 app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}`)
+  console.log(`app listening on port ${PORT}`)
 })

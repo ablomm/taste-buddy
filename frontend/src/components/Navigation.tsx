@@ -51,31 +51,25 @@ const LoggedOutNavigation = () => (
 
 const SignedInNavigation = () => (
   <NavigationContainer>
-    <Tab.Navigator initialRouteName='ExplorePage' screenOptions={tabBarOptions} sceneContainerStyle={{ backgroundColor: 'transparent' }}/*tabBar={props => <NavBar {...props} />}*/>
+    <Tab.Navigator initialRouteName='AccountPageStack' screenOptions={tabBarOptions} sceneContainerStyle={{ backgroundColor: 'transparent' }}/*tabBar={props => <NavBar {...props} />}*/>
       <Tab.Screen
-        name='ExplorePage'
-        component={ExplorePage}
+        name='CreatePostOrRecipeStack'
+        component={CreatePostOrRecipeStack}
         options={{
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="planet-outline" size={size} color={color} />),
+            <Ionicons name="add-outline" size={size + 10} color={color} />),
+          tabBarActiveTintColor: 'green',
+          tabBarInactiveTintColor: 'gray',
         }}
       />
-
       <Tab.Screen
         name='SearchPageStack'
         component={SearchPageStack}
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="search-outline" size={size} color={color} />),
-        }}
-      />
-
-      <Tab.Screen
-        name='CreatePostOrRecipeStack'
-        component={CreatePostOrRecipeStack}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="add-outline" size={size + 20} color={color} />),
+          tabBarActiveTintColor: 'green',
+          tabBarInactiveTintColor: 'gray',
         }}
       />
 
@@ -85,6 +79,8 @@ const SignedInNavigation = () => (
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="star-outline" size={size} color={color} />),
+          tabBarActiveTintColor: 'green',
+          tabBarInactiveTintColor: 'gray',
         }}
       />
 
@@ -94,6 +90,8 @@ const SignedInNavigation = () => (
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home-outline" size={size} color={color} />),
+          tabBarActiveTintColor: 'green',
+          tabBarInactiveTintColor: 'gray',
         }}
       />
     </Tab.Navigator>
@@ -109,7 +107,10 @@ const CreatePostOrRecipeStack = () => (
 const AccountPageStack = () => (
   <Stack.Navigator initialRouteName='AccountPage' screenOptions={stackOptions}>
     <Stack.Screen name='AccountPage' component={AccountPage} />
+    <Stack.Screen name='ViewPostPage' component={ViewPostPage} />
+    <Stack.Screen name='RecipePage' component={RecipePage} />
     <Stack.Screen name='SettingsPage' component={SettingsPage} />
+    <Stack.Screen name='EditRecipePage' component={EditRecipePage} />
     <Stack.Screen name='DietaryPreference' component={DietaryPreference} />
   </Stack.Navigator>
 );
@@ -118,8 +119,8 @@ const SearchPageStack = () => (
   <Stack.Navigator initialRouteName='SearchPage' screenOptions={stackOptions}>
     <Stack.Screen name='SearchPage' component={SearchPage} />
     <Stack.Screen name='ViewPostPage' component={ViewPostPage} />
-      <Stack.Screen name='RecipePage' component={RecipePage} />
-      <Stack.Screen name='EditRecipePage' component={EditRecipePage} />
+    <Stack.Screen name='RecipePage' component={RecipePage} />
+    <Stack.Screen name='EditRecipePage' component={EditRecipePage} />
   </Stack.Navigator>
 );
 const RecommenderPageStack = () => (

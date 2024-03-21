@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexGrow: 1,
     height: 40,
-    backgroundColor: "#6752EC",
+    backgroundColor: "#8CC84B",
     color: "white",
     borderWidth: 0,
   },

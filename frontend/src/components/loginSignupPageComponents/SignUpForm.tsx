@@ -105,7 +105,7 @@ const SignUpForm = () => {
                         />
 
                         {/* <Button title="Sign Up" color={"black"}></Button> */}
-                        <TBButton onPress={handleSubmit} title="Sign Up" />
+                        <TBButton style={{ backgroundColor: "#FFFFFF", borderColor: "#000" }} onPress={handleSubmit} title="Sign Up" />
                     </View>)}
             </Formik>
         </>);

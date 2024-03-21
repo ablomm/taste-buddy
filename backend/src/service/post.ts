@@ -46,10 +46,22 @@ export async function createPost(userID: number|any, description: string, tags: 
     return post.id;
 }
 
+export async function deletePost(postID:number){
+    await prisma.posts.update({
+        where: {
+          id: postID
+        },
+        data: {
+            isDeleted:true
+    }})
+    console.log("Post Deleted ...");
+}
+
 export async function getPostsByUserAndID(userID: number|undefined) {
     return await prisma.posts.findMany({
         where: {
-            author: userID
+            author: userID,
+            isDeleted: false
         },
     });
 }
@@ -59,6 +71,9 @@ export async function getPostsByPage(page: number) {
     const postsPerPage = 21;
 
     return await prisma.posts.findMany({
+        where: {
+            isDeleted: false
+        },
         skip: postsPerPage * page,
         take: postsPerPage,
     })

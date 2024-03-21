@@ -83,6 +83,16 @@ export async function setProfilePicOfUser(username:string, profilePic: string){
         },
     });
 }
+export async function setProfileDescription(username:string, description: string){
+    const updateUser = await prisma.user.update({
+        where: {
+            username: username,
+        },
+        data: {
+            description:description
+        },
+    });
+}
 
 export async function addDietaryPref(username: string, dietaryPref: string) {
     const updateUser = await prisma.user.update({
@@ -102,7 +112,7 @@ export async function addDietaryPref(username: string, dietaryPref: string) {
 
 export async function saveRecipeToFolder(recipeID: number, userID: any, folderID: any) {
     //check if saved already
-    
+
     for (let i=0; i<folderID.length;i++) {
 
         const existingFolder = await prisma.folder.findUnique({ //check if folder exists first
@@ -127,7 +137,7 @@ export async function saveRecipeToFolder(recipeID: number, userID: any, folderID
             console.log("Folder doesn't exist!")
         }
     }
-} 
+}
 
 export async function saveRecipe(recipeID: number, userID: any) {
     //check if saved already
@@ -140,8 +150,8 @@ export async function saveRecipe(recipeID: number, userID: any) {
         }
     });
 
-    //check if folder 0 exists already
-    const existingFolder0 = await prisma.folder.findUnique({
+    //check if folder 0 exists already (this is unique)
+    const existingFolder0 = await prisma.folder.findFirst({
         where: {
             userID: userID,
             folderName: 'All'
@@ -365,28 +375,6 @@ export async function deleteFolder(folderID: any) {
     const user = await prisma.folder.delete({
         where: {
             id: folderID,
-        },
-    })
-
-    return user;
-}
-
-export async function getRecipesInFolder(userID: any, folderName: any) {
-    const user = await prisma.user.findMany({
-        where: {
-            id: userID,
-        },
-        include: {
-            savedRecipes: {
-                include: {
-                    recipe: true,
-                    folders: {
-                        where: {
-                            folderName: folderName,
-                        },
-                    },
-                },
-            },
         },
     })
 
