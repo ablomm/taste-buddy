@@ -68,7 +68,7 @@ for _, row in ingredients_df.iterrows():
 ingredients_to_insert = pd.DataFrame(rows)
 # set default values and ensure numeric for amount
 ingredients_to_insert['measurementType']= ""
-ingredients_to_insert['amount'] = pd.to_numeric(ingredients_to_insert['amount'], errors='coerce').fillna(0)
+ingredients_to_insert['amount'] = pd.to_numeric(ingredients_to_insert['amount'], errors='coerce').fillna(1)
 
 # insert to database
 try:
