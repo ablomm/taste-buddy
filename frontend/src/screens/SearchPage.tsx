@@ -1,7 +1,7 @@
 import React from 'react';
 import {View, StyleSheet} from 'react-native';
 import SearchBar from '../components/SearchBar';
-import PostsGrid from '../components/PostsGrid';
+import AllPostsGrid from '../components/AllPostsGrid';
 import SearchResultBody from "../components/SearchPageComponents/SearchResultBody";
 
 
@@ -56,7 +56,7 @@ const SearchPage = ({navigation}: any) => {
                 />
                 :
                 /* When not searching display recommendations */
-                <PostsGrid />
+                <AllPostsGrid />
             }
         </View>
     );

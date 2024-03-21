@@ -73,7 +73,6 @@ const GalleryPage = ({navigation}:any) => {
         <View style={styles.container}>
             <View style={styles.headerWrapper}>
                 <View style={styles.headerLeftWrapper}>
-                    <View><BackButton navigation = {navigation}/></View>
                     <View style={styles.headerTiltleWrapper}><Text style={styles.headerTiltle}>Select an Image {`<_<`}</Text></View>
                 </View>
                 <View>
@@ -127,7 +126,7 @@ export const styles = StyleSheet.create(
             
         },
         pickedImageIcon:{
-            color:"#0029FF",
+            color:"green",
             alignItems:"center",
             position:"absolute",
             top: "20%",
@@ -145,7 +144,7 @@ export const styles = StyleSheet.create(
             flex: 1,
             flexGrow: 1,
             height: 40,
-            backgroundColor: "#6752EC",
+            backgroundColor: "#8CC84B",
             color: "white",
             borderWidth: 0,
         },

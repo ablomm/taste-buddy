@@ -8,15 +8,20 @@ import {
   TouchableOpacity,
   RefreshControl,
   ScrollView,
+  Alert,
 } from "react-native";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import { NavigationContainer, useNavigation } from "@react-navigation/native";
+import { NavigationContainer, useNavigation, useFocusEffect } from "@react-navigation/native";
 import { UserContext } from "../providers/UserProvider";
 import Modal from "react-native-modal";
-import TBButton from "../components/TBButton";
 import { FontAwesome } from "@expo/vector-icons"; // or 'react-native-vector-icons/MaterialIcons'
 import Icon from "react-native-vector-icons/FontAwesome";
-import { getUserDetails } from "../functions/HTTPRequests";
+import { getRecipesInFolder, getUserDetails } from "../functions/HTTPRequests";
+import PostsGrid from "../components/PostsGrid";
+import RecipeListItem from "../components/RecipeListItem";
+import { LoadingContext } from "../providers/LoadingProvider";
+import { TouchableRipple } from "react-native-paper";
+const fallbackProfilePicture = require("../../assets/profile.jpg");
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -24,16 +29,10 @@ interface Post {
   id: number;
   content: string;
 }
-const RecentPostsScreen: (
-  {
-    posts,
-  }: {
-    posts: any;
-  },
-  refreshFunction,
-  refreshing
-) => React.JSX.Element = ({
+
+const RecentPostsScreen = ({
   posts,
+  navigation,
   refreshFunction,
   refreshing,
   userRecipes,
@@ -43,25 +42,10 @@ const RecentPostsScreen: (
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={refreshFunction} />
       }
+      style={{ backgroundColor: "white" }}
     >
       <View style={styles.screen}>
-        <View style={styles.postsContainer}>
-          {posts &&
-            posts.slice(-3).map((post) => (
-              <View key={post.id} style={styles.postContainer}>
-                <Image source={{ uri: post.image }} style={styles.postImage} />
-              </View>
-            ))}
-          {userRecipes &&
-            userRecipes.slice(-3).map((recipe) => (
-              <View key={recipe.id} style={styles.postContainer}>
-                <Image
-                  source={{ uri: recipe.recipeImage }}
-                  style={styles.postImage}
-                />
-              </View>
-            ))}
-        </View>
+        <PostsGrid posts={posts} navigation={navigation}></PostsGrid>
       </View>
     </ScrollView>
   );
@@ -77,6 +61,7 @@ const SavedPostsScreen = ({
   userFolders,
   refreshFunction,
   refreshing,
+  navigation,
 }) => {
   const [isModalVisible, setModalVisible] = useState(false); //for create folder button
   const [isModalVisible1, setModalVisible1] = useState(false); //for delete folder button
@@ -89,6 +74,7 @@ const SavedPostsScreen = ({
 
   const userContext = React.useContext(UserContext) as any;
   const username = userContext.state.username;
+  const loadingContext = React.useContext(LoadingContext) as any;
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
@@ -109,8 +95,7 @@ const SavedPostsScreen = ({
   const addFolder = async (folderName) => {
     try {
       let response = await fetch(
-        `${
-          process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
+        `${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
         }/user/create-folder/${username}}`,
         {
           method: "POST",
@@ -133,14 +118,16 @@ const SavedPostsScreen = ({
     } catch (error: any) {
       console.error(error.stack);
     }
+
+    refreshFunction();
+
     toggleModal();
   };
 
   const deleteFolder = async (folderId) => {
     try {
       let response = await fetch(
-        `${
-          process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
+        `${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
         }/user/delete-folder/${username}}`,
         {
           method: "DELETE",
@@ -163,51 +150,21 @@ const SavedPostsScreen = ({
     } catch (error: any) {
       console.error(error.stack);
     }
+
+    refreshFunction();
+
     toggleModal1();
   };
 
-  const getRecipesInFolder = async (folderName) => {
+  const _getRecipesInFolder = async (folderName) => {
+    loadingContext.enable();
     try {
-      let response = await fetch(
-        `${
-          process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
-        }/user/get-recipes-in-folder/${username}?folderName=${folderName}`,
-        {
-          method: "GET",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        }
-      );
-
-      if (response.status !== 200) {
-        console.error("got recipes in folder unsuccessfully");
-      } else {
-        await response.json().then((result) => {
-          let test = JSON.stringify(result);
-          let test1 = JSON.parse(test);
-
-          setRecipesInFolder(
-            test1[0].savedRecipes.filter(
-              (recipe) =>
-                recipe.folders.some(
-                  (folder) => folder.folderName === folderName
-                ) && recipe.isShowing === true
-            ) || []
-          );
-          console.log(
-            "recipes in folder " +
-              folderName +
-              ": " +
-              JSON.stringify(test1[0].savedRecipes)
-          );
-        });
-        console.log("got recipes in folder successfully");
-      }
+      setRecipesInFolder(await getRecipesInFolder(username, folderName));
     } catch (error: any) {
       console.error(error.stack);
+      Alert.alert("failure getting recipes");
+    } finally {
+      loadingContext.disable();
     }
     toggleModal2();
     toggleModal3();
@@ -236,19 +193,14 @@ const SavedPostsScreen = ({
           </TouchableOpacity>
           <View style={styles.postsContainer}>
             {recipesInFolder &&
-              recipesInFolder.map((post) => {
-                return (
-                  <TouchableOpacity style={styles.postContainer} key={post.id}>
-                    <View key={post.id} style={styles.postContainer}>
-                      <Image
-                        source={{ uri: post.recipe.recipeImage }}
-                        style={styles.postImage}
-                        key={post.id}
-                      />
-                    </View>
-                  </TouchableOpacity>
-                );
-              })}
+              recipesInFolder.map((item) => (
+                <RecipeListItem
+                  key={item.id}
+                  item={item}
+                  navigation={navigation}
+                />
+              ))}
+
             {recipesInFolder.length === 0 && (
               <View style={styles.noRecipesText}>
                 <Text>No recipes in folder</Text>
@@ -256,16 +208,18 @@ const SavedPostsScreen = ({
             )}
           </View>
         </View>
+
+
         <View style={{ display: isModalVisible2 ? "flex" : "none" }}>
-          <View style={styles.postsContainer}>
-            <TouchableOpacity onPress={toggleModal} style={styles.addButton}>
+          <View style={styles.plusContainerContainer}>
+            <TouchableRipple onPress={toggleModal} style={styles.plusContainer}>
               <FontAwesome
                 name="plus"
                 size={40}
                 color="white"
                 style={styles.plusIcon}
               />
-            </TouchableOpacity>
+            </TouchableRipple>
             <Modal
               isVisible={isModalVisible}
               style={styles.modalCenter}
@@ -280,21 +234,23 @@ const SavedPostsScreen = ({
                   value={folderName}
                   onChangeText={(text) => setFolderName(text)}
                 />
-                <TouchableOpacity
+                <TouchableRipple
                   style={styles.addFolderButton}
                   onPress={() => addFolder(folderName)}
                 >
                   <Text style={styles.addButtonLabel}>Add Folder</Text>
-                </TouchableOpacity>
+                </TouchableRipple>
               </View>
             </Modal>
+          </View>
+          <View style={styles.folderContainer}>
             {userFolders.map((folder) => {
               return (
-                <TouchableOpacity
+                <TouchableRipple
                   style={styles.postContainer}
                   key={`${folder.id}-${Math.random()}`}
                   onPress={() => {
-                    getRecipesInFolder(folder.folderName);
+                    _getRecipesInFolder(folder.folderName);
                   }}
                   onLongPress={() => {
                     if (folder.id !== 1) {
@@ -302,62 +258,64 @@ const SavedPostsScreen = ({
                     }
                   }}
                 >
-                  <View
-                    key={`${folder.id}-${Math.random()}`}
-                    style={styles.folders}
-                  >
-                    <Text
-                      style={styles.addButtonLabel}
-                      key={`${folder.id}-${Math.random()}`}
-                    >
-                      {folder.folderName}
-                    </Text>
-                  </View>
-                  <Modal
-                    isVisible={isModalVisible1}
-                    style={styles.modalCenter}
-                    onBackdropPress={toggleModal1}
-                    key={`${folder.id}-${Math.random()}`}
-                  >
+                  <>
                     <View
-                      style={styles.modalContent}
                       key={`${folder.id}-${Math.random()}`}
+                      style={styles.folders}
                     >
                       <Text
-                        style={styles.modalTitle}
+                        style={styles.addButtonLabel}
                         key={`${folder.id}-${Math.random()}`}
                       >
-                        Delete Folder?
+                        {folder.folderName}
                       </Text>
+                    </View>
+                    <Modal
+                      isVisible={isModalVisible1}
+                      style={styles.modalCenter}
+                      onBackdropPress={toggleModal1}
+                      key={`${folder.id}-${Math.random()}`}
+                    >
                       <View
-                        style={styles.deleteContainer}
+                        style={styles.modalContent}
                         key={`${folder.id}-${Math.random()}`}
                       >
-                        <TouchableOpacity
-                          style={styles.addFolderButton1}
+                        <Text
+                          style={styles.modalTitle}
                           key={`${folder.id}-${Math.random()}`}
-                          onPress={() => {
-                            deleteFolder(folder.id);
-                          }}
                         >
-                          <Text
-                            style={styles.addButtonLabel}
+                          Delete Folder?
+                        </Text>
+                        <View
+                          style={styles.deleteContainer}
+                          key={`${folder.id}-${Math.random()}`}
+                        >
+                          <TouchableRipple
+                            style={styles.addFolderButton1}
                             key={`${folder.id}-${Math.random()}`}
+                            onPress={() => {
+                              deleteFolder(folder.id);
+                            }}
                           >
-                            Yes
-                          </Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          style={styles.addFolderButton2}
-                          key={`${folder.id}-${Math.random()}`}
-                          onPress={() => toggleModal1()}
-                        >
-                          <Text style={styles.addButtonLabel}>No</Text>
-                        </TouchableOpacity>
+                            <Text
+                              style={styles.addButtonLabel}
+                              key={`${folder.id}-${Math.random()}`}
+                            >
+                              Yes
+                            </Text>
+                          </TouchableRipple>
+                          <TouchableRipple
+                            style={styles.addFolderButton2}
+                            key={`${folder.id}-${Math.random()}`}
+                            onPress={() => toggleModal1()}
+                          >
+                            <Text style={styles.addButtonLabel}>No</Text>
+                          </TouchableRipple>
+                        </View>
                       </View>
-                    </View>
-                  </Modal>
-                </TouchableOpacity>
+                    </Modal>
+                  </>
+                </TouchableRipple>
               );
             })}
           </View>
@@ -379,13 +337,10 @@ const AccountPage = () => {
   const [userDetails, setUserDetails] = useState({
     username: "Unknown",
     profilePic: "",
+    description: "",
   });
 
-  useEffect(() => {
-    fetchUserData();
-  }, []);
-
-  const navigation = useNavigation();
+  const navigation: any = useNavigation();
 
   const navigateToSettings = () => {
     // Navigate to the settings page
@@ -397,8 +352,7 @@ const AccountPage = () => {
     try {
       //get posts
       const response = await fetch(
-        `${
-          process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
+        `${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
         }/post/get-posts/${username}`,
         {
           method: "GET",
@@ -412,7 +366,6 @@ const AccountPage = () => {
 
       await response.json().then((result) => {
         setPosts(result);
-        console.log("recent posts: ", result);
       });
     } catch (error) {
       console.error(error);
@@ -421,8 +374,7 @@ const AccountPage = () => {
     try {
       //get posts
       const response = await fetch(
-        `${
-          process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
+        `${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
         }/recipe/get-recipes-for-user/${username}`,
         {
           method: "GET",
@@ -436,7 +388,6 @@ const AccountPage = () => {
 
       await response.json().then((result) => {
         setUserRecipes(result);
-        console.log("recent recipes: ", result);
       });
     } catch (error) {
       console.error(error);
@@ -445,8 +396,7 @@ const AccountPage = () => {
     try {
       //get folders
       const response = await fetch(
-        `${
-          process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
+        `${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
         }/user/get-folders/${username}`,
         {
           method: "GET",
@@ -472,8 +422,7 @@ const AccountPage = () => {
     try {
       //get saved recipes
       const response = await fetch(
-        `${
-          process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
+        `${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
         }/user/get-saved-recipes/${username}`,
         {
           method: "GET",
@@ -505,15 +454,28 @@ const AccountPage = () => {
     }, 1000);
   }, []);
 
+  useFocusEffect(
+    React.useCallback(() => {
+      onRefresh();
+    }, [])
+  );
+
   return (
     <View style={styles.container}>
       <View style={styles.profileHeader}>
         <Image
-          source={{ uri: userDetails.profilePic }}
+          source={
+            userDetails.profilePic
+              ? { uri: userDetails.profilePic }
+              : fallbackProfilePicture
+          }
           style={styles.profilePicture}
         />
         <View style={styles.userInfo}>
           <Text style={styles.username}>{username}</Text>
+          <Text style={styles.profileDescription}>
+            {userDetails.description}
+          </Text>
         </View>
 
         <TouchableOpacity>
@@ -525,12 +487,23 @@ const AccountPage = () => {
       </View>
 
       <NavigationContainer independent={true}>
-        <Tab.Navigator>
-          <Tab.Screen name="Recent Posts">
+        <Tab.Navigator
+          sceneContainerStyle={{ backgroundColor: 'transparent' }}
+          screenOptions={({ }) => ({
+            tabBarStyle: {
+              backgroundColor: "rgba(160, 220, 95, 0.15)",
+            },
+            tabBarIndicatorStyle: {
+              backgroundColor: "#8CC84B",
+            },
+          })}
+        >
+          <Tab.Screen name="Your Posts">
             {() =>
               posts ? (
                 <RecentPostsScreen
                   posts={posts}
+                  navigation={navigation}
                   userRecipes={userRecipes}
                   refreshFunction={onRefresh}
                   refreshing={refreshing}
@@ -548,6 +521,7 @@ const AccountPage = () => {
                   userFolders={userFolders}
                   refreshFunction={onRefresh}
                   refreshing={refreshing}
+                  navigation={navigation}
                 />
               ) : (
                 <Text>Loading ...</Text>
@@ -575,7 +549,7 @@ const styles = StyleSheet.create({
     height: 30,
     fontSize: 27,
     marginLeft: 8,
-    color: "#00D387",
+    color: "#8CC84B",
   },
   profileHeader: {
     flexDirection: "row",
@@ -598,6 +572,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 5,
   },
+  profileDescription: {},
   screen: {
     flex: 1,
     backgroundColor: "#fff",
@@ -613,12 +588,25 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     justifyContent: "space-between",
   },
-  postContainer: {
-    width: "48%",
+  plusContainerContainer: {
+    flex: 1,
+    flexGrow: 50,
+    width: "100%",
     marginBottom: 10,
     marginTop: 10,
     justifyContent: "center",
     alignItems: "center",
+  },
+  postContainer: {
+    flex: 1,
+    minWidth: 100,
+    maxWidth: 100,
+    height: 100,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 1,
+    borderWidth: 1,
+    borderColor: "#fff"
   },
   postImage: {
     width: 100,
@@ -631,13 +619,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   addButton: {
-    marginLeft: 50,
-    marginTop: 30,
     borderRadius: 5,
     backgroundColor: "#8CC84B",
     alignItems: "center", // Center items horizontally
     justifyContent: "center",
-    width: 50,
+    width: '95%',
     height: 55,
   },
   backIcon: {
@@ -645,14 +631,26 @@ const styles = StyleSheet.create({
     paddingLeft: 5,
   },
   folders: {
-    marginRight: 15,
-    marginTop: 10,
     borderRadius: 5,
     backgroundColor: "rgba(140, 200, 75, 0.9)",
     alignItems: "center", // Center items horizontally
     justifyContent: "center",
-    width: 95,
-    height: 95,
+    width: '100%',
+    height: '100%',
+  },
+  folderContainer: {
+    marginHorizontal: "auto",
+    flexDirection: "row",
+    justifyContent: "center",
+    flexWrap: "wrap",
+  },
+  plusContainer: {
+    borderRadius: 5,
+    backgroundColor: "rgba(100, 150, 55, 0.9)",
+    alignItems: "center", // Center items horizontally
+    justifyContent: "center",
+    width: '95%',
+    height: 60,
   },
   foldersLabel: {
     color: "#fff",

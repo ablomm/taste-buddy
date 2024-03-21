@@ -1,6 +1,7 @@
 import express, {Response, Request} from 'express';
 import { PrismaClient } from '@prisma/client';
-import {createUser, setProfilePicOfUser, getModeratorStatus, addDietaryPref, getUserById, saveRecipe, getSavedRecipes, getUserByUsername, deleteSavedRecipe, createFolder, getUserFolders, deleteFolder, getRecipesInFolder, saveRecipeToFolder, rejectRecipe} from '../service/user';
+import {createUser, setProfilePicOfUser, setProfileDescription, getModeratorStatus, addDietaryPref, getUserById, saveRecipe, getSavedRecipes, getUserByUsername, deleteSavedRecipe, createFolder, getUserFolders, deleteFolder, saveRecipeToFolder, rejectRecipe} from '../service/user';
+import { getRecipesInFolder } from '../service/recipe';
 import { generateUploadURL } from '../service/s3';
 const prisma = new PrismaClient();
 const router = express.Router();
@@ -39,7 +40,8 @@ router.get("/id/:id", async (req: express.Request, res: express.Response) => {
 
   return res.send({
     username: user?.username,
-    profilePic: user?.profilePic
+    profilePic: user?.profilePic,
+    description: user?.description
   })
 })
 
@@ -77,6 +79,22 @@ router.post("/update-profile/profilePic", async (req: express.Request, res: expr
     console.log("update profile pic userid : " + username);
 
     await setProfilePicOfUser(username, profilePic)
+
+    res.sendStatus(200);
+  } catch(error) {
+    console.error(error);
+  }
+});
+
+router.post("/update-profile/description", async (req: express.Request, res: express.Response) => {
+  try {
+    const { username,
+      description
+    } = req.body;
+
+    console.log("update profile description userid : " + username);
+
+    await setProfileDescription(username, description)
 
     res.sendStatus(200);
   } catch(error) {
@@ -151,7 +169,7 @@ router.get("/get-mod-status/:username", async (req: express.Request, res: expres
 // get recipes from a folder
 router.get("/get-recipes-in-folder/:username", async (req: express.Request, res: express.Response) => {
   const username: string = req.params["username"]
-  const folderName: string = req.params.folderName;
+  const folderName: string = req.query["folderName"] as string;
   const resultString: string = username.endsWith('}') ? username.slice(0, -1) : username; //remove the curly brackets thats at the end for some reason
 
   const user = await getUserByUsername(resultString);

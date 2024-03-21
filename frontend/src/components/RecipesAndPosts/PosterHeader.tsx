@@ -1,19 +1,33 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image} from "react-native";
-import {IconButton} from "react-native-paper";
+import { getUserDetails } from '../../functions/HTTPRequests';
+import { UserContext } from '../../providers/UserProvider';
 
-const PosterHeader = ({ owner, editFunction }) => {
+const fallbackProfilePicture = require("../../../assets/profile.jpg");
+
+const PosterHeader = ({ userId, personalComponent}) => {
+    let [user, setUser] = useState({ username: "Unknown", profilePic: "" });
+    let [owner, setOwner] = useState<boolean>(false);
+
+    const userContext = React.useContext(UserContext) as any;
+    
+    useEffect(() => {
+        async function setUserDetails() {
+            setUser(await getUserDetails(userId))
+        }
+        setOwner(userId==userContext.state.userId);
+        setUserDetails();
+    }, [userId])
+    
     return(
         <View style={styles.container}>
             <View style={styles.subContainer}>
-                <Image source={require("../../../assets/no-image.png")} style={styles.profileImage}/>
-                <Text style={styles.profileUsername}>username</Text>
+                <Image source={user.profilePic ? {uri: user.profilePic} : fallbackProfilePicture} style={styles.profileImage}/>
+                <Text style={styles.profileUsername}>{user.username}</Text>
             </View>
             { owner ?
                 <View>
-                    <IconButton icon="pencil"
-                                size={16}
-                                onPress={editFunction} />
+                    {personalComponent()}
                 </View>
                 :
                 null

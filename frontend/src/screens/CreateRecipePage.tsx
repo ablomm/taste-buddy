@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TextInput, StyleSheet, KeyboardAvoidingView, ScrollView, Image, Platform, Alert, ActivityIndicator } from "react-native";
+import { View, Text, StyleSheet, KeyboardAvoidingView, ScrollView, Image, Platform, Alert } from "react-native";
 import * as yup from 'yup';
 import { Formik} from 'formik';
 import ValidatedInput from '../components/ValidatedInput';
@@ -284,7 +284,15 @@ const CreateRecipePage = ({ route, navigation }: any) => {
                   error={errors.title}
                 />
 
-                <Text style={styles.header}>Instructions*</Text>
+                <Text style={styles.header}>Ingredients</Text>
+                <View style={styles.multiContainer}>
+                  {ingredients.map((ingredient, index) => {
+                    return (<IngredientListItem onPress={() => { openEditIngredientForm(index) }} ingredient={ingredient} key={index} />);
+                  })}
+                  <TBButton style={styles.addButton} onPress={() => setIngredientsModalVisible(true)} title="+" />
+                </View>
+
+                <Text style={styles.header}>Instructions</Text>
                 <View style={styles.multiContainer}>
                   {steps.map((step, index) => {
                     return (<StepListItem onPress={() => { openEditStepForm(index) }} item={step} index={index} key={index} />);
@@ -333,14 +341,6 @@ const CreateRecipePage = ({ route, navigation }: any) => {
                   error={errors.servings}
                 />
 
-                <Text style={styles.header}>Ingredients</Text>
-                <View style={styles.multiContainer}>
-                  {ingredients.map((ingredient, index) => {
-                    return (<IngredientListItem onPress={() => { openEditIngredientForm(index) }} ingredient={ingredient} key={index} />);
-                  })}
-                  <TBButton style={styles.addButton} onPress={() => setIngredientsModalVisible(true)} title="+" />
-                </View>
-
                 <Text style={styles.header}>Tags</Text>
                 <View style={styles.multiContainer}>
                   {tags.map((tag, index) => {
@@ -367,7 +367,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexGrow: 1,
     height: 40,
-    backgroundColor: "#6752EC",
+    backgroundColor: "#8CC84B",
     color: "white",
     borderWidth: 0,
   },

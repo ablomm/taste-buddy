@@ -1,5 +1,5 @@
-import React, {useState} from "react";
-import { StyleSheet, Text, TextInput, View, Keyboard, Button, Image } from "react-native";
+import React from "react";
+import { StyleSheet, View, Image } from "react-native";
 
 const Post = ({ imageUrl }: any) => {
     return (

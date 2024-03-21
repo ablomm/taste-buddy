@@ -1,6 +1,6 @@
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, SafeAreaView } from 'react-native';
+import { StyleSheet, SafeAreaView , View, Image, Text} from 'react-native';
 import Navigation from "../components/Navigation";
 import UserProvider, { UserContext } from '../providers/UserProvider';
 import LoadingIcon from './LoadingIcon';
@@ -35,10 +35,21 @@ const TasteBuddy = () => {
         checkJWT(userContext);
     }, [])
 
+    const username = userContext.state.username;
+
     return (
         <>
             <LoadingIcon />
             <SafeAreaView style={styles.container}>
+                {username && ( //only show header when logged in (when username not null)
+                    <View style={{ alignItems: 'center', flexDirection: 'row', justifyContent: 'center'}}>
+                        <Image
+                            source={require("../../assets/logo/Logo.png")}
+                            style={{ height: 42.7, width: 135.1, marginRight: 10}}
+                        />
+                        <Text >t a s t e b u d d y</Text>
+                    </View>
+                )}
                 <Navigation />
                 <StatusBar style="auto" />
             </SafeAreaView>
