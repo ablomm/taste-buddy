@@ -20,10 +20,9 @@ import {
     deleteReview, 
     getRecipeRating, 
     processTags,
-    getRecipeRating,
     getPersonalizedRecipes,
-    getTopRatedRecipes
-
+    getTopRatedRecipes,
+    getRecipesByIDs
 } from '../service/recipe';
 import { getUserByUsername, getProfilePhotoByUsername, getSavedRecipeIDs, getRejectedRecipeIDs } from "../service/user";
 import {editRecipe, storeRecipe} from "../service/search";
@@ -117,7 +116,7 @@ router.get("/batch/:num", async (req: express.Request, res: express.Response) =>
     }
 });
 
-interface Recipe {
+interface DatasetRecipe {
     RecipeId: number | 0;
     Name: string;
     CookTime: string | null;
@@ -133,7 +132,7 @@ interface Recipe {
     RecipeInstructions: string[];
 }
 
-const convertToRecipe = (recipe: Recipe) => {
+const convertFromDatasetRecipe = (recipe: DatasetRecipe) => {
     return {
       id: recipe.RecipeId,
       authorID: 0,
@@ -146,8 +145,8 @@ const convertToRecipe = (recipe: Recipe) => {
       servings: recipe.RecipeServings,
       recipeImage: recipe.Images.length > 0 ? recipe.Images[0] : "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png",
       averageRating: recipe.AggregatedRating,
-      ingredients: recipe.RecipeIngredientQuantities.map((quantity, index) => {
-        return { recipeID: recipe.RecipeId, amount: quantity, ingredient: recipe.RecipeIngredientParts[index], measurementType: "tbsp"}}),
+      ingredients: recipe.RecipeIngredientParts.map((ingredient, index) => {
+        return { recipeID: recipe.RecipeId, amount: recipe.RecipeIngredientQuantities[index], ingredient: ingredient, measurementType: ""}}),
       instructions: recipe.RecipeInstructions,
       tags: []
     };
@@ -155,26 +154,18 @@ const convertToRecipe = (recipe: Recipe) => {
 
 router.post("/api/recommendations", async (req: express.Request, res: express.Response) => {
     try {
-        // add batch logic here so that cards can be reloaded -- i think this is good/done
-        // add loading sign -- maybe customize one for page -- should be done!
-        // find out how to show full recipe (on swipe up) -- MAYBE add button directly on card
-        // update recommendation algorithm
-        // display ellipses for overflowing text on description -- should be done!
-        // update UI to be darker so that text is more visible -- maybe okay now?
-        // (maybe) filter out data without images -- done!
-        // (maybe) get larger list and retain some recipes instead of fetching every time
-
         const userID = req.body.userID;
-        const savedRecipeIDs = await getSavedRecipeIDs(20); 
-        const rejectedRecipeIDs = await getRejectedRecipeIDs(20);
+        const savedRecipeIDs = await getSavedRecipeIDs(userID); 
+        const rejectedRecipeIDs = await getRejectedRecipeIDs(userID);
 
         let personalizedResult, personalizedRecipes;
-        const temp = [ { recipeID: 39}, {recipeID: 41}, {recipeID: 43}, {recipeID: 51}, {recipeID: 52}, {recipeID: 54}, {recipeID: 60}]
-        const tempReject = [ {recipeID: 1}, {recipeID: 2}, {recipeID: 3}, {recipeID: 4}, {recipeID: 5}]
+        // const temp = [ { recipeID: 39}, {recipeID: 41}, {recipeID: 43}, {recipeID: 51}, {recipeID: 52}, {recipeID: 54}, {recipeID: 60}]
+        // const tempReject = [ {recipeID: 1}, {recipeID: 2}, {recipeID: 3}, {recipeID: 4}, {recipeID: 5}]
         
         // If there are saved recipes, get personalized recipes
         // if(savedRecipeIDs.length > 0){
-            personalizedResult = await getPersonalizedRecipes(temp, rejectedRecipeIDs);
+            // personalizedResult = await getPersonalizedRecipes(temp, rejectedRecipeIDs);
+            personalizedResult = await getPersonalizedRecipes(savedRecipeIDs, rejectedRecipeIDs);
             personalizedRecipes = JSON.parse(personalizedResult);
         // }
              
@@ -192,13 +183,15 @@ router.post("/api/recommendations", async (req: express.Request, res: express.Re
             [recipes[i], recipes[j]] = [recipes[j], recipes[i]];
         }
 
-        // convert recipes to Recipe object matching database before returning
-        const recommend = recipes.map(convertToRecipe)
+        // convert recipes to Recipe object matching database before returning -- when return dataset object
+        // const recommend = recipes.map(convertFromDatasetRecipe)
+
+        // get recipes with the ID list that was returned
+        const recommend = await getRecipesByIDs(recipes);
 
         // Send the result back to the client
         res.json(recommend);
     } catch (error) {
-        console.error("catching error!", error);
         res.status(500).send('Internal Server Error');
     }
 });

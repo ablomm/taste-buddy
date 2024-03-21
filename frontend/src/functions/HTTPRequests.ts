@@ -208,7 +208,7 @@ export const getRecipesInFolder = async (username: string, folderName: string) =
     }
 
     return await response.json();
-
+}
 export const addRecipeToUserSaved = async(recipeID: number, username: string) => {
     try {
         let response = await fetch(
@@ -259,5 +259,4 @@ export const addUserRejectedRecipe = async(recipeID: number, userID: number) => 
       } catch (error) {
         console.error(error);
       }
-
-}
+    }

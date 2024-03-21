@@ -74,7 +74,7 @@ const SignedInNavigation = () => (
       />
 
       <Tab.Screen
-        name='RecommenderPage'
+        name='RecommenderPageStack'
         component={RecommenderPageStack}
         options={{
           tabBarIcon: ({ color, size }) => (
