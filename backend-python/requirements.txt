@@ -6,3 +6,4 @@ scikit_learn==1.4.1.post1
 SQLAlchemy==2.0.28
 torch==2.2.1
 tqdm==4.66.2
+pyarrow==15.0.2
