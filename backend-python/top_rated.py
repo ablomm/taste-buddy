@@ -137,7 +137,7 @@ def top100():
     recipes['Images'] = recipes['Images'].apply(convert_to_list)
     recipes['RecipeInstructions'] = recipes['RecipeInstructions'].apply(convert_to_list)
 
-    review_path = 'output.parquet'
+    review_path = 'data/dataset/dataset/reviews.parquet'
     reviews = pd.read_parquet(review_path)
 
     recipe_names = recipes.set_index('RecipeId')['Name'].to_dict()
