@@ -14,11 +14,20 @@ import {
     processIngredients,
     processInstructions,
     getRecipeBatch,
-    getRecipesByUserID, getReviewByUser, OrderBy, deleteReview, getRecipeRating, processTags
+    getRecipesByUserID, 
+    getReviewByUser, 
+    OrderBy, 
+    deleteReview, 
+    getRecipeRating, 
+    processTags,
+    getPersonalizedRecipes,
+    getTopRatedRecipes,
+    getRecipesByIDs
 } from '../service/recipe';
-import { getUserByUsername, getProfilePhotoByUsername } from "../service/user";
+import { getUserByUsername, getProfilePhotoByUsername, getSavedRecipeIDs, getRejectedRecipeIDs } from "../service/user";
 import {editRecipe, storeRecipe} from "../service/search";
 import jwt, { JwtPayload } from "jsonwebtoken";
+
 
 const router = express.Router();
 
@@ -104,6 +113,86 @@ router.get("/batch/:num", async (req: express.Request, res: express.Response) =>
         return res.json(recipes);
     }catch (error){
         console.error(error);
+    }
+});
+
+interface DatasetRecipe {
+    RecipeId: number | 0;
+    Name: string;
+    CookTime: string | null;
+    Description: string;
+    Images: string[];
+    RecipeCategory: string;
+    Keywords: string[];
+    RecipeIngredientQuantities: string[];
+    RecipeIngredientParts: string[];
+    AggregatedRating: number | 0;
+    Calories: number | 0;
+    RecipeServings: number | 0;
+    RecipeInstructions: string[];
+}
+
+const convertFromDatasetRecipe = (recipe: DatasetRecipe) => {
+    return {
+      id: recipe.RecipeId,
+      authorID: 0,
+      creationTime: Date.now(),
+      recipeTitle: recipe.Name,
+      description: recipe.Description,
+      cookTimeHours: 0,
+      cootTimeMinutes: 0,
+      calories: recipe.Calories,
+      servings: recipe.RecipeServings,
+      recipeImage: recipe.Images.length > 0 ? recipe.Images[0] : "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png",
+      averageRating: recipe.AggregatedRating,
+      ingredients: recipe.RecipeIngredientParts.map((ingredient, index) => {
+        return { recipeID: recipe.RecipeId, amount: recipe.RecipeIngredientQuantities[index], ingredient: ingredient, measurementType: ""}}),
+      instructions: recipe.RecipeInstructions,
+      tags: []
+    };
+  }
+
+router.post("/api/recommendations", async (req: express.Request, res: express.Response) => {
+    try {
+        const userID = req.body.userID;
+        const savedRecipeIDs = await getSavedRecipeIDs(userID); 
+        const rejectedRecipeIDs = await getRejectedRecipeIDs(userID);
+
+        let personalizedResult, personalizedRecipes;
+        // const temp = [ { recipeID: 39}, {recipeID: 41}, {recipeID: 43}, {recipeID: 51}, {recipeID: 52}, {recipeID: 54}, {recipeID: 60}]
+        // const tempReject = [ {recipeID: 1}, {recipeID: 2}, {recipeID: 3}, {recipeID: 4}, {recipeID: 5}]
+        
+        // If there are saved recipes, get personalized recipes
+        // if(savedRecipeIDs.length > 0){
+            // personalizedResult = await getPersonalizedRecipes(temp, rejectedRecipeIDs);
+            personalizedResult = await getPersonalizedRecipes(savedRecipeIDs, rejectedRecipeIDs);
+            personalizedRecipes = JSON.parse(personalizedResult);
+        // }
+             
+        // Get top rated recipes
+        // const topRatedResult = await getTopRatedRecipes(rejectedRecipeIDs);
+        // const topRecipes = JSON.parse(topRatedResult);
+
+        // Combine personalized results with top rated
+        // const recipes = personalizedRecipes.concat(topRecipes);
+        const recipes = personalizedRecipes;
+
+        // Randomize combined list so that they are shown randomly to user
+        for (let i = recipes.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [recipes[i], recipes[j]] = [recipes[j], recipes[i]];
+        }
+
+        // convert recipes to Recipe object matching database before returning -- when return dataset object
+        // const recommend = recipes.map(convertFromDatasetRecipe)
+
+        // get recipes with the ID list that was returned
+        const recommend = await getRecipesByIDs(recipes);
+
+        // Send the result back to the client
+        res.json(recommend);
+    } catch (error) {
+        res.status(500).send('Internal Server Error');
     }
 });
 

@@ -34,7 +34,8 @@ const RecipeListItem = ({ item, navigation }) => {
           </Text>
           <Text>
             {item.tags != undefined
-              ? truncateText(item.tags.join(", "), 15)
+              ? truncateText(item.tags.map(tag => tag.name).join(", "), 15)
+              
               : ""}
           </Text>
         </View>
