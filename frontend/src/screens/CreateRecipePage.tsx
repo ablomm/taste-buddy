@@ -183,7 +183,7 @@ const CreateRecipePage = ({ route, navigation }: any) => {
       );
 
       console.log("upload successful")
-      navigation.navigate('AccountPageStack');
+      navigation.navigate('AccountPage');
 
     } catch (error: any) {
       console.error("Error saving recipe");
