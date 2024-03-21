@@ -4,11 +4,11 @@ import re
 from sqlalchemy import create_engine
 
 # database connection
-engine = create_engine('mysql+mysqlconnector://root:strongPassword@localhost:3306/tastebuddy')
+engine = create_engine('mysql+mysqlconnector://root:0000@localhost:3306/tastebuddy')
 conn = engine.connect()
 
 # retrieving data from dataset
-parquet_path = 'recipes.parquet'
+parquet_path = '../data/dataset/recipes.parquet'
 recipes_full = pd.read_parquet(parquet_path)
 
 # removing rows without images
@@ -69,6 +69,27 @@ try:
     ingredients_to_insert.to_sql('RecipeIngredients', con=engine, if_exists='append', index=False)
 except Exception as e:
     print(f"An error occurred: {e}")
-    
+
+transformed_df = recipes_full[['RecipeId', 'RecipeInstructions']].copy().loc[0:999, :]
+
+exploded_df = transformed_df.explode('RecipeInstructions').reset_index(drop=True)
+
+# Generate a step number for each instruction within each RecipeId.
+exploded_df['StepNumber'] = exploded_df.groupby('RecipeId').cumcount() + 1
+print(exploded_df.loc[0:9, :])
+# Rename the 'RecipeInstructions' column to 'Instruction' for clarity.
+exploded_df.rename(columns={'RecipeInstructions': 'Instruction'}, inplace=True)
+
+# Now, exploded_df has the structure we want, and we can adjust column names/order as needed.
+final_df = exploded_df[['RecipeId', 'StepNumber', 'Instruction']]
+final_df.columns = ['recipeID', 'step', 'instruction']
+
+print(final_df)
+
+try:
+    final_df.to_sql('recipeinstructions', con=engine, if_exists='append', index=False)
+except Exception as e:
+    print(f"An error occurred: {e}")
+
 # close connection
 conn.close()

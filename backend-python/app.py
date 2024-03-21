@@ -8,15 +8,9 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 app = Flask(__name__)
-recipes_path = 'data/dataset/dataset/recipes.parquet'
-recipes_full = pd.read_parquet(recipes_path)
-recipes_full = recipes_full[recipes_full['Images'].apply(lambda x: x is not None and len(x) > 0)]
 
-review_path = 'data/dataset/dataset/reviews.parquet'
-reviews_full = pd.read_parquet(review_path)
-
-def train_top_rated():
-    top_rated.train()
+def train_top_rated(data):
+    top_rated.train(data)
     return "Training completed."
 
 def extract_top_rated(data):
@@ -28,6 +22,10 @@ def extract_top_rated(data):
         return "Dataset failed to extract"
     
 def personalized_recommendations(data):
+    recipes_path = 'data/dataset/recipes.parquet'
+    recipes_full = pd.read_parquet(recipes_path)
+    recipes_full = recipes_full[recipes_full['Images'].apply(lambda x: x is not None and len(x) > 0)]
+
     # Get recipe IDs
     saved_recipe_ids = [d['recipeID'] for d in data.get('savedRecipeIDs', [])]
     rejected_recipe_ids = [d['recipeID'] for d in data.get('rejectedRecipeIDs', [])]
@@ -80,7 +78,7 @@ def personalized_recommendations(data):
 
 def top_rated_recommendations(data):
     # top rated recipe model 
-    result = top_rated.top100()
+    result = top_rated.top100(data)
 
     all_recipes_list = []
 
@@ -105,6 +103,20 @@ def call_personalized():
 def call_top_rated():
     data = request.json
     result = np.array(top_rated_recommendations(data)).tolist()
+    print(result)
+    return jsonify(result)
+
+@app.route('/api/train/top-rated-recipes', methods=['POST'])
+def train_top_rated_endpoint():
+    data = request.json
+    result = train_top_rated(data)
+    print(result)
+    return jsonify(result)
+
+@app.route('/api/extract/top-rated-recipes', methods=['POST'])
+def extract_top_rated_files():
+    data = request.json
+    result = extract_top_rated(data)
     print(result)
     return jsonify(result)
 

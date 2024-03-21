@@ -208,6 +208,7 @@ export const getRecipesInFolder = async (username: string, folderName: string) =
     }
 
     return await response.json();
+}
 
 export const addRecipeToUserSaved = async(recipeID: number, username: string) => {
     try {
