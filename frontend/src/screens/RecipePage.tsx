@@ -228,7 +228,7 @@ const RecipePage = ({ route, navigation }: any) => {
           <Text style={styles.recipeDescription}>{recipe?.description}</Text>
           <Text style={styles.subTitle}>Ingredients</Text>
           {recipe?.ingredients.map((ingredient, index) => (
-              <CheckboxRecipe key={index} checkboxText={`${ingredient.ingredient} ${ingredient.measurementType}`}/>
+              <CheckboxRecipe key={index} checkboxText={`${ingredient.amount} ${ingredient.ingredient} ${ingredient.measurementType}`}/>
           ))}
           <Text style={styles.subTitle}>Instructions</Text>
           {recipe?.instructions.map((instruction) => (
