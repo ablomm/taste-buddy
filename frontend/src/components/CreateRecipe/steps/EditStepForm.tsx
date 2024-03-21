@@ -60,7 +60,6 @@ const EditStepForm = ({ visible, setVisible, item, editItem, deleteItem }: any) 
 
             <TBButton onPress={handleSubmit as any} title="Save" />
             <TBButton onPress={handleDelete as any} title="Delete" />
-            <TBButton onPress={() => setVisible(false)} title="Cancel" />
           </>
         )}
       </Formik>

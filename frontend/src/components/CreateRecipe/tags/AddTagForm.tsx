@@ -50,7 +50,6 @@ const AddTagForm = ({ visible, setVisible, addTag }: any) => {
                 />
 
                 <TBButton onPress={handleSubmit as any} title="Save"/>
-                <TBButton onPress={() => setVisible(false)} title="Cancel" />
               </>
             )}
           </Formik>

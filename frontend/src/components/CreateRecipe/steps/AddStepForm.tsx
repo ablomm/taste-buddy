@@ -55,7 +55,6 @@ const AddStepForm = ({ visible, setVisible, addItem }: any) => {
             />
 
             <TBButton onPress={handleSubmit as any} title="Save" />
-            <TBButton onPress={() => setVisible(false)} title="Cancel" />
           </>
         )}
       </Formik>
