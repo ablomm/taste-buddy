@@ -182,7 +182,7 @@ const RecipePage = ({ route, navigation }: any) => {
                   { opacity: heroTitleOpacity },
                 ]}
               >
-                {truncateText(recipe.tags.map(tag => tag.name).join(", "), 19)}
+                {truncateText(recipe.tags.join(", "), 19)}
               </Animated.Text>
             ) : null}
             <Animated.Text
@@ -228,7 +228,8 @@ const RecipePage = ({ route, navigation }: any) => {
           <Text style={styles.recipeDescription}>{recipe?.description}</Text>
           <Text style={styles.subTitle}>Ingredients</Text>
           {recipe?.ingredients.map((ingredient, index) => (
-              <CheckboxRecipe key={index} checkboxText={`${ingredient.amount} ${ingredient.ingredient} ${ingredient.measurementType}`}/>
+              <CheckboxRecipe key={index}
+                              checkboxText={`${ingredient.amount} ${ingredient.measurementType} ${ingredient.ingredient}`}/>
           ))}
           <Text style={styles.subTitle}>Instructions</Text>
           {recipe?.instructions.map((instruction) => (

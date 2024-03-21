@@ -400,9 +400,6 @@ export async function updateIngredients(
         },
     });
 
-    console.log("Retrieved old ingredients: " + JSON.stringify(ingredients));
-    console.log("Retrieved new ingredients: " + JSON.stringify(newIngredients));
-
     // Compare new ingredients to old ingredients
     let ingredientsToAdd: Ingredient[] = [];
     let ingredientsToRemove: number[] = [];
@@ -427,12 +424,6 @@ export async function updateIngredients(
                         },
                         data: newIngredient,
                     });
-                    console.log(
-                        "Updated " +
-                        oldIngredient.id +
-                        " with " +
-                        JSON.stringify(newIngredient)
-                    );
                 }
                 break;
             }
@@ -471,8 +462,6 @@ export async function updateIngredients(
                 },
             },
         });
-
-        console.log("Removed Ingredient IDs: " + ingredientsToRemove);
     }
 
     // Add new ingredients
@@ -480,8 +469,6 @@ export async function updateIngredients(
         await prisma.recipeIngredients.createMany({
             data: processIngredients(recipeId, ingredientsToAdd),
         });
-
-        console.log("Added: " + JSON.stringify(ingredientsToAdd));
     }
 
     console.log("Ingredient update completed ...");
@@ -507,9 +494,6 @@ export async function updateInstructions(
                 recipeID: recipeId,
             },
         });
-        // Compare existing to new instructions
-        console.log("Old instructions: " + JSON.stringify(instructions));
-        console.log("New instructions: " + JSON.stringify(newInstructions));
 
         let containSameInstructions: boolean = true;
 
@@ -541,7 +525,6 @@ export async function updateInstructions(
 
             // insert new instructions
             await createInstructions(recipeId, newInstructions);
-            console.log("New instructions added ...");
         }
 
         console.log("Instruction update complete ...");
@@ -551,10 +534,6 @@ export async function updateInstructions(
             error
         );
     }
-}
-
-export async function updateRecipeTags(recipeId: number, newTags: []) {
-    // TODO: Implement once tags are fully implemented
 }
 
 /**

@@ -4,9 +4,9 @@ import {
   Text,
   StyleSheet,
   Image,
-  Modal,
   TouchableWithoutFeedback,
 } from "react-native";
+import Modal from "react-native-modal";
 import { ScrollView } from "react-native-gesture-handler";
 import Header from "../components/header/Header";
 import PosterHeader from "../components/RecipesAndPosts/PosterHeader";
@@ -73,16 +73,15 @@ const ViewPostPage = ({ route, navigation }) => {
         <Text style={styles.time}>{calculateTimeDifference(post.creationTime)}</Text>
       </ScrollView>
       <Modal
-        animationType="slide"
-        transparent={true}
-        visible={optionsModalVisible}
-        onRequestClose={() => setOptionsByModalVisible(false)}
+        isVisible={optionsModalVisible}
+        onBackdropPress={() => setOptionsByModalVisible(false)}
       >
         <TouchableWithoutFeedback
           onPress={() => setOptionsByModalVisible(false)}
         >
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
+              <Text style = {styles.modalTitle}>Are you sure?</Text>
               <TBButton
                 style={{
                   padding: 5,
@@ -100,11 +99,6 @@ const ViewPostPage = ({ route, navigation }) => {
                   navigation.goBack()
                 }}
                 title="Delete"
-              />
-              <TBButton
-                style={{ padding: 5, width: 150 }}
-                onPress={() => setOptionsByModalVisible(false)}
-                title="Cancel"
               />
             </View>
           </View>
@@ -147,6 +141,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginTop: 22,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 15,
   },
   flex: {
     flexDirection: 'row', // Align items horizontally

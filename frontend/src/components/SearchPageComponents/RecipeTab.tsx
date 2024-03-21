@@ -20,17 +20,19 @@ export function RecipeTab({ navigation, search, recipes }) {
     return (
         <>
             {recipes != null && recipes.length != 0 ?
-                <FlatList
-                    data={recipes}
-                    renderItem={({ item }) => <RecipeListItem item={item} navigation={navigation} />}
-                    keyExtractor={item => item.id.toString()}
-                    refreshControl={
-                        <RefreshControl
-                            refreshing={refreshing}
-                            onRefresh={onRefresh}
-                        />
-                    }
-                />
+                <View style={styles.container}>
+                    <FlatList
+                        data={recipes}
+                        renderItem={({item}) => <RecipeListItem item={item} navigation={navigation}/>}
+                        keyExtractor={item => item.id.toString()}
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={refreshing}
+                                onRefresh={onRefresh}
+                            />
+                        }
+                    />
+                </View>
                 :
                 <NoResultMessage message='No relevant recipes found.' />
             }
@@ -39,6 +41,9 @@ export function RecipeTab({ navigation, search, recipes }) {
 }
 
 const styles = StyleSheet.create({
+    container: {
+        height: 575
+    },
     buttonContainer: {
         flexDirection: 'row',
         justifyContent: 'center',

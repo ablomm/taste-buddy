@@ -11,6 +11,7 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import React, { useEffect, useState } from "react";
 import { FilterButton } from "./FilterButton";
 import { ModalButton } from "./SortButton";
+import {truncateText} from "../../functions/Utility";
 
 export function FilterBar({ tags, onSelectFilter, onSelectOption, onChange }) {
   const [filterModalVisible, setFilterModalVisible] = useState(false);
@@ -96,26 +97,23 @@ export function FilterBar({ tags, onSelectFilter, onSelectOption, onChange }) {
         <TouchableWithoutFeedback onPress={() => setFilterModalVisible(false)}>
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
-              <Text style={styles.modalTitle}>Filter By</Text>
-              <FlatList
-                style={
-                  styles.list && { maxHeight: Math.ceil(tags.length / 3) * 60 }
-                }
-                data={tags}
-                renderItem={({ item }) => (
-                  <FilterButton
-                    selected={selectedTags.includes(item)}
-                    text={item}
-                    onClick={() => handleSelectedFilter(item)}
-                  />
-                )}
-                keyExtractor={(item, index) => index.toString()}
-                numColumns={3}
-              />
-              <ModalButton
-                text="Done"
-                onClick={() => setFilterModalVisible(false)}
-              />
+              {tags.length == 0 ?
+                  <Text>No tags to filter</Text>
+                  :
+                  <><Text style={styles.modalTitle}>Filter By</Text><FlatList
+                      style={styles.list && {maxHeight: 400}}
+                      data={tags}
+                      renderItem={({item}) => (
+                          <FilterButton
+                              selected={selectedTags.includes(item)}
+                              text={truncateText(item, 14)}
+                              onClick={() => handleSelectedFilter(item)}/>
+                      )}
+                      keyExtractor={(item, index) => index.toString()}
+                      numColumns={3}/><ModalButton
+                      text="Done"
+                      onClick={() => setFilterModalVisible(false)}/></>
+              }
             </View>
           </View>
         </TouchableWithoutFeedback>
