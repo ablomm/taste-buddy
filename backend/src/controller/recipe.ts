@@ -14,11 +14,21 @@ import {
     processIngredients,
     processInstructions,
     getRecipeBatch,
-    getRecipesByUserID, getReviewByUser, OrderBy, deleteReview, getRecipeRating, processTags
+    getRecipesByUserID, 
+    getReviewByUser, 
+    OrderBy, 
+    deleteReview, 
+    getRecipeRating, 
+    processTags,
+    getRecipeRating,
+    getPersonalizedRecipes,
+    getTopRatedRecipes
+
 } from '../service/recipe';
-import { getUserByUsername, getProfilePhotoByUsername } from "../service/user";
+import { getUserByUsername, getProfilePhotoByUsername, getSavedRecipeIDs, getRejectedRecipeIDs } from "../service/user";
 import {editRecipe, storeRecipe} from "../service/search";
 import jwt, { JwtPayload } from "jsonwebtoken";
+
 
 const router = express.Router();
 
@@ -104,6 +114,92 @@ router.get("/batch/:num", async (req: express.Request, res: express.Response) =>
         return res.json(recipes);
     }catch (error){
         console.error(error);
+    }
+});
+
+interface Recipe {
+    RecipeId: number | 0;
+    Name: string;
+    CookTime: string | null;
+    Description: string;
+    Images: string[];
+    RecipeCategory: string;
+    Keywords: string[];
+    RecipeIngredientQuantities: string[];
+    RecipeIngredientParts: string[];
+    AggregatedRating: number | 0;
+    Calories: number | 0;
+    RecipeServings: number | 0;
+    RecipeInstructions: string[];
+}
+
+const convertToRecipe = (recipe: Recipe) => {
+    return {
+      id: recipe.RecipeId,
+      authorID: 0,
+      creationTime: Date.now(),
+      recipeTitle: recipe.Name,
+      description: recipe.Description,
+      cookTimeHours: 0,
+      cootTimeMinutes: 0,
+      calories: recipe.Calories,
+      servings: recipe.RecipeServings,
+      recipeImage: recipe.Images.length > 0 ? recipe.Images[0] : "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png",
+      averageRating: recipe.AggregatedRating,
+      ingredients: recipe.RecipeIngredientQuantities.map((quantity, index) => {
+        return { recipeID: recipe.RecipeId, amount: quantity, ingredient: recipe.RecipeIngredientParts[index], measurementType: "tbsp"}}),
+      instructions: recipe.RecipeInstructions,
+      tags: []
+    };
+  }
+
+router.post("/api/recommendations", async (req: express.Request, res: express.Response) => {
+    try {
+        // add batch logic here so that cards can be reloaded -- i think this is good/done
+        // add loading sign -- maybe customize one for page -- should be done!
+        // find out how to show full recipe (on swipe up) -- MAYBE add button directly on card
+        // update recommendation algorithm
+        // display ellipses for overflowing text on description -- should be done!
+        // update UI to be darker so that text is more visible -- maybe okay now?
+        // (maybe) filter out data without images -- done!
+        // (maybe) get larger list and retain some recipes instead of fetching every time
+
+        const userID = req.body.userID;
+        const savedRecipeIDs = await getSavedRecipeIDs(20); 
+        const rejectedRecipeIDs = await getRejectedRecipeIDs(20);
+
+        let personalizedResult, personalizedRecipes;
+        const temp = [ { recipeID: 39}, {recipeID: 41}, {recipeID: 43}, {recipeID: 51}, {recipeID: 52}, {recipeID: 54}, {recipeID: 60}]
+        const tempReject = [ {recipeID: 1}, {recipeID: 2}, {recipeID: 3}, {recipeID: 4}, {recipeID: 5}]
+        
+        // If there are saved recipes, get personalized recipes
+        // if(savedRecipeIDs.length > 0){
+            personalizedResult = await getPersonalizedRecipes(temp, rejectedRecipeIDs);
+            personalizedRecipes = JSON.parse(personalizedResult);
+        // }
+             
+        // Get top rated recipes
+        // const topRatedResult = await getTopRatedRecipes(rejectedRecipeIDs);
+        // const topRecipes = JSON.parse(topRatedResult);
+
+        // Combine personalized results with top rated
+        // const recipes = personalizedRecipes.concat(topRecipes);
+        const recipes = personalizedRecipes;
+
+        // Randomize combined list so that they are shown randomly to user
+        for (let i = recipes.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [recipes[i], recipes[j]] = [recipes[j], recipes[i]];
+        }
+
+        // convert recipes to Recipe object matching database before returning
+        const recommend = recipes.map(convertToRecipe)
+
+        // Send the result back to the client
+        res.json(recommend);
+    } catch (error) {
+        console.error("catching error!", error);
+        res.status(500).send('Internal Server Error');
     }
 });
 

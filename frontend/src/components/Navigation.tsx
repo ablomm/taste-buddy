@@ -75,7 +75,7 @@ const SignedInNavigation = () => (
 
       <Tab.Screen
         name='RecommenderPage'
-        component={RecommenderPage}
+        component={RecommenderPageStack}
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="star-outline" size={size} color={color} />),
@@ -121,6 +121,12 @@ const SearchPageStack = () => (
     <Stack.Screen name='ViewPostPage' component={ViewPostPage} />
     <Stack.Screen name='RecipePage' component={RecipePage} />
     <Stack.Screen name='EditRecipePage' component={EditRecipePage} />
+  </Stack.Navigator>
+);
+const RecommenderPageStack = () => (
+  <Stack.Navigator initialRouteName='SearchPage' screenOptions={stackOptions}>
+       <Stack.Screen name='RecommenderPage' component={RecommenderPage} />
+      <Stack.Screen name='RecipePage' component={RecipePage} />
   </Stack.Navigator>
 );
 export default Navigation;
