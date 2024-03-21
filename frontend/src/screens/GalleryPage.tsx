@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, Image, Dimensions, TouchableOpacity, FlatList } from 'react-native';
-import BackButton from '../components/BackButton';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import TBButton from '../components/TBButton';
 import * as MediaLibrary from 'expo-media-library';

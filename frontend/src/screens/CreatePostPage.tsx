@@ -123,7 +123,7 @@ const CreatePostPage = ({ route, navigation }: any) => {
             await savePost(userContext.state.username, values.description, tags, imageUrl, values.recipeUrl)
   
             console.log("Save post successful")
-            navigation.navigate('AccountPageStack');
+            navigation.navigate('AccountPage');
 
           } catch (error: any) {
             console.error("Error saving post");
