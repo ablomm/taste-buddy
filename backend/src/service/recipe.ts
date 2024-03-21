@@ -2,7 +2,6 @@ import { PrismaClient } from "@prisma/client";
 import { RequestOptions, IncomingMessage } from "http";
 import {updateRatingES} from "./search";
 
-
 const prisma = new PrismaClient();
 const http = require("http");
 
@@ -764,6 +763,22 @@ export async function getRecipesInFolder(userID: any, folderName: any) {
                         }
                     }
                 }
+            }
+        }
+    });
+    return recipes;
+}
+
+export async function getRecipesByIDs(recipeIDs: number[]) {
+    const recipes = await prisma.recipe.findMany({
+        include: {
+            ingredients: true,
+            instructions: true,
+            tags: true,
+        },
+        where: {
+            id: {
+                in: recipeIDs
             }
         }
     });

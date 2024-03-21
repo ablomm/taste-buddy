@@ -5,7 +5,6 @@ import { TouchableRipple } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 
 const RelevantPostsGrid = ({posts}) => {
-    const [currentPosts, setCurrentPosts] = useState<any[]>([]);
     const [refreshing, setRefresh] = useState(false);
     const navigation: any = useNavigation();
 
@@ -17,17 +16,15 @@ const RelevantPostsGrid = ({posts}) => {
     };
 
     const _onRefresh = React.useCallback(() => {
-        setRefresh(true);
-        console.log("Refreshing");
-        setTimeout(()=>{
-            setRefresh(false);
-            console.log("Done Refreshing")
-        }, 3000)
-    }, []);
-
-    useEffect(() => {
-        setCurrentPosts(posts);
-    }, []);
+        if (!refreshing) {
+            setRefresh(true);
+            console.log("Refreshing");
+            setTimeout(()=>{
+                setRefresh(false);
+                console.log("Done Refreshing")
+            }, 3000)
+        }
+    }, [refreshing]);
 
     return (
         <ScrollView contentContainerStyle={styles.app}
@@ -45,7 +42,7 @@ const RelevantPostsGrid = ({posts}) => {
                     }
         >
 
-            {currentPosts.map((post: any, index) => {
+            {posts.map((post: any, index) => {
                 return (
                     <TouchableRipple key={index} onPress={() => {
                         navigation.push("ViewPostPage", post);

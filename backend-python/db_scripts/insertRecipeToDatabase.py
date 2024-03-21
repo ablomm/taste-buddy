@@ -70,7 +70,8 @@ try:
 except Exception as e:
     print(f"An error occurred: {e}")
 
-transformed_df = recipes_full[['RecipeId', 'RecipeInstructions']].copy().loc[0:999, :]
+#transformed_df = recipes_full[['RecipeId', 'RecipeInstructions']].copy().loc[0:999, :]
+transformed_df = recipes_full.head(1000)[['RecipeId', 'RecipeInstructions']].copy()
 
 exploded_df = transformed_df.explode('RecipeInstructions').reset_index(drop=True)
 

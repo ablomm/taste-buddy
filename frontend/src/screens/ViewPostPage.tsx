@@ -17,7 +17,7 @@ import { LoadingContext } from "../providers/LoadingProvider";
 import PostTabBar from "../components/PostTabBar";
 import { UserContext } from '../providers/UserProvider';
 
-const ViewPostPage = ({ route }) => {
+const ViewPostPage = ({ route, navigation }) => {
   let post = route.params;
   const [optionsModalVisible, setOptionsByModalVisible] =
     useState<boolean>(false);
@@ -97,6 +97,7 @@ const ViewPostPage = ({ route }) => {
                     loadingContext.disable()
                   );
                   setOptionsByModalVisible(false);
+                  navigation.goBack()
                 }}
                 title="Delete"
               />
