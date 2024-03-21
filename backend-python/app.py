@@ -68,7 +68,7 @@ def personalized_recommendations(data):
     # Store all recommended recipe IDs here
     all_recommended_ids = set()
     average_similarity = np.mean(similarity_scores_tags, axis=0)
-    top_recommended = np.argsort(average_similarity)[-50:][::-1]
+    top_recommended = np.argsort(average_similarity)[-20:][::-1]
     top_recipe_ids = filtered_recipes_db.iloc[top_recommended]['recipeID'].values
 
     all_recommended_ids = set(map(int, top_recipe_ids))
