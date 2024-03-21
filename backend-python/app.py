@@ -8,9 +8,12 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 app = Flask(__name__)
-parquet_path = 'recipes.parquet'
-recipes_full = pd.read_parquet(parquet_path)
+recipes_path = 'data/dataset/dataset/recipes.parquet'
+recipes_full = pd.read_parquet(recipes_path)
 recipes_full = recipes_full[recipes_full['Images'].apply(lambda x: x is not None and len(x) > 0)]
+
+review_path = 'data/dataset/dataset/reviews.parquet'
+reviews_full = pd.read_parquet(review_path)
 
 def train_top_rated():
     top_rated.train()
@@ -84,9 +87,13 @@ def top_rated_recommendations(data):
     #convert dataframes within list to a list of dictionaries
     for df in result:
         if isinstance(df, pd.DataFrame) and not df.empty:
+            for column in df.columns:
+                # Apply conversion if any cell in the column is an ndarray
+                if df[column].apply(lambda x: isinstance(x, np.ndarray)).any():
+                    df[column] = df[column].apply(lambda x: x.tolist() if isinstance(x, np.ndarray) else x)
             all_recipes_list.extend(df.to_dict(orient="records"))
             
-    return json.dumps(all_recipes_list)
+    return all_recipes_list
 
 @app.route('/api/personalized-recommendations', methods=['POST'])
 def call_personalized():
@@ -97,8 +104,9 @@ def call_personalized():
 @app.route('/api/top-rated-recipes', methods=['POST'])
 def call_top_rated():
     data = request.json
-    result = top_rated_recommendations(data)
-    return result
+    result = np.array(top_rated_recommendations(data)).tolist()
+    print(result)
+    return jsonify(result)
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -162,8 +162,8 @@ router.post("/api/recommendations", async (req: express.Request, res: express.Re
         // (maybe) get larger list and retain some recipes instead of fetching every time
 
         const userID = req.body.userID;
-        const savedRecipeIDs = await getSavedRecipeIDs(20); 
-        const rejectedRecipeIDs = await getRejectedRecipeIDs(20);
+        //const savedRecipeIDs = await getSavedRecipeIDs(20); 
+        //const rejectedRecipeIDs = await getRejectedRecipeIDs(20);
 
         let personalizedResult, personalizedRecipes;
         const temp = [ { recipeID: 39}, {recipeID: 41}, {recipeID: 43}, {recipeID: 51}, {recipeID: 52}, {recipeID: 54}, {recipeID: 60}]
@@ -171,17 +171,17 @@ router.post("/api/recommendations", async (req: express.Request, res: express.Re
         
         // If there are saved recipes, get personalized recipes
         // if(savedRecipeIDs.length > 0){
-            personalizedResult = await getPersonalizedRecipes(temp, rejectedRecipeIDs);
-            personalizedRecipes = JSON.parse(personalizedResult);
+            //personalizedResult = await getPersonalizedRecipes(temp, rejectedRecipeIDs);
+            //personalizedRecipes = JSON.parse(personalizedResult);
         // }
              
         // Get top rated recipes
-        // const topRatedResult = await getTopRatedRecipes(rejectedRecipeIDs);
-        // const recipes = JSON.parse(topRatedResult.replace(/\bNaN\b/g, "null"));
+         const topRatedResult = await getTopRatedRecipes("");
+         const recipes = JSON.parse(topRatedResult.replace(/\bNaN\b/g, "null"));
 
         // Combine personalized results with top rated
         // const recipes = personalizedRecipes.concat(topRecipes);
-        const recipes = personalizedRecipes;
+        //const recipes = personalizedRecipes;
 
         // Randomize combined list so that they are shown randomly to user
         for (let i = recipes.length - 1; i > 0; i--) {

@@ -11,11 +11,19 @@ import {
   addUserRejectedRecipe,
 } from "../functions/HTTPRequests";
 
+interface InstructionStep {
+  step: number;
+  instruction: string;
+}
+
+interface FormattedInstructions {
+  list: InstructionStep[];
+}
+
 const fetchRecipeBatch = async (num: number) => {
   try {
     const response = await fetch(
-      `${
-        process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
+      `${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
       }/recipe/batch/${num}`,
       {
         method: "GET",
@@ -36,8 +44,7 @@ const fetchRecipeBatch = async (num: number) => {
 const fetchRecommendedRecipes = async (userID: number) => {
   try {
     const response = await fetch(
-      `${
-        process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
+      `${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
       }/recipe/api/recommendations`,
       {
         method: "POST",
@@ -104,20 +111,36 @@ const RecommenderPage = ({ navigation }) => {
   };
 
   const showFullRecipe = async (recipe: Recipe) => {
-    console.log("ingredients ", recipe.ingredients);
+    recipe.instructions = formatInstructions(recipe.instructions).list
+
     navigation.navigate("RecipePage", {
       recipe: recipe,
     });
   };
 
+  const formatInstructions = (recipeInstructions: string[]): FormattedInstructions => {
+    let formattedInstructions: FormattedInstructions = {
+      list: []
+    };
+  
+    recipeInstructions.forEach((item, index) => {
+      formattedInstructions.list.push({
+        step: index + 1,
+        instruction: item
+      });
+    });
+  
+    return formattedInstructions;
+  }
+
   const checkRecipeList = async (recipeID: number) => {
     console.log(`check recipes left: ${recipesLeft}`);
     // filter out recipe in recipe list so that list length can be tracked
 
-    console.log(
-      "how do i know rec list",
-      recipes.map((r) => r.id)
-    );
+    //console.log(
+    //  "how do i know rec list",
+    //  recipes.map((r) => r.id)
+    //);
 
     if (recipesLeft == 1) {
       loadNextBatch();

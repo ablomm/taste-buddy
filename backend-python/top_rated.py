@@ -62,8 +62,12 @@ def train():
     if not os.path.isdir("data"): #check for extracted data
        setup()
     
-    recipes = pd.read_csv('data/dataset/recipes.csv')
-    reviews = pd.read_csv('data/dataset/reviews.csv')
+    recipes_path = 'data/dataset/dataset/recipes.parquet'
+    recipes = pd.read_parquet(recipes_path)
+    recipes = recipes[recipes['Images'].apply(lambda x: x is not None and len(x) > 0)]
+
+    review_path = 'data/dataset/dataset/reviews.parquet'
+    reviews = pd.read_parquet(review_path)
 
     print('Size of the recipes: ', recipes.shape, '\nSize of the Reviews: ', reviews.shape)
 
@@ -121,11 +125,21 @@ def train():
 
     return
 
+def convert_to_list(data):
+    if isinstance(data, np.ndarray):
+        return data.tolist()
+    return data  # Return as is if not an ndarray
 
 def top100():
-    recipes = pd.read_parquet('data/dataset/dataset/recipes.parquet')
-    reviews = pd.read_parquet('data/dataset/dataset/reviews.parquet')
-    
+    recipes_path = 'data/dataset/dataset/recipes.parquet'
+    recipes = pd.read_parquet(recipes_path)
+    recipes = recipes[recipes['Images'].apply(lambda x: x is not None and len(x) > 0)]
+    recipes['Images'] = recipes['Images'].apply(convert_to_list)
+    recipes['RecipeInstructions'] = recipes['RecipeInstructions'].apply(convert_to_list)
+
+    review_path = 'output.parquet'
+    reviews = pd.read_parquet(review_path)
+
     recipe_names = recipes.set_index('RecipeId')['Name'].to_dict()
     n_users = len(reviews.AuthorId.unique())
     n_items = len(reviews.RecipeId.unique())
