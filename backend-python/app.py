@@ -122,12 +122,5 @@ def train_top_rated_endpoint():
     print(result)
     return jsonify(result)
 
-@app.route('/api/extract/top-rated-recipes', methods=['POST'])
-def extract_top_rated_files():
-    data = request.json
-    result = extract_top_rated(data)
-    print(result)
-    return jsonify(result)
-
 if __name__ == '__main__':
     app.run(debug=True)
