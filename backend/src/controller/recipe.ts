@@ -22,7 +22,9 @@ import {
     processTags,
     getPersonalizedRecipes,
     getTopRatedRecipes,
-    getRecipesByIDs
+    getRecipesByIDs,
+    setupTopRatedModel,
+    trainTopRated
 } from '../service/recipe';
 import { getUserByUsername, getProfilePhotoByUsername, getSavedRecipeIDs, getRejectedRecipeIDs } from "../service/user";
 import {editRecipe, storeRecipe} from "../service/search";
@@ -163,19 +165,19 @@ router.post("/api/recommendations", async (req: express.Request, res: express.Re
         // const tempReject = [ {recipeID: 1}, {recipeID: 2}, {recipeID: 3}, {recipeID: 4}, {recipeID: 5}]
         
         // If there are saved recipes, get personalized recipes
-        // if(savedRecipeIDs.length > 0){
+        if(savedRecipeIDs.length > 0){
             // personalizedResult = await getPersonalizedRecipes(temp, rejectedRecipeIDs);
             personalizedResult = await getPersonalizedRecipes(savedRecipeIDs, rejectedRecipeIDs);
             personalizedRecipes = JSON.parse(personalizedResult);
-        // }
+         }
              
         // Get top rated recipes
-        // const topRatedResult = await getTopRatedRecipes(rejectedRecipeIDs);
-        // const topRecipes = JSON.parse(topRatedResult);
+         const topRatedResult = await getTopRatedRecipes(true);
+         const recipes = JSON.parse(topRatedResult.replace(/\bNaN\b/g, "null"));
 
         // Combine personalized results with top rated
         // const recipes = personalizedRecipes.concat(topRecipes);
-        const recipes = personalizedRecipes;
+        //const recipes = personalizedRecipes;
 
         // Randomize combined list so that they are shown randomly to user
         for (let i = recipes.length - 1; i > 0; i--) {
@@ -189,9 +191,102 @@ router.post("/api/recommendations", async (req: express.Request, res: express.Re
         // get recipes with the ID list that was returned
         const recommend = await getRecipesByIDs(recipes);
 
+        console.log(recommend)
+
         // Send the result back to the client
         res.json(recommend);
     } catch (error) {
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+router.post("/api/recommendations/setup", async (req: express.Request, res: express.Response) => {
+    try { 
+        const topRatedSetupResult = await setupTopRatedModel(req.body); 
+        console.log(topRatedSetupResult)
+        // Send the result back to the client
+        res.json(topRatedSetupResult);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+router.post("/api/recommendations/train", async (req: express.Request, res: express.Response) => {
+    try { 
+        const trainingModel = await trainTopRated(req.body); 
+        // Send the result back to the client
+        res.json(trainingModel);
+    } catch (error) {
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+router.post("/api/recommendations/setup", async (req: express.Request, res: express.Response) => {
+    try { 
+        const topRatedSetupResult = await setupTopRatedModel(req.body); 
+        console.log(topRatedSetupResult)
+        // Send the result back to the client
+        res.json(topRatedSetupResult);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+router.post("/api/recommendations/train", async (req: express.Request, res: express.Response) => {
+    try { 
+        const trainingModel = await trainTopRated(req.body); 
+        // Send the result back to the client
+        res.json(trainingModel);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+router.post("/api/recommendations/setup", async (req: express.Request, res: express.Response) => {
+    try { 
+        const topRatedSetupResult = await setupTopRatedModel(req.body); 
+        console.log(topRatedSetupResult)
+        // Send the result back to the client
+        res.json(topRatedSetupResult);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+router.post("/api/recommendations/train", async (req: express.Request, res: express.Response) => {
+    try { 
+        const trainingModel = await trainTopRated(req.body); 
+        // Send the result back to the client
+        res.json(trainingModel);
+    } catch (error) {
+
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+router.post("/api/recommendations/setup", async (req: express.Request, res: express.Response) => {
+    try { 
+        const topRatedSetupResult = await setupTopRatedModel(req.body); 
+        console.log(topRatedSetupResult)
+        // Send the result back to the client
+        res.json(topRatedSetupResult);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+router.post("/api/recommendations/train", async (req: express.Request, res: express.Response) => {
+    try { 
+        const trainingModel = await trainTopRated(req.body); 
+        // Send the result back to the client
+        res.json(trainingModel);
+    } catch (error) {
+        console.error(error);
         res.status(500).send('Internal Server Error');
     }
 });

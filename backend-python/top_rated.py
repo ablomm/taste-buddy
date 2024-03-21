@@ -12,46 +12,74 @@ from torch.utils.data import DataLoader
 from torch import save 
 from tqdm.notebook import tqdm
 from sklearn.cluster import KMeans
+from dotenv import load_dotenv
+from sqlalchemy import create_engine
+
+load_dotenv()
 
 s3 = boto3.client('s3',  
-                  aws_access_key_id='AKIASMHR2QCEZQPLXWXR',
-                  aws_secret_access_key= '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', 
+                  aws_access_key_id= os.getenv("AWS_ACCESS_KEY_ID"),
+                  aws_secret_access_key= os.getenv("AWS_SECRET_ACCESS_KEY"), 
                   region_name='us-east-2')
 
 bucket_name = 'tastebuddy-images'
 folder_name = 'engine/'
 
+engine = create_engine('mysql+mysqlconnector://root:0000@localhost:3306/tastebuddy')
+conn = engine.connect()
+
 def get_zip():
     object_key = folder_name + "dataset.zip"
     file_path = "dataset.zip"
-    
+
     try:
         s3.download_file(bucket_name, object_key, file_path)
+
+        if os.path.isfile("dataset.zip"):
+            print('dataset downloaded')
+
         return True
     except Exception as e:
+        print('dataset unable to download')
         print(e)
         return False 
 
 def setup():
     
-    if not os.path.isfile("dataset.zip"):
+    if (not os.path.isfile("dataset.zip")):
        get_zip()
-    
-    with zipfile.ZipFile('dataset.zip', 'r') as zip_ref:
-        zip_ref.extractall('data')
 
     if os.path.isdir("data"):
        return True
     else:
-       return False
+        try: 
+           with zipfile.ZipFile('dataset.zip', 'r') as zip_ref:
+            zip_ref.extractall('data')
 
-def train():
+            print('extracted dataset.zip')
+        except Exception as e:
+            print('unable to extract dataset.zip')
+            print(e)
+            return False
+
+def train(smallSet):
 
     if not os.path.isdir("data"): #check for extracted data
        setup()
     
-    recipes = pd.read_csv('data/dataset/recipes.csv')
-    reviews = pd.read_csv('data/dataset/reviews.csv')
+    recipes_path = 'data/dataset/recipes.parquet'
+    recipes = pd.read_parquet(recipes_path)
+    recipes = recipes[recipes['Images'].apply(lambda x: x is not None and len(x) > 0)]
+    #smallSet = True
+    review_path = 'data/dataset/reviews.parquet'
+    reviews = pd.read_parquet(review_path)
+
+    if smallSet:
+        recipes_raw = pd.read_sql('SELECT * FROM recipe LIMIT 1000;', engine)
+        reviews_raw = pd.read_sql('SELECT * FROM review LIMIT 1000;', engine)
+
+        recipes = recipes_raw.rename(columns={'authorID': 'AuthorId', 'recipeTitle': 'Name', 'id': 'RecipeId'}) 
+        reviews = reviews_raw.rename(columns={'userID': 'AuthorId','rating':'Rating','recipeID': 'RecipeId'}) 
 
     print('Size of the recipes: ', recipes.shape, '\nSize of the Reviews: ', reviews.shape)
 
@@ -71,58 +99,78 @@ def train():
         if param.requires_grad:
             print(name, param.data)
     
-    if cuda:
-        model = model.cuda()
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"Using device: {device}")
 
     loss_fn = torch.nn.MSELoss()   # MSE loss
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
 
     # Train data
-    train_set = Loader()
+    train_set = Loader(smallSet)
     train_loader = DataLoader(train_set, 128, shuffle=True)
 
     for it in tqdm(range(num_epochs)):
         losses = []
         for x, y in train_loader:
-            #print("Batch loaded") 
-            #print(x.shape, y.shape)
-            #print(cuda)
-            if cuda:
-                x, y = x.cuda(), y.cuda()
-                optimizer.zero_grad()
-                outputs = model(x)
-                #print("Outputs shape:", outputs.shape)
-                #print("y shape:", y.shape)
-                loss = loss_fn(outputs.squeeze(), y.type(torch.float32))
-                #print("Loss calculated:", loss.item())
-                losses.append(loss.item())
-                loss.backward()
-                optimizer.step()
+            x, y = x.to(device), y.to(device)
+            optimizer.zero_grad()
+            outputs = model(x)
+            loss = loss_fn(outputs.squeeze(), y.type(torch.float32))
+            print('loss ', loss)
+            losses.append(loss.item())
+            loss.backward()
+            optimizer.step()
         if len(losses) == 0:
             raise ValueError("No losses recorded. Check DataLoader and training loop.")
 
         print("iter #{}".format(it), "Loss:", sum(losses) / len(losses))
 
     model.to('cpu')  # Move model to CPU before saving just in case
-    torch.save(model.state_dict(), 'model_state_dict.pth')
+    if smallSet:
+        torch.save(model.state_dict(), 'model_state_small_dict.pth')
+    else:
+        torch.save(model.state_dict(), 'model_state_dict.pth')
     print("Model state dictionary saved successfully.")
 
     return
 
+def convert_to_list(data):
+    if isinstance(data, np.ndarray):
+        return data.tolist()
+    return data  # Return as is if not an ndarray
 
-def top100():
-    recipes = pd.read_csv('data/dataset/recipes.csv')
-    reviews = pd.read_csv('data/dataset/reviews.csv')
-    
+def top100(smallSet):
+    recipes_path = 'data/dataset/recipes.parquet'
+    recipes = pd.read_parquet(recipes_path)
+    recipes = recipes[recipes['Images'].apply(lambda x: x is not None and len(x) > 0)]
+    recipes['Images'] = recipes['Images'].apply(convert_to_list)
+    recipes['RecipeInstructions'] = recipes['RecipeInstructions'].apply(convert_to_list)
+
+    review_path = 'data/dataset/reviews.parquet'
+    reviews = pd.read_parquet(review_path)
+    #smallSet = True
+    if smallSet:
+        recipes_raw = pd.read_sql('SELECT * FROM recipe LIMIT 1000;', engine)
+        reviews_raw = pd.read_sql('SELECT * FROM review LIMIT 1000;', engine)
+
+        recipes = recipes_raw.rename(columns={'authorID': 'AuthorId', 'recipeTitle': 'Name', 'id': 'RecipeId'}) 
+        reviews = reviews_raw.rename(columns={'userID': 'AuthorId','rating':'Rating','recipeID': 'RecipeId'}) 
+
     recipe_names = recipes.set_index('RecipeId')['Name'].to_dict()
     n_users = len(reviews.AuthorId.unique())
     n_items = len(reviews.RecipeId.unique())
 
     loaded_model = MatrixFactorization(n_users, n_items, n_factors=8)
-    loaded_model.load_state_dict(torch.load('model_state_dict.pth'))
+
+    if smallSet:
+        loaded_model.load_state_dict(torch.load('model_state_small_dict.pth'))
+    else:
+        loaded_model.load_state_dict(torch.load('model_state_dict.pth'))
+
+    
     loaded_model.eval()
 
-    train_set = Loader()
+    train_set = Loader(smallSet)
 
     if torch.cuda.is_available():
         loaded_model.cuda()
@@ -136,7 +184,7 @@ def top100():
     warnings.filterwarnings('ignore')
 
     clustered_recipes_list = []
-
+    recipe_list =[]
     for cluster in range(10):
         print("Cluster #{}".format(cluster))
         recs = []
@@ -161,12 +209,18 @@ def top100():
             else:
                 print(f"Recipe ID {recid} not found in recipes.")
             if len(recs) == 10:
-                break;
+                break
         for rec in sorted(recs, key=lambda tup: tup[1], reverse=True)[:10]:
             print("\t", rec[0])
         
         cluster_df = recipes[recipes['RecipeId'].isin(cluster_recipe_ids)]
         cluster_df['Cluster'] = cluster
         clustered_recipes_list.append(cluster_df)
-    
-    return clustered_recipes_list
+        #print(cluster_df['RecipeId'].tolist())
+        #clustered_recipes_list.extend(cluster_df['RecipeId'].tolist())
+        recipe_list.extend(cluster_df['RecipeId'].tolist())
+
+    if smallSet:
+        return recipe_list
+    else:
+        return clustered_recipes_list

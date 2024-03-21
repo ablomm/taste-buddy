@@ -4,12 +4,23 @@ from torch.utils.data import DataLoader
 from torch import save 
 import torch 
 import pandas as pd
+from sqlalchemy import create_engine
 
-class Loader(Dataset):
+class Loader():
     
-    def __init__(self):
-        recipes = pd.read_csv('data/dataset/recipes.csv')
-        reviews = pd.read_csv('data/dataset/reviews.csv')
+    def __init__(self,smallSet):
+
+        recipes = pd.read_parquet('data/dataset/recipes.parquet')
+        reviews = pd.read_parquet('data/dataset/reviews.parquet')
+
+        if smallSet: 
+            engine = create_engine('mysql+mysqlconnector://root:0000@localhost:3306/tastebuddy')
+            conn = engine.connect()
+            recipes_raw = pd.read_sql('SELECT * FROM recipe LIMIT 1000;', engine)
+            reviews_raw = pd.read_sql('SELECT * FROM review LIMIT 1000;', engine)
+
+            recipes = recipes_raw.rename(columns={'authorID': 'AuthorId', 'recipeTitle': 'Name', 'id': 'RecipeId'}) 
+            reviews = reviews_raw.rename(columns={'userID': 'AuthorId','rating':'Rating','recipeID': 'RecipeId'}) 
 
         self.reviews = reviews.copy()
 

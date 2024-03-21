@@ -8,12 +8,9 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 app = Flask(__name__)
-parquet_path = 'recipes.parquet'
-recipes_full = pd.read_parquet(parquet_path)
-recipes_full = recipes_full[recipes_full['Images'].apply(lambda x: x is not None and len(x) > 0)]
 
-def train_top_rated():
-    top_rated.train()
+def train_top_rated(data):
+    top_rated.train(data)
     return "Training completed."
 
 def extract_top_rated(data):
@@ -25,6 +22,10 @@ def extract_top_rated(data):
         return "Dataset failed to extract"
     
 def personalized_recommendations(data):
+    recipes_path = 'data/dataset/recipes.parquet'
+    recipes_full = pd.read_parquet(recipes_path)
+    recipes_full = recipes_full[recipes_full['Images'].apply(lambda x: x is not None and len(x) > 0)]
+
     # Get recipe IDs
     saved_recipe_ids = [d['recipeID'] for d in data.get('savedRecipeIDs', [])]
     rejected_recipe_ids = [d['recipeID'] for d in data.get('rejectedRecipeIDs', [])]
@@ -75,18 +76,25 @@ def personalized_recommendations(data):
     result = recipes_full[recipes_full['RecipeId'].isin(final_recommendations)]
     return result.to_json(orient='records')
 
-def top_rated_recommendations(data):
+def top_rated_recommendations(smallSet):
     # top rated recipe model 
-    result = top_rated.top100()
+    result = top_rated.top100(smallSet)
 
     all_recipes_list = []
 
+    if smallSet:
+        all_recipes_list = result
+    else:
     #convert dataframes within list to a list of dictionaries
-    for df in result:
-        if isinstance(df, pd.DataFrame) and not df.empty:
-            all_recipes_list.extend(df.to_dict(orient="records"))
-            
-    return json.dumps(all_recipes_list)
+        for df in result:
+            if isinstance(df, pd.DataFrame) and not df.empty:
+                for column in df.columns:
+                    # Apply conversion if any cell in the column is an ndarray
+                    if df[column].apply(lambda x: isinstance(x, np.ndarray)).any():
+                        df[column] = df[column].apply(lambda x: x.tolist() if isinstance(x, np.ndarray) else x)
+                all_recipes_list.extend(df.to_dict(orient="records"))
+    
+    return all_recipes_list
 
 @app.route('/api/personalized-recommendations', methods=['POST'])
 def call_personalized():
@@ -97,8 +105,29 @@ def call_personalized():
 @app.route('/api/top-rated-recipes', methods=['POST'])
 def call_top_rated():
     data = request.json
-    result = top_rated_recommendations(data)
-    return result
+    smallSet = True
+    result = []
+
+    if smallSet:
+        result = top_rated_recommendations(smallSet)
+    else:
+        result = np.array(top_rated_recommendations(smallSet)).tolist()
+
+    return jsonify(result)
+
+@app.route('/api/train/top-rated-recipes', methods=['POST'])
+def train_top_rated_endpoint():
+    data = request.json
+    result = train_top_rated(data)
+    print(result)
+    return jsonify(result)
+
+@app.route('/api/extract/top-rated-recipes', methods=['POST'])
+def extract_top_rated_files():
+    data = request.json
+    result = extract_top_rated(data)
+    print(result)
+    return jsonify(result)
 
 if __name__ == '__main__':
     app.run(debug=True)

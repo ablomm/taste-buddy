@@ -12,11 +12,20 @@ import {
   addUserRejectedRecipe,
 } from "../functions/HTTPRequests";
 
+interface InstructionStep {
+  step: number;
+  instruction: string;
+}
+
+interface FormattedInstructions {
+  list: InstructionStep[];
+}
+
+
 const fetchRecommendedRecipes = async (userID: number) => {
   try {
     const response = await fetch(
-      `${
-        process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
+      `${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
       }/recipe/api/recommendations`,
       {
         method: "POST",
@@ -82,13 +91,28 @@ const RecommenderPage = ({ navigation }) => {
     });
   };
 
+  const formatInstructions = (recipeInstructions: string[]): FormattedInstructions => {
+    let formattedInstructions: FormattedInstructions = {
+      list: []
+    };
+  
+    recipeInstructions.forEach((item, index) => {
+      formattedInstructions.list.push({
+        step: index + 1,
+        instruction: item
+      });
+    });
+  
+    return formattedInstructions;
+  }
+
   const checkRecipeList = async (recipeID: number) => {
-    console.log(`check recipes left: ${recipesLeft}`);
+    /*console.log(`check recipes left: ${recipesLeft}`);
 
     console.log(
       "how do i know rec list",
       recipes.map((r) => r.id)
-    );
+    );*/
 
     if (recipesLeft == 1) {
       loadNextBatch();
