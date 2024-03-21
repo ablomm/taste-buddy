@@ -182,7 +182,7 @@ const RecipePage = ({ route, navigation }: any) => {
                   { opacity: heroTitleOpacity },
                 ]}
               >
-                {truncateText(recipe.tags.join(", "), 19)}
+                {truncateText(recipe.tags.map(tag => tag.name).join(", "), 19)}
               </Animated.Text>
             ) : null}
             <Animated.Text
