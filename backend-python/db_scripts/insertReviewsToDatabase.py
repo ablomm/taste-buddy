@@ -5,7 +5,11 @@ import time
 from sqlalchemy import create_engine
 from dotenv import load_dotenv
 
-engine = create_engine(os.getenv("DB_CONNECTION_STRING"))
+load_dotenv()
+
+db = os.getenv("DB_CONNECTION_STRING")
+print(db)
+engine = create_engine(db)
 conn = engine.connect()
 sql = "SELECT * FROM tastebuddy.review"
 
