@@ -194,7 +194,6 @@ router.post("/api/recommendations", async (req: express.Request, res: express.Re
 
         // convert recipes to Recipe object matching database before returning
         const recommend = recipes.map(convertToRecipe)
-
         // Send the result back to the client
         res.json(recommend);
     } catch (error) {

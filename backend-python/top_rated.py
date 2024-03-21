@@ -184,7 +184,7 @@ def top100(smallSet):
     warnings.filterwarnings('ignore')
 
     clustered_recipes_list = []
-
+    recipe_list =[]
     for cluster in range(10):
         print("Cluster #{}".format(cluster))
         recs = []
@@ -216,5 +216,11 @@ def top100(smallSet):
         cluster_df = recipes[recipes['RecipeId'].isin(cluster_recipe_ids)]
         cluster_df['Cluster'] = cluster
         clustered_recipes_list.append(cluster_df)
-    
-    return clustered_recipes_list
+        #print(cluster_df['RecipeId'].tolist())
+        #clustered_recipes_list.extend(cluster_df['RecipeId'].tolist())
+        recipe_list.extend(cluster_df['RecipeId'].tolist())
+
+    if smallSet:
+        return recipe_list
+    else:
+        return clustered_recipes_list

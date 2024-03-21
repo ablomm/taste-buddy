@@ -76,21 +76,24 @@ def personalized_recommendations(data):
     result = recipes_full[recipes_full['RecipeId'].isin(final_recommendations)]
     return result.to_json(orient='records')
 
-def top_rated_recommendations(data):
+def top_rated_recommendations(smallSet):
     # top rated recipe model 
-    result = top_rated.top100(data)
+    result = top_rated.top100(smallSet)
 
     all_recipes_list = []
 
+    if smallSet:
+        all_recipes_list = result
+    else:
     #convert dataframes within list to a list of dictionaries
-    for df in result:
-        if isinstance(df, pd.DataFrame) and not df.empty:
-            for column in df.columns:
-                # Apply conversion if any cell in the column is an ndarray
-                if df[column].apply(lambda x: isinstance(x, np.ndarray)).any():
-                    df[column] = df[column].apply(lambda x: x.tolist() if isinstance(x, np.ndarray) else x)
-            all_recipes_list.extend(df.to_dict(orient="records"))
-            
+        for df in result:
+            if isinstance(df, pd.DataFrame) and not df.empty:
+                for column in df.columns:
+                    # Apply conversion if any cell in the column is an ndarray
+                    if df[column].apply(lambda x: isinstance(x, np.ndarray)).any():
+                        df[column] = df[column].apply(lambda x: x.tolist() if isinstance(x, np.ndarray) else x)
+                all_recipes_list.extend(df.to_dict(orient="records"))
+    
     return all_recipes_list
 
 @app.route('/api/personalized-recommendations', methods=['POST'])
@@ -102,8 +105,14 @@ def call_personalized():
 @app.route('/api/top-rated-recipes', methods=['POST'])
 def call_top_rated():
     data = request.json
-    result = np.array(top_rated_recommendations(data)).tolist()
-    print(result)
+    smallSet = True
+    result = []
+
+    if smallSet:
+        result = top_rated_recommendations(smallSet)
+    else:
+        result = np.array(top_rated_recommendations(smallSet)).tolist()
+
     return jsonify(result)
 
 @app.route('/api/train/top-rated-recipes', methods=['POST'])
