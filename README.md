@@ -8,6 +8,17 @@
 - add .env file that contains backend url EXPO_PUBLIC_SERVER_URL = "http://[ipAddress]:[backend port number]"
 - `npm start`
 
+# Backend-Python
+- `pip install -r requirements.txt`
+- `cd db_scripts`
+- Check the .env file for changing to your database connection string, it is currently set for port 3307 and root password: 0000 for the container.
+- `python insertRecipeToDatabase.py`
+- It is CRUCIAL that insertRecipeToDatabase.py be successfully completed first before the reviews insertion.
+- `python insertReviewsToDatabase.py`
+- `cd ../`
+- `flask --app app run`
+- Once the setup is complete, then you only need to use `flask --app app run` to start it any time.
+
 # Docker
 1. Download [Docker Desktop](https://www.docker.com/products/docker-desktop/).
 2. If you are using windows, after installing, you need to increase the wsl2 memory limit to increase performance, if you have 16gb of ram, do the following:

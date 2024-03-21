@@ -191,8 +191,6 @@ router.post("/api/recommendations", async (req: express.Request, res: express.Re
         // get recipes with the ID list that was returned
         const recommend = await getRecipesByIDs(recipes);
 
-        console.log(recommend)
-
         // Send the result back to the client
         res.json(recommend);
     } catch (error) {
