@@ -22,6 +22,7 @@ import RecipeListItem from "../components/RecipeListItem";
 import { LoadingContext } from "../providers/LoadingProvider";
 import { TouchableRipple } from "react-native-paper";
 const fallbackProfilePicture = require("../../assets/profile.jpg");
+import LogoHeader from "../components/header/LogoHeader";
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -462,6 +463,7 @@ const AccountPage = () => {
 
   return (
     <View style={styles.container}>
+      <LogoHeader></LogoHeader>
       <View style={styles.profileHeader}>
         <Image
           source={

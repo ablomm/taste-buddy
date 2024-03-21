@@ -117,7 +117,9 @@ const CreatePostPage = ({ route, navigation }: any) => {
             let type = image.uri.substring(image.uri.lastIndexOf('.') + 1, image.uri.length);
   
             let imageUrl = await putImage(buf, type)
-  
+
+            navigation.navigate('GalleryPage')
+            
             await savePost(userContext.state.username, values.description, tags, imageUrl, values.recipeUrl)
   
             console.log("Save post successful")

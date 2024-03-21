@@ -5,6 +5,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import TBButton from '../components/TBButton';
 import * as MediaLibrary from 'expo-media-library';
 import { PagedInfo, Asset } from 'expo-media-library';
+import LogoHeader from "../components/header/LogoHeader";
 
 const windowWidth= Dimensions.get('window').width;
 const windowHeight= Dimensions.get('window').height;
@@ -71,6 +72,7 @@ const GalleryPage = ({navigation}:any) => {
       );
     return(
         <View style={styles.container}>
+            <LogoHeader/>
             <View style={styles.headerWrapper}>
                 <View style={styles.headerLeftWrapper}>
                     <View style={styles.headerTiltleWrapper}><Text style={styles.headerTiltle}>Select an Image {`<_<`}</Text></View>

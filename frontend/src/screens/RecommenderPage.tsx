@@ -5,6 +5,7 @@ import TBButton from "../components/TBButton";
 import { TinderCard } from "rn-tinder-card";
 import { LinearGradient } from "expo-linear-gradient";
 import { UserContext } from "../providers/UserProvider";
+import LogoHeader from "../components/header/LogoHeader";
 
 const RecommenderPage = () => {
   const userContext = React.useContext(UserContext) as any;
@@ -98,79 +99,88 @@ const RecommenderPage = () => {
   }, []);
 
   return (
-    <View style={styles.wrapper}>
-      <View style={{ flex: 1, height: PAGE_HEIGHT }}>
-        {recipes.map((item, index) => {
-          return (
-            (
-              <View
-                key={index}
-                style={[styles.cardContainer, {zIndex: -index}]} // need zindex because by default the last item in the list was displaying first
-                pointerEvents="box-none"
-              >
-                <TinderCard
-                  cardHeight={0.75 * PAGE_HEIGHT}
-                  cardWidth={0.95 * PAGE_WIDTH}
-                  cardStyle={styles.card}
-                  // disableTopSwipe={true}
-                  onSwipedRight={() => {
-                    saveRecipe(item.id, username);
-                  }}
-                  onSwipedLeft={() => {
-                    rejectRecipe(item.id);
-                  }}
-                  onSwipedBottom={() => {
-                    Alert.alert("Swiped Bottom");
-                  }}
-                  onSwipedTop={() => {
-                    Alert.alert("Swiped Top");
-                  }}
-                >
-                  <View>
-                    <ImageBackground
-                      source={{ uri: item.recipeImage }}
-                      style={styles.image}
-                      imageStyle={{ borderRadius: 25 }}
-                    >
-                      <View style={{ height: 0.6 * PAGE_HEIGHT }}></View>
-                      <View style={{ flex: 1 }}>
-                        <LinearGradient
-                          colors={["rgba(0,0,0,0)", "rgba(0,0,0,0.49)"]}
-                          start={{ x: 0, y: 0 }}
-                          end={{ x: 0, y: 1 }}
-                          style={{ flex: 1, borderRadius: 25 }}
-                        >
-                          <Text style={styles.recipeTitleText}>
-                            {item.recipeTitle}
-                          </Text>
-                          <Text style={styles.recipeDescription}>
-                            {item.description}
-                          </Text>
-                        </LinearGradient>
-                      </View>
-                    </ImageBackground>
-                  </View>
-                </TinderCard>
-              </View>
-            ) || "test this?"
-          );
-        })}
+    <View style={styles.container}>
+      <View>
+        <LogoHeader />
       </View>
-      {/* <Button title="fetch recipes list" onPress={fetchRecipeList}/> */}
-      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-        <TBButton style={{ width: "25%" }} title="X" />
-        <TBButton
-          style={{ width: "30%" }}
-          title="Full Recipe"
-          onPress={() => loadNextBatch}
-        />
-        <TBButton style={{ width: "25%" }} title="Save" onPress={() => saveRecipe(2,username)} />
+      <View style={styles.wrapper}>
+        <View style={{ flex: 1 }}>
+          {recipes.map((item, index) => {
+            return (
+              (
+                <View
+                  key={index}
+                  style={[styles.cardContainer, {zIndex: -index}]} // need zindex because by default the last item in the list was displaying first
+                  pointerEvents="box-none"
+                >
+                  <TinderCard
+                    cardHeight={0.75 * PAGE_HEIGHT}
+                    cardWidth={0.95 * PAGE_WIDTH}
+                    cardStyle={styles.card}
+                    // disableTopSwipe={true}
+                    onSwipedRight={() => {
+                      saveRecipe(item.id, username);
+                    }}
+                    onSwipedLeft={() => {
+                      rejectRecipe(item.id);
+                    }}
+                    onSwipedBottom={() => {
+                      Alert.alert("Swiped Bottom");
+                    }}
+                    onSwipedTop={() => {
+                      Alert.alert("Swiped Top");
+                    }}
+                  >
+                    <View>
+                      <ImageBackground
+                        source={{ uri: item.recipeImage }}
+                        style={styles.image}
+                        imageStyle={{ borderRadius: 25 }}
+                      >
+                        <View style={{ height: 0.6 * PAGE_HEIGHT }}></View>
+                        <View style={{ flex: 1 }}>
+                          <LinearGradient
+                            colors={["rgba(0,0,0,0)", "rgba(0,0,0,0.49)"]}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 0, y: 1 }}
+                            style={{ flex: 1, borderRadius: 25 }}
+                          >
+                            <Text style={styles.recipeTitleText}>
+                              {item.recipeTitle}
+                            </Text>
+                            <Text style={styles.recipeDescription}>
+                              {item.description}
+                            </Text>
+                          </LinearGradient>
+                        </View>
+                      </ImageBackground>
+                    </View>
+                  </TinderCard>
+                </View>
+              ) || "test this?"
+            );
+          })}
+        </View>
+        {/* <Button title="fetch recipes list" onPress={fetchRecipeList}/> */}
+        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+          <TBButton style={{ width: "25%" }} title="X" />
+          <TBButton
+            style={{ width: "30%" }}
+            title="Full Recipe"
+            onPress={() => loadNextBatch}
+          />
+          <TBButton style={{ width: "25%" }} title="Save" onPress={() => saveRecipe(2,username)} />
+        </View>
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
   recipeTitleText: {
     // textAlign: "center",
     fontSize: 25,
@@ -199,6 +209,7 @@ const styles = StyleSheet.create({
   },
   wrapper: {
     flex: 1,
+    paddingTop: 30
   },
 });
 
