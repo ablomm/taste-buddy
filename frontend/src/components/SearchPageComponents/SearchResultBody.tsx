@@ -39,7 +39,6 @@ function SearchResultBody({ navigation, searchResults, search }) {
     }
   }
 
-  // TODO: Determine if scrollable or limited filter tags is better
   function applyRecipeSortingAndFiltering() {
     if (relevantRecipes != null && relevantRecipes.length != 0) {
       let processedArray: Recipe[] = [...relevantRecipes];
@@ -138,7 +137,7 @@ function SearchResultBody({ navigation, searchResults, search }) {
         </TouchableOpacity>
       </View>
 
-      <>
+      <View>
         {selectedTab === "recipes" && (
           <FilterBar
             onSelectFilter={selectedFilter}
@@ -156,7 +155,7 @@ function SearchResultBody({ navigation, searchResults, search }) {
         ) : (
           <PostTab relevantPosts={relevantPosts} />
         )}
-      </>
+      </View>
     </View>
   );
 }
