@@ -3,7 +3,9 @@ from torch.utils.data.dataset import Dataset
 from torch.utils.data import DataLoader
 from torch import save 
 import torch 
+import os
 import pandas as pd
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 
 class Loader():
@@ -14,9 +16,9 @@ class Loader():
         reviews = pd.read_parquet('data/dataset/reviews.parquet')
 
         if smallSet: 
-            engine = create_engine('mysql+mysqlconnector://root:0000@localhost:3306/tastebuddy')
+            engine = create_engine(os.getenv("DB_CONNECTION_STRING"))
             conn = engine.connect()
-            recipes_raw = pd.read_sql('SELECT * FROM recipe LIMIT 1000;', engine)
+            recipes_raw = pd.read_sql('SELECT * FROM Recipe LIMIT 1000;', engine)
             reviews_raw = pd.read_sql('SELECT * FROM review LIMIT 1000;', engine)
 
             recipes = recipes_raw.rename(columns={'authorID': 'AuthorId', 'recipeTitle': 'Name', 'id': 'RecipeId'}) 

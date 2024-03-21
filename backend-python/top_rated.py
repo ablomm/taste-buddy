@@ -25,7 +25,7 @@ s3 = boto3.client('s3',
 bucket_name = 'tastebuddy-images'
 folder_name = 'engine/'
 
-engine = create_engine('mysql+mysqlconnector://root:0000@localhost:3306/tastebuddy')
+engine = create_engine(os.getenv("DB_CONNECTION_STRING"))
 conn = engine.connect()
 
 def get_zip():
@@ -150,7 +150,7 @@ def top100(smallSet):
     reviews = pd.read_parquet(review_path)
     #smallSet = True
     if smallSet:
-        recipes_raw = pd.read_sql('SELECT * FROM recipe LIMIT 1000;', engine)
+        recipes_raw = pd.read_sql('SELECT * FROM Recipe LIMIT 1000;', engine)
         reviews_raw = pd.read_sql('SELECT * FROM review LIMIT 1000;', engine)
 
         recipes = recipes_raw.rename(columns={'authorID': 'AuthorId', 'recipeTitle': 'Name', 'id': 'RecipeId'}) 

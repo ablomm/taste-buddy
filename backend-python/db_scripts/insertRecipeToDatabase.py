@@ -1,10 +1,12 @@
 import pandas as pd
 import numpy as np
 import re
+import os
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 
 # database connection
-engine = create_engine('mysql+mysqlconnector://root:0000@localhost:3306/tastebuddy')
+engine = create_engine(os.getenv("DB_CONNECTION_STRING"))
 conn = engine.connect()
 
 # retrieving data from dataset
