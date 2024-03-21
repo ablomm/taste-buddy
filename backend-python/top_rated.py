@@ -142,7 +142,7 @@ def top100(smallSet):
     clustered_recipes_list = []
     recipe_list =[]
     for cluster in range(10):
-        print("Cluster #{}".format(cluster))
+        #print("Cluster #{}".format(cluster))
         recs = []
 
         cluster_indexes = np.where(kmeans.labels_ == cluster)[0]
@@ -162,12 +162,11 @@ def top100(smallSet):
             rat_count = reviews.loc[reviews['RecipeId']==recid].count()[0]
             if recid in recipe_names:
                 recs.append((recipe_names[recid], rat_count))
-            else:
-                print(f"Recipe ID {recid} not found in recipes.")
+
             if len(recs) == 10:
                 break
-        for rec in sorted(recs, key=lambda tup: tup[1], reverse=True)[:10]:
-            print("\t", rec[0])
+        #for rec in sorted(recs, key=lambda tup: tup[1], reverse=True)[:10]:
+        #    print("\t", rec[0])
         
         cluster_df = recipes[recipes['RecipeId'].isin(cluster_recipe_ids)]
         cluster_df['Cluster'] = cluster

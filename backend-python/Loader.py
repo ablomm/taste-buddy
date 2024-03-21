@@ -42,8 +42,8 @@ class Loader():
         self.x = self.reviews[['AuthorId', 'RecipeId']].values  # Input features
         self.y = self.reviews['Rating'].values  # Target variables
 
-        print(self.x)
-        print(self.y)
+        #print(self.x)
+        #print(self.y)
         self.x, self.y = torch.tensor(self.x), torch.tensor(self.y) # Transforms the data to tensors
 
     def __getitem__(self, index):
