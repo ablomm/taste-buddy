@@ -11,6 +11,7 @@ import recipeController from "./controller/recipe"
 import postController from "./controller/post"
 import searchController from "./controller/search";
 import s3Controller from "./controller/s3"
+import populateES from './scripts/populateES';
 
 const app = express();
 
@@ -41,5 +42,8 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
 const PORT = process.env.PORT || 8080
 
 app.listen(PORT, () => {
+  if (process.argv[2] == "-scripts") {
+      populateES();
+  }
   console.log(`app listening on port ${PORT}`)
 })

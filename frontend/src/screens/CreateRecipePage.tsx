@@ -167,6 +167,8 @@ const CreateRecipePage = ({ route, navigation }: any) => {
       let type = image.uri.substring(image.uri.lastIndexOf('.') + 1, image.uri.length);
       let imageUrl = await putImage(buf, type)
 
+      navigation.navigate('GalleryPage')
+      
       await saveRecipe(
         userContext.state.username,
         data.title,

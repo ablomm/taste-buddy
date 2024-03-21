@@ -5,6 +5,7 @@ import TBButton from "../components/TBButton";
 import { TinderCard } from "rn-tinder-card";
 import { LinearGradient } from "expo-linear-gradient";
 import { UserContext } from "../providers/UserProvider";
+import LogoHeader from "../components/header/LogoHeader";
 import { Recipe } from "../interfaces/RecipeInterface";
 import {
   addRecipeToUserSaved,
@@ -224,6 +225,10 @@ const RecommenderPage = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
   fullRecipeButton: {
     width: "40%",
     height: 30,

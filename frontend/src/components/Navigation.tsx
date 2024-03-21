@@ -58,8 +58,8 @@ const SignedInNavigation = () => (
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="add-outline" size={size + 10} color={color} />),
-          tabBarActiveTintColor: 'green',
-          tabBarInactiveTintColor: 'gray',
+          tabBarActiveTintColor: '#8CC84B',
+          tabBarInactiveTintColor: '#a1a1a1',
         }}
       />
       <Tab.Screen
@@ -68,8 +68,8 @@ const SignedInNavigation = () => (
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="search-outline" size={size} color={color} />),
-          tabBarActiveTintColor: 'green',
-          tabBarInactiveTintColor: 'gray',
+          tabBarActiveTintColor: '#8CC84B',
+          tabBarInactiveTintColor: '#a1a1a1',
         }}
       />
 
@@ -79,8 +79,8 @@ const SignedInNavigation = () => (
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="star-outline" size={size} color={color} />),
-          tabBarActiveTintColor: 'green',
-          tabBarInactiveTintColor: 'gray',
+          tabBarActiveTintColor: '#8CC84B',
+          tabBarInactiveTintColor: '#a1a1a1',
         }}
       />
 
@@ -90,8 +90,8 @@ const SignedInNavigation = () => (
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home-outline" size={size} color={color} />),
-          tabBarActiveTintColor: 'green',
-          tabBarInactiveTintColor: 'gray',
+          tabBarActiveTintColor: '#8CC84B',
+          tabBarInactiveTintColor: '#a1a1a1',
         }}
       />
     </Tab.Navigator>

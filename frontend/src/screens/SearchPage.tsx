@@ -3,7 +3,7 @@ import {View, StyleSheet} from 'react-native';
 import SearchBar from '../components/SearchBar';
 import AllPostsGrid from '../components/AllPostsGrid';
 import SearchResultBody from "../components/SearchPageComponents/SearchResultBody";
-
+import LogoHeader from "../components/header/LogoHeader";
 
 const SearchPage = ({navigation}: any) => {
     const [searchPhrase, setSearchPhrase] = React.useState("");
@@ -39,6 +39,7 @@ const SearchPage = ({navigation}: any) => {
 
     return (
         <View style={styles.container}>
+            <LogoHeader/>
             <SearchBar
                 searchPhrase={searchPhrase}
                 setSearchPhrase={setSearchPhrase}
