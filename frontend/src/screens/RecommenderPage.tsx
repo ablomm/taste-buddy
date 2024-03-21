@@ -21,7 +21,6 @@ interface FormattedInstructions {
   list: InstructionStep[];
 }
 
-
 const fetchRecommendedRecipes = async (userID: number) => {
   try {
     const response = await fetch(
@@ -107,14 +106,7 @@ const RecommenderPage = ({ navigation }) => {
   }
 
   const checkRecipeList = async (recipeID: number) => {
-    /*console.log(`check recipes left: ${recipesLeft}`);
-
-    console.log(
-      "how do i know rec list",
-      recipes.map((r) => r.id)
-    );*/
-
-    if (recipesLeft == 1) {
+    if (recipesLeft < 3) {
       loadNextBatch();
     }
   };
@@ -131,11 +123,11 @@ const RecommenderPage = ({ navigation }) => {
             return (
               <View
                 key={index}
-                style={[styles.cardContainer]} // need zindex because by default the last item in the list was displaying first
+                style={[styles.cardContainer]} 
                 pointerEvents="box-none"
               >
                 <TinderCard
-                  cardHeight={0.75 * PAGE_HEIGHT}
+                  cardHeight={0.80 * PAGE_HEIGHT}
                   cardWidth={0.95 * PAGE_WIDTH}
                   cardStyle={styles.card}
                   disableTopSwipe={true}
@@ -165,7 +157,7 @@ const RecommenderPage = ({ navigation }) => {
                         >
                           <View
                             style={{
-                              height: 0.58 * PAGE_HEIGHT,
+                              height: 0.62 * PAGE_HEIGHT,
                               flexDirection: "column-reverse",
                             }}
                           >
@@ -193,9 +185,6 @@ const RecommenderPage = ({ navigation }) => {
                           >
                             <TBButton
                               title="See Full Recipe"
-                              // onPress={() => {
-                              //   showFullRecipe(item);
-                              // }}
                               onPress={() => showFullRecipe(item)}
                               style={styles.fullRecipeButton}
                               textColor={{ color: "white" }}
@@ -215,7 +204,7 @@ const RecommenderPage = ({ navigation }) => {
             pointerEvents="box-none"
           >
             <TinderCard
-              cardHeight={0.75 * PAGE_HEIGHT}
+              cardHeight={0.80 * PAGE_HEIGHT}
               cardWidth={0.95 * PAGE_WIDTH}
               cardStyle={styles.defaultCard}
               disableBottomSwipe={true}
@@ -233,12 +222,6 @@ const RecommenderPage = ({ navigation }) => {
                 <Text style={styles.defaultText}>
                   One moment! We're finding you some recommendations...
                 </Text>
-                <TBButton
-                  title="Temp load next batch"
-                  onPress={() => {
-                    loadNextBatch();
-                  }}
-                ></TBButton>
               </View>
             </TinderCard>
           </View>
