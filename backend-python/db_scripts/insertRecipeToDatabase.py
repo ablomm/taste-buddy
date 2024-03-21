@@ -2,8 +2,60 @@ import pandas as pd
 import numpy as np
 import re
 import os
+import zipfile
+import pandas as pd
+import torch
+import os
+import boto3
+import warnings
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
+
+load_dotenv()
+
+s3 = boto3.client('s3',  
+                  aws_access_key_id= os.getenv("AWS_ACCESS_KEY_ID"),
+                  aws_secret_access_key= os.getenv("AWS_SECRET_ACCESS_KEY"), 
+                  region_name='us-east-2')
+
+bucket_name = 'tastebuddy-images'
+folder_name = 'engine/'
+db = os.getenv("DB_CONNECTION_STRING")
+engine = create_engine(db)
+conn = engine.connect()
+
+def get_zip():
+    object_key = folder_name + "dataset.zip"
+    file_path = "../dataset.zip"
+
+    try:
+        s3.download_file(bucket_name, object_key, file_path)
+
+        if os.path.isfile("../dataset.zip"):
+            print('dataset downloaded')
+
+        return True
+    except Exception as e:
+        print('dataset unable to download')
+        print(e)
+        return False 
+
+#Download and set up dataset on startup
+if (not os.path.isfile("../dataset.zip")):
+   get_zip()
+
+if os.path.isdir("data"):
+   print("directory is already set up!")
+else:
+    try: 
+     with zipfile.ZipFile('../dataset.zip', 'r') as zip_ref:
+        zip_ref.extractall('../data')
+
+        print('extracted dataset.zip')
+    except Exception as e:
+        print('unable to extract dataset.zip')
+        print(e)
+
 
 # database connection
 engine = create_engine(os.getenv("DB_CONNECTION_STRING"))
@@ -79,15 +131,13 @@ exploded_df = transformed_df.explode('RecipeInstructions').reset_index(drop=True
 
 # Generate a step number for each instruction within each RecipeId.
 exploded_df['StepNumber'] = exploded_df.groupby('RecipeId').cumcount() + 1
-print(exploded_df.loc[0:9, :])
+
 # Rename the 'RecipeInstructions' column to 'Instruction' for clarity.
 exploded_df.rename(columns={'RecipeInstructions': 'Instruction'}, inplace=True)
 
 # Now, exploded_df has the structure we want, and we can adjust column names/order as needed.
 final_df = exploded_df[['RecipeId', 'StepNumber', 'Instruction']]
 final_df.columns = ['recipeID', 'step', 'instruction']
-
-print(final_df)
 
 try:
     final_df.to_sql('recipeinstructions', con=engine, if_exists='append', index=False)

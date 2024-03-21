@@ -16,7 +16,8 @@ class Loader():
         reviews = pd.read_parquet('data/dataset/reviews.parquet')
 
         if smallSet: 
-            engine = create_engine(os.getenv("DB_CONNECTION_STRING"))
+            db = os.getenv("DB_CONNECTION_STRING")
+            engine = create_engine(db)
             conn = engine.connect()
             recipes_raw = pd.read_sql('SELECT * FROM Recipe LIMIT 1000;', engine)
             reviews_raw = pd.read_sql('SELECT * FROM review LIMIT 1000;', engine)
