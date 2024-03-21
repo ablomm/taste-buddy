@@ -101,7 +101,6 @@ const AddIngredientForm = ({ visible, setVisible, addIngredients }: any) => {
             </View>
 
             <TBButton onPress={handleSubmit as any} title="Save" />
-            <TBButton onPress={() => setVisible(false)} title="Cancel" />
           </>
         )}
       </Formik>

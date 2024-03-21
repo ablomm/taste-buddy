@@ -18,6 +18,7 @@ model User {
   createDate   DateTime           @default(now())
   isModerator Boolean @default(false)
   savedRecipes UserSavedRecipes[]
+  rejectedRecommendedRecipes UserRejectedRecipes[]
   recipes      Recipe[]
   userPosts    UserPosts[]
   profilePic   String             @default("")
@@ -46,6 +47,14 @@ model Folder {
   @@unique([userID, folderName])
 }
 
+model UserRejectedRecipes {
+  id        Int       @id @default(autoincrement())
+  userID    Int
+  user      User      @relation(fields: [userID], references: [id])
+  recipeID  Int
+  @@unique([userID, recipeID])
+}
+
 model DietaryPref {
   id                 Int                  @id @default(autoincrement())
   author             User                 @relation(fields: [authorID], references: [id])
@@ -59,7 +68,7 @@ model Recipe {
   authorID           Int
   creationTime       DateTime             @default(now())
   recipeTitle        String
-  description        String
+  description        String @db.LongText
   cookTimeHours      Int?
   cootTimeMinutes    Int
   calories           Int?

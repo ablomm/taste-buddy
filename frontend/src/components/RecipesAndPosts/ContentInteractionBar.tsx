@@ -10,6 +10,7 @@ import {
 import { UserContext } from "../../providers/UserProvider";
 import Modal from "react-native-modal";
 import CheckBox from "expo-checkbox";
+import { addRecipeToUserSaved } from "../../functions/HTTPRequests";
 
 interface Folder {
   id: number;
@@ -70,32 +71,7 @@ const ContentInteractionBar = ({ recipeID }) => {
   const saveRecipe = async () => {
     toggleModal();
     setSaved(true);
-    try {
-      let response = await fetch(
-        `${
-          process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
-        }/user/save-recipe/${username}}`,
-        {
-          method: "POST",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({
-            recipeID: recipeID,
-          }),
-        }
-      );
-
-      if (response.status !== 200) {
-        console.error("save recipe unsuccessful");
-      } else {
-        console.log("save recipe successful");
-      }
-    } catch (error: any) {
-      console.error(error.stack);
-    }
+    addRecipeToUserSaved(recipeID,username)
 
     //now save to additional folders checked other than default folder All
     const checkedFolders = checkboxes
