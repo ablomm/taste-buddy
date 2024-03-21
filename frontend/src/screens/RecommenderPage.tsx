@@ -70,7 +70,7 @@ const RecommenderPage = ({ navigation }) => {
   const rejectRecipe = async (recipeID: number) => {
     console.log("rejecting: ", recipeID);
     // filter out recipe in recipe list so that list length can be tracked
-    setRecipes(recipes.filter((recipe) => recipe.id !== recipeID));
+    setRecipes(currentRecipes => currentRecipes.filter(recipe => recipe.id !== recipeID));
     addUserRejectedRecipe(recipeID, userID);
     setRecipesLeft(recipesLeft - 1);
     checkRecipeList(recipeID);
@@ -79,7 +79,7 @@ const RecommenderPage = ({ navigation }) => {
   const saveRecipe = async (recipeID: number) => {
     console.log("saving: ", recipeID);
     // filter out recipe in recipe list so that list length can be tracked
-    setRecipes(recipes.filter((recipe) => recipe.id !== recipeID));
+    setRecipes(currentRecipes => currentRecipes.filter(recipe => recipe.id !== recipeID));
     setRecipesLeft(recipesLeft - 1);
     addRecipeToUserSaved(recipeID, username);
     checkRecipeList(recipeID);
