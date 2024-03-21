@@ -1,8 +1,11 @@
 import pandas as pd
 import numpy as np
+import os
 import time    
 from sqlalchemy import create_engine
-engine = create_engine('mysql+mysqlconnector://root:0000@localhost:3306/tastebuddy')
+from dotenv import load_dotenv
+
+engine = create_engine(os.getenv("DB_CONNECTION_STRING"))
 conn = engine.connect()
 sql = "SELECT * FROM tastebuddy.review"
 

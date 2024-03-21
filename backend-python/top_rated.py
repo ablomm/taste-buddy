@@ -17,55 +17,11 @@ from sqlalchemy import create_engine
 
 load_dotenv()
 
-s3 = boto3.client('s3',  
-                  aws_access_key_id= os.getenv("AWS_ACCESS_KEY_ID"),
-                  aws_secret_access_key= os.getenv("AWS_SECRET_ACCESS_KEY"), 
-                  region_name='us-east-2')
-
-bucket_name = 'tastebuddy-images'
-folder_name = 'engine/'
-
-engine = create_engine('mysql+mysqlconnector://root:0000@localhost:3306/tastebuddy')
+db = os.getenv("DB_CONNECTION_STRING")
+engine = create_engine(db)
 conn = engine.connect()
 
-def get_zip():
-    object_key = folder_name + "dataset.zip"
-    file_path = "dataset.zip"
-
-    try:
-        s3.download_file(bucket_name, object_key, file_path)
-
-        if os.path.isfile("dataset.zip"):
-            print('dataset downloaded')
-
-        return True
-    except Exception as e:
-        print('dataset unable to download')
-        print(e)
-        return False 
-
-def setup():
-    
-    if (not os.path.isfile("dataset.zip")):
-       get_zip()
-
-    if os.path.isdir("data"):
-       return True
-    else:
-        try: 
-           with zipfile.ZipFile('dataset.zip', 'r') as zip_ref:
-            zip_ref.extractall('data')
-
-            print('extracted dataset.zip')
-        except Exception as e:
-            print('unable to extract dataset.zip')
-            print(e)
-            return False
-
 def train(smallSet):
-
-    if not os.path.isdir("data"): #check for extracted data
-       setup()
     
     recipes_path = 'data/dataset/recipes.parquet'
     recipes = pd.read_parquet(recipes_path)
@@ -150,7 +106,7 @@ def top100(smallSet):
     reviews = pd.read_parquet(review_path)
     #smallSet = True
     if smallSet:
-        recipes_raw = pd.read_sql('SELECT * FROM recipe LIMIT 1000;', engine)
+        recipes_raw = pd.read_sql('SELECT * FROM Recipe LIMIT 1000;', engine)
         reviews_raw = pd.read_sql('SELECT * FROM review LIMIT 1000;', engine)
 
         recipes = recipes_raw.rename(columns={'authorID': 'AuthorId', 'recipeTitle': 'Name', 'id': 'RecipeId'}) 
