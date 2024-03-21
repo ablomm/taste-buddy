@@ -8,7 +8,7 @@ sql = "SELECT * FROM tastebuddy.review"
 
 df = pd.read_parquet('../data/dataset/reviews.parquet')
 
-transformed_df = df[['RecipeId','Review','Rating','AuthorId','AuthorName','DateSubmitted']].copy().loc[0:4999, :]
+transformed_df = df.head(10000)[['RecipeId','Review','Rating','AuthorId','AuthorName','DateSubmitted']].copy()
 
 transformed_df['profilePic'] = ''
 transformed_df['DateSubmitted'] = pd.to_datetime(df['DateSubmitted'])
@@ -29,3 +29,5 @@ try:
     transformed_df.to_sql('review', con=engine, if_exists='append', index=False)
 except Exception as e:
     print(f"An error occurred: {e}")
+
+conn.close()
