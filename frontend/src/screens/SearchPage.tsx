@@ -39,7 +39,6 @@ const SearchPage = ({navigation}: any) => {
 
     return (
         <View style={styles.container}>
-            <LogoHeader/>
             <SearchBar
                 searchPhrase={searchPhrase}
                 setSearchPhrase={setSearchPhrase}
