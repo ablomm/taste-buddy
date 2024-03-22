@@ -66,7 +66,7 @@ router.post("/save", async (req: express.Request, res: express.Response) => {
         tags: tags,
         image
     } = req.body;
-
+    
     console.log("recipe /save username: " + username);
 
     const user = await getUserByUsername(username);
@@ -90,7 +90,7 @@ router.post("/save", async (req: express.Request, res: express.Response) => {
         ...recipe,
         ingredients: ingredientsObj,
         instructions: instructionsObj,
-        tags: processedTags
+        tags: tags
     }
 
     // Store in elastic search db
