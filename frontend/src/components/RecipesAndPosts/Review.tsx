@@ -26,7 +26,7 @@ export function UserReview({review, currentUserID, handleDelete}: {
                 <Image
                     source={user.profilePic ? {uri: user.profilePic} : fallbackProfilePicture}
                     style={{width: 50, height: 50, borderRadius: 50}}/>
-                <View style={{flexDirection: 'column', marginLeft: 10}}>
+                <View style={{flexDirection: 'column', marginLeft: 10, width:'85%'}}>
                     <Text>{review.username}</Text>
                     <StarRating
                         rating={review.rating}
