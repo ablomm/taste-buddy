@@ -161,6 +161,7 @@ router.post("/api/recommendations", async (req: express.Request, res: express.Re
         const rejectedRecipeIDs = await getRejectedRecipeIDs(userID);
 
         let personalizedResult = [], personalizedRecipes = [];
+
         // const temp = [ { recipeID: 39}, {recipeID: 41}, {recipeID: 43}, {recipeID: 51}, {recipeID: 52}, {recipeID: 54}, {recipeID: 60}]
         // const tempReject = [ {recipeID: 1}, {recipeID: 2}, {recipeID: 3}, {recipeID: 4}, {recipeID: 5}]
 
@@ -174,9 +175,9 @@ router.post("/api/recommendations", async (req: express.Request, res: express.Re
         // Get top rated recipes -- COMMENT OUT IF YOU DON'T HAVE ENOUGH RAM
         const topRatedResult = await getTopRatedRecipes(true);
         const topRecipes = JSON.parse(topRatedResult.replace(/\bNaN\b/g, "null"));
-        const recipes = topRecipes.concat(personalizedRecipes); // Combine personalized results with top rated
+        const recipes: number[] = Array.from(new Set<number>(personalizedRecipes.concat(topRecipes))); // Combine personalized results with top rated -- ensure no duplicate
         
-        // UNCOMMENT THIS IF COMMENTING OUT PREVIOUS (also ensure that the user you are signing in with has a saved recipe)
+      // UNCOMMENT THIS IF COMMENTING OUT PREVIOUS (also ensure that the user you are signing in with has a saved recipe)
         // const recipes = personalizedRecipes;
 
         // Randomize combined list so that they are shown randomly to user
