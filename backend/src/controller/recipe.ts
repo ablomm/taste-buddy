@@ -205,16 +205,6 @@ router.post("/api/recommendations/train", async (req: express.Request, res: expr
         // Send the result back to the client
         res.json(trainingModel);
     } catch (error) {
-        res.status(500).send('Internal Server Error');
-    }
-});
-
-router.post("/api/recommendations/train", async (req: express.Request, res: express.Response) => {
-    try { 
-        const trainingModel = await trainTopRated(req.body); 
-        // Send the result back to the client
-        res.json(trainingModel);
-    } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');
     }
@@ -226,28 +216,6 @@ router.post("/api/recommendations/setup", async (req: express.Request, res: expr
         console.log(topRatedSetupResult)
         // Send the result back to the client
         res.json(topRatedSetupResult);
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Internal Server Error');
-    }
-});
-
-router.post("/api/recommendations/train", async (req: express.Request, res: express.Response) => {
-    try { 
-        const trainingModel = await trainTopRated(req.body); 
-        // Send the result back to the client
-        res.json(trainingModel);
-    } catch (error) {
-
-        res.status(500).send('Internal Server Error');
-    }
-});
-
-router.post("/api/recommendations/train", async (req: express.Request, res: express.Response) => {
-    try { 
-        const trainingModel = await trainTopRated(req.body); 
-        // Send the result back to the client
-        res.json(trainingModel);
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');
