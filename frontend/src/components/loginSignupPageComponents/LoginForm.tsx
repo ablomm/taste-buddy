@@ -31,7 +31,7 @@ const LoginForm = () => {
             userContext.login(data.username, result.id)
 
         } catch (error: any) {
-            console.error(error);
+            //console.error(error);
             Alert.alert("Login failed please try again")
 
         } finally {
