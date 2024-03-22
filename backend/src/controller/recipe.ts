@@ -160,7 +160,7 @@ router.post("/api/recommendations", async (req: express.Request, res: express.Re
         const savedRecipeIDs = await getSavedRecipeIDs(userID); 
         const rejectedRecipeIDs = await getRejectedRecipeIDs(userID);
 
-        let personalizedResult, personalizedRecipes;
+        let personalizedResult = [], personalizedRecipes = [];
         // const temp = [ { recipeID: 39}, {recipeID: 41}, {recipeID: 43}, {recipeID: 51}, {recipeID: 52}, {recipeID: 54}, {recipeID: 60}]
         // const tempReject = [ {recipeID: 1}, {recipeID: 2}, {recipeID: 3}, {recipeID: 4}, {recipeID: 5}]
 
@@ -174,8 +174,8 @@ router.post("/api/recommendations", async (req: express.Request, res: express.Re
         // Get top rated recipes -- COMMENT OUT IF YOU DON'T HAVE ENOUGH RAM
         const topRatedResult = await getTopRatedRecipes(true);
         const topRecipes = JSON.parse(topRatedResult.replace(/\bNaN\b/g, "null"));
-        const recipes = personalizedRecipes.concat(topRecipes); // Combine personalized results with top rated
-
+        const recipes = topRecipes.concat(personalizedRecipes); // Combine personalized results with top rated
+        
         // UNCOMMENT THIS IF COMMENTING OUT PREVIOUS (also ensure that the user you are signing in with has a saved recipe)
         // const recipes = personalizedRecipes;
 
