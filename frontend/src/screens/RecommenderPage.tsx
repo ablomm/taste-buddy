@@ -111,14 +111,14 @@ const RecommenderPage = ({ navigation }) => {
 
   const checkRecipeList = async () => {
     console.log(recipesLeft)
-    if (!isLoadingNextBatch && recipesLeft <= 20) {
+    if (!isLoadingNextBatch && recipesLeft == 20) {
       isLoadingNextBatch = true;
       loadNextBatch();
     }
   };
 
   useEffect(() => {
-    checkRecipeList();
+    loadNextBatch();
   }, []);
 
   return (
