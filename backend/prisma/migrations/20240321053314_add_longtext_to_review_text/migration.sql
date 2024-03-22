@@ -1,2 +1,2 @@
 -- AlterTable
-ALTER TABLE `review` MODIFY `reviewText` LONGTEXT NOT NULL;
+ALTER TABLE `Review` MODIFY `reviewText` LONGTEXT NOT NULL;
