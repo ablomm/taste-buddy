@@ -95,7 +95,7 @@ model RecipeInstructions {
   recipeID    Int
   recipe      Recipe @relation(fields: [recipeID], references: [id])
   step        Int?
-  instruction String
+  instruction String @db.LongText
 }
 
 model Tag {
@@ -132,7 +132,7 @@ model PostTags {
 model Review {
   id            Int         @id @default(autoincrement())
   recipeID      Int
-  reviewText    String
+  reviewText    String      @db.LongText
   rating        Int
   userID        Int
   username      String

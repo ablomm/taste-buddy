@@ -3,13 +3,27 @@ from torch.utils.data.dataset import Dataset
 from torch.utils.data import DataLoader
 from torch import save 
 import torch 
+import os
 import pandas as pd
+from dotenv import load_dotenv
+from sqlalchemy import create_engine
 
-class Loader(Dataset):
+class Loader():
     
-    def __init__(self):
-        recipes = pd.read_csv('data/dataset/recipes.csv')
-        reviews = pd.read_csv('data/dataset/reviews.csv')
+    def __init__(self,smallSet):
+
+        recipes = pd.read_parquet('data/dataset/recipes.parquet')
+        reviews = pd.read_parquet('data/dataset/reviews.parquet')
+
+        if smallSet: 
+            db = os.getenv("DB_CONNECTION_STRING")
+            engine = create_engine(db)
+            conn = engine.connect()
+            recipes_raw = pd.read_sql('SELECT * FROM Recipe LIMIT 1000;', engine)
+            reviews_raw = pd.read_sql('SELECT * FROM review LIMIT 1000;', engine)
+
+            recipes = recipes_raw.rename(columns={'authorID': 'AuthorId', 'recipeTitle': 'Name', 'id': 'RecipeId'}) 
+            reviews = reviews_raw.rename(columns={'userID': 'AuthorId','rating':'Rating','recipeID': 'RecipeId'}) 
 
         self.reviews = reviews.copy()
 
@@ -28,8 +42,8 @@ class Loader(Dataset):
         self.x = self.reviews[['AuthorId', 'RecipeId']].values  # Input features
         self.y = self.reviews['Rating'].values  # Target variables
 
-        print(self.x)
-        print(self.y)
+        #print(self.x)
+        #print(self.y)
         self.x, self.y = torch.tensor(self.x), torch.tensor(self.y) # Transforms the data to tensors
 
     def __getitem__(self, index):

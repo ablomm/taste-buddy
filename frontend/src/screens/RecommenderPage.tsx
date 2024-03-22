@@ -12,11 +12,19 @@ import {
   addUserRejectedRecipe,
 } from "../functions/HTTPRequests";
 
+interface InstructionStep {
+  step: number;
+  instruction: string;
+}
+
+interface FormattedInstructions {
+  list: InstructionStep[];
+}
+
 const fetchRecommendedRecipes = async (userID: number) => {
   try {
     const response = await fetch(
-      `${
-        process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
+      `${process.env.EXPO_PUBLIC_SERVER_URL || "http://localhost:8080"
       }/recipe/api/recommendations`,
       {
         method: "POST",
@@ -50,28 +58,29 @@ const RecommenderPage = ({ navigation }) => {
 
   // call this whenever you need to add more recipes to the end of the list
   const loadNextBatch = async () => {
+    console.log("loading next batch")
   let recommendedRecipes = (await fetchRecommendedRecipes(
       userID
     )) as Recipe[];
     setRecipes([...recipes, ...recommendedRecipes]);
     setBatchNum(batchNum + 1);
-    setRecipesLeft(recipesLeft + recommendedRecipes.length - 1);
+    setRecipesLeft(currentRecipesLeft => currentRecipesLeft + recommendedRecipes.length - 1);
   };
 
   const rejectRecipe = async (recipeID: number) => {
-    console.log("rejecting: ", recipeID);
+    // console.log("rejecting: ", recipeID);
     // filter out recipe in recipe list so that list length can be tracked
-    setRecipes(recipes.filter((recipe) => recipe.id !== recipeID));
+    setRecipes(currentRecipes => currentRecipes.filter(recipe => recipe.id !== recipeID));
     addUserRejectedRecipe(recipeID, userID);
-    setRecipesLeft(recipesLeft - 1);
+    setRecipesLeft(currentRecipesLeft => currentRecipesLeft - 1);
     checkRecipeList(recipeID);
   };
 
   const saveRecipe = async (recipeID: number) => {
-    console.log("saving: ", recipeID);
+    // console.log("saving: ", recipeID);
     // filter out recipe in recipe list so that list length can be tracked
-    setRecipes(recipes.filter((recipe) => recipe.id !== recipeID));
-    setRecipesLeft(recipesLeft - 1);
+    setRecipes(currentRecipes => currentRecipes.filter(recipe => recipe.id !== recipeID));
+    setRecipesLeft(currentRecipesLeft => currentRecipesLeft - 1);
     addRecipeToUserSaved(recipeID, username);
     checkRecipeList(recipeID);
   };
@@ -82,14 +91,22 @@ const RecommenderPage = ({ navigation }) => {
     });
   };
 
+  const formatInstructions = (recipeInstructions: string[]): FormattedInstructions => {
+    let formattedInstructions: FormattedInstructions = {
+      list: []
+    };
+  
+    recipeInstructions.forEach((item, index) => {
+      formattedInstructions.list.push({
+        step: index + 1,
+        instruction: item
+      });
+    });
+  
+    return formattedInstructions;
+  }
+
   const checkRecipeList = async (recipeID: number) => {
-    console.log(`check recipes left: ${recipesLeft}`);
-
-    console.log(
-      "how do i know rec list",
-      recipes.map((r) => r.id)
-    );
-
     if (recipesLeft == 1) {
       loadNextBatch();
     }
@@ -107,11 +124,11 @@ const RecommenderPage = ({ navigation }) => {
             return (
               <View
                 key={index}
-                style={[styles.cardContainer]} // need zindex because by default the last item in the list was displaying first
+                style={[styles.cardContainer]} 
                 pointerEvents="box-none"
               >
                 <TinderCard
-                  cardHeight={0.75 * PAGE_HEIGHT}
+                  cardHeight={0.80 * PAGE_HEIGHT}
                   cardWidth={0.95 * PAGE_WIDTH}
                   cardStyle={styles.card}
                   disableTopSwipe={true}
@@ -141,7 +158,7 @@ const RecommenderPage = ({ navigation }) => {
                         >
                           <View
                             style={{
-                              height: 0.58 * PAGE_HEIGHT,
+                              height: 0.62 * PAGE_HEIGHT,
                               flexDirection: "column-reverse",
                             }}
                           >
@@ -169,9 +186,6 @@ const RecommenderPage = ({ navigation }) => {
                           >
                             <TBButton
                               title="See Full Recipe"
-                              // onPress={() => {
-                              //   showFullRecipe(item);
-                              // }}
                               onPress={() => showFullRecipe(item)}
                               style={styles.fullRecipeButton}
                               textColor={{ color: "white" }}
@@ -191,7 +205,7 @@ const RecommenderPage = ({ navigation }) => {
             pointerEvents="box-none"
           >
             <TinderCard
-              cardHeight={0.75 * PAGE_HEIGHT}
+              cardHeight={0.80 * PAGE_HEIGHT}
               cardWidth={0.95 * PAGE_WIDTH}
               cardStyle={styles.defaultCard}
               disableBottomSwipe={true}
@@ -209,12 +223,6 @@ const RecommenderPage = ({ navigation }) => {
                 <Text style={styles.defaultText}>
                   One moment! We're finding you some recommendations...
                 </Text>
-                <TBButton
-                  title="Temp load next batch"
-                  onPress={() => {
-                    loadNextBatch();
-                  }}
-                ></TBButton>
               </View>
             </TinderCard>
           </View>
