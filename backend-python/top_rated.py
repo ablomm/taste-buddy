@@ -21,6 +21,12 @@ db = os.getenv("DB_CONNECTION_STRING")
 engine = create_engine(db)
 conn = engine.connect()
 
+top100_limit = 1000
+top100_last_id = 1
+
+n_users_initial = 1815  # number of users from the training phase
+n_items_initial = 2508  # number of items from the training phase
+
 def train(smallSet):
     
     recipes_path = 'data/dataset/recipes.parquet'
@@ -31,8 +37,8 @@ def train(smallSet):
     reviews = pd.read_parquet(review_path)
 
     if smallSet:
-        recipes_raw = pd.read_sql('SELECT * FROM recipe LIMIT 1000;', engine)
-        reviews_raw = pd.read_sql('SELECT * FROM review LIMIT 1000;', engine)
+        recipes_raw = pd.read_sql('SELECT * FROM recipe LIMIT 4000;', engine)
+        reviews_raw = pd.read_sql('SELECT * FROM review LIMIT 4000;', engine)
 
         recipes = recipes_raw.rename(columns={'authorID': 'AuthorId', 'recipeTitle': 'Name', 'id': 'RecipeId'}) 
         reviews = reviews_raw.rename(columns={'userID': 'AuthorId','rating':'Rating','recipeID': 'RecipeId'}) 
@@ -41,6 +47,12 @@ def train(smallSet):
 
     n_users = len(reviews.AuthorId.unique())
     n_items = len(reviews.RecipeId.unique())
+
+    global n_users_initial 
+    n_users_initial = n_users
+
+    global n_items_initial 
+    n_items_initial = n_items
 
     print(len(recipes) / (n_users*n_items) * 100, '% of the matrix is filled.')
 
@@ -101,26 +113,33 @@ def top100(smallSet):
     recipes = recipes[recipes['Images'].apply(lambda x: x is not None and len(x) > 0)]
     recipes['Images'] = recipes['Images'].apply(convert_to_list)
     recipes['RecipeInstructions'] = recipes['RecipeInstructions'].apply(convert_to_list)
-
+    
     review_path = 'data/dataset/reviews.parquet'
     reviews = pd.read_parquet(review_path)
+
+    global top100_last_id
+    global top100_limit
+    global n_users
+    global n_items
     #smallSet = True
     if smallSet:
-        recipes_raw = pd.read_sql('SELECT * FROM Recipe LIMIT 1000;', engine)
-        reviews_raw = pd.read_sql('SELECT * FROM review LIMIT 1000;', engine)
+        recipes_raw = pd.read_sql('SELECT * FROM Recipe where id > '+ str(top100_last_id) +' LIMIT ' + str(top100_limit) + ';', engine)
+        reviews_raw = pd.read_sql('SELECT * FROM review where id > '+ str(top100_last_id) +' LIMIT ' + str(top100_limit) + ';', engine)
 
         recipes = recipes_raw.rename(columns={'authorID': 'AuthorId', 'recipeTitle': 'Name', 'id': 'RecipeId'}) 
         reviews = reviews_raw.rename(columns={'userID': 'AuthorId','rating':'Rating','recipeID': 'RecipeId'}) 
 
-    recipe_names = recipes.set_index('RecipeId')['Name'].to_dict()
-    n_users = len(reviews.AuthorId.unique())
-    n_items = len(reviews.RecipeId.unique())
+        top100_last_id = recipes_raw.iloc[-1]['id']
 
-    loaded_model = MatrixFactorization(n_users, n_items, n_factors=8)
+    recipe_names = recipes.set_index('RecipeId')['Name'].to_dict()
 
     if smallSet:
+        loaded_model = MatrixFactorization(n_users_initial, n_items_initial, n_factors=8)
         loaded_model.load_state_dict(torch.load('model_state_small_dict.pth'))
     else:
+        n_users = len(reviews.AuthorId.unique())
+        n_items = len(reviews.RecipeId.unique())
+        loaded_model = MatrixFactorization(n_users, n_items, n_factors=8)
         loaded_model.load_state_dict(torch.load('model_state_dict.pth'))
 
     

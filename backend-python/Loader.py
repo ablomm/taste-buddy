@@ -19,8 +19,8 @@ class Loader():
             db = os.getenv("DB_CONNECTION_STRING")
             engine = create_engine(db)
             conn = engine.connect()
-            recipes_raw = pd.read_sql('SELECT * FROM Recipe LIMIT 1000;', engine)
-            reviews_raw = pd.read_sql('SELECT * FROM review LIMIT 1000;', engine)
+            recipes_raw = pd.read_sql('SELECT * FROM Recipe LIMIT 4000;', engine)
+            reviews_raw = pd.read_sql('SELECT * FROM review LIMIT 4000;', engine)
 
             recipes = recipes_raw.rename(columns={'authorID': 'AuthorId', 'recipeTitle': 'Name', 'id': 'RecipeId'}) 
             reviews = reviews_raw.rename(columns={'userID': 'AuthorId','rating':'Rating','recipeID': 'RecipeId'}) 

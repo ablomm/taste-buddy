@@ -67,7 +67,7 @@ recipes_full = recipes_full[recipes_full['Images'].apply(lambda x: x is not None
 
 
 # get first 1000 recipes to insert
-rows_to_insert = recipes_full.head(1000)[['RecipeId', 'Name', 'TotalTime', 'Description','Images','AggregatedRating', 'Calories', 'RecipeServings']].copy()
+rows_to_insert = recipes_full.head(4000)[['RecipeId', 'Name', 'TotalTime', 'Description','Images','AggregatedRating', 'Calories', 'RecipeServings']].copy()
 # get next thousand -- if uncommented, must change other fields
 # rows_to_insert = recipes_full.iloc[1000:2000][['RecipeId', 'Name', 'TotalTime', 'Description','Images','AggregatedRating', 'Calories', 'RecipeServings']].copy()
 
@@ -103,7 +103,7 @@ try:
 except Exception as e:
     print(f"An error occurred: {e}")
             
-ingredients_df = recipes_full.head(1000)[['RecipeId', 'RecipeIngredientQuantities','RecipeIngredientParts']].copy()
+ingredients_df = recipes_full.head(4000)[['RecipeId', 'RecipeIngredientQuantities','RecipeIngredientParts']].copy()
 # ingredients_df = recipes_full.iloc[1000:2000][['RecipeId', 'RecipeIngredientQuantities','RecipeIngredientParts']].copy()
 
 ingredients_df.rename(columns={'RecipeId': 'recipeID','RecipeIngredientQuantities': 'amount','RecipeIngredientParts': 'ingredient'}, inplace=True)
@@ -128,7 +128,7 @@ try:
 except Exception as e:
     print(f"An error occurred: {e}")
     
-tags_df = recipes_full.head(1000)[['RecipeId', 'Keywords', 'RecipeCategory']].copy()
+tags_df = recipes_full.head(4000)[['RecipeId', 'Keywords', 'RecipeCategory']].copy()
 tags_df['tags'] = recipes_full.apply(lambda row: ', '.join([str(item) for item in row['Keywords'] if item is not None]) + ' ' +  (str(row['RecipeCategory']) if row['RecipeCategory'] is not None else ''), axis=1)
 
 all_tags_list = tags_df['tags'].apply(lambda x: x.split(', ')).tolist()
@@ -166,7 +166,7 @@ except Exception as e:
     print(f"An error occurred: {e}")
 
 #transformed_df = recipes_full[['RecipeId', 'RecipeInstructions']].copy().loc[0:999, :]
-transformed_df = recipes_full.head(1000)[['RecipeId', 'RecipeInstructions']].copy()
+transformed_df = recipes_full.head(4000)[['RecipeId', 'RecipeInstructions']].copy()
 
 exploded_df = transformed_df.explode('RecipeInstructions').reset_index(drop=True)
 
