@@ -30,11 +30,10 @@ function SearchResultBody({ navigation, searchResults, search }) {
       recipes.forEach((recipe) => {
         if (recipe.tags != undefined) {
           recipe.tags.forEach((tag) => {
-            uniqueTagsSet.add(tag);
+            uniqueTagsSet.add((tag.name?tag.name:tag.value));
           });
         }
       });
-
       setAllUniqueTags(Array.from(uniqueTagsSet));
     }
   }
@@ -57,8 +56,12 @@ function SearchResultBody({ navigation, searchResults, search }) {
 
   function filterRecipes(recipes: Recipe[], selectedTags: string[]) {
     return recipes.filter((recipe: Recipe) => {
+      let tagsName = recipe.tags.map(item => item.name)
+      /*console.log(selectedTags.some(
+        (tag) => recipe.tags && tagsName.includes(tag)
+      ))*/
       return selectedTags.some(
-        (tag) => recipe.tags && recipe.tags.includes(tag)
+        (tag) => recipe.tags && tagsName.includes(tag)
       );
     });
   }
