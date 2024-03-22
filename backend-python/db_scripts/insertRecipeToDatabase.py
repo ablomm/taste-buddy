@@ -3,9 +3,7 @@ import numpy as np
 import re
 import os
 import zipfile
-import pandas as pd
 import torch
-import os
 import boto3
 import warnings
 from dotenv import load_dotenv
