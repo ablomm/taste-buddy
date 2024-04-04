@@ -1,4 +1,5 @@
 # Backend 
+- `copy .env.dist to .env and put in secrets`
 - `npm install`
 - `npx prisma migrate dev` to update db
 - `npm run start:dev`
@@ -9,6 +10,7 @@
 - `npm start`
 
 # Backend-Python
+- `copy .env.dist to .env and put in secrets`
 - `pip install -r requirements.txt`
 - `cd db_scripts`
 - Check the .env file for changing to your database connection string, it is currently set for port 3307 and root password: 0000 for the container.
