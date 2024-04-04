@@ -6,7 +6,7 @@
 
 # Frontend
 - `npm install`
-- add .env file that contains backend url EXPO_PUBLIC_SERVER_URL = "http://[ipAddress]:[backend port number]"
+- `copy .env.dist to .env and change EXPO_PUBLIC_SERVER_URL = "http://[ipAddress]:[backend port number]"`
 - `npm start`
 
 # Backend-Python
