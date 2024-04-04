@@ -5,8 +5,8 @@
 - `npm run start:dev`
 
 # Frontend
+- - `cp .env.dist .env` and change `EXPO_PUBLIC_SERVER_URL = "http://[ipAddress]:[backend port number]"`
 - `npm install`
-- `cp .env.dist .env` and change `EXPO_PUBLIC_SERVER_URL = "http://[ipAddress]:[backend port number]"`
 - `npm start`
 
 # Backend-Python
