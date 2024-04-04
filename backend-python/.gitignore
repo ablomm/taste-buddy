@@ -1,2 +1,3 @@
 *.pyc
 recipes.parquet
+.env
